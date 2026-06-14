@@ -1,0 +1,4 @@
+export const REPORT_REPOSITORY = Symbol("REPORT_REPOSITORY");
+export const LISTING_EXTRACTOR = Symbol("LISTING_EXTRACTOR");
+export const RALPH_ANALYSER = Symbol("RALPH_ANALYSER");
+export const CREDIT_SERVICE = Symbol("CREDIT_SERVICE");

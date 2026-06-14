@@ -1,0 +1,20 @@
+{
+  "name": "auction-car-risk-checker",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @auction-risk/web",
+    "dev:web": "npm run dev --workspace @auction-risk/web",
+    "dev:api": "npm run start:dev --workspace @auction-risk/api",
+    "build": "npm run build --workspace @auction-risk/shared && npm run build --workspace @auction-risk/api && npm run build --workspace @auction-risk/web",
+    "build:web": "npm run build --workspace @auction-risk/web",
+    "build:api": "npm run build --workspace @auction-risk/api",
+    "build:shared": "npm run build --workspace @auction-risk/shared",
+    "test": "npm run test --workspace @auction-risk/api",
+    "lint": "npm run lint --workspaces"
+  }
+}
