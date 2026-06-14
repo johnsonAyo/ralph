@@ -5,7 +5,7 @@ import {
   ReportSnapshot,
   ReportStatus,
   ReportStatusCode,
-} from "@auction-risk/shared";
+} from "@ralph/shared";
 
 export class Report {
   private constructor(

@@ -1,4 +1,4 @@
-import { ExtractedImage } from "@auction-risk/shared";
+import { ExtractedImage } from "@ralph/shared";
 import { Page } from "playwright";
 import {
   CopartFieldCode,

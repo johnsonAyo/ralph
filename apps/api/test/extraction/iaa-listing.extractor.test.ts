@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { AuctionPlatformCode, ExtractionConfidence } from "@auction-risk/shared";
+import { AuctionPlatformCode, ExtractionConfidence } from "@ralph/shared";
 import { buildIaaListingSnapshot } from "@/modules/extraction/infrastructure/iaa/iaa-snapshot.mapper";
 
 

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { ReportSnapshot, reportSnapshotSchema } from "@auction-risk/shared";
+import { ReportSnapshot, reportSnapshotSchema } from "@ralph/shared";
 import { SUPABASE_ADMIN } from "@/modules/supabase/supabase.module";
 import { Report } from "@/modules/reports/domain/report.entity";
 import { ReportRepository } from "@/modules/reports/domain/report.repository";

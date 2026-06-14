@@ -1,4 +1,4 @@
-import { AuctionPlatformCode, ListingSnapshot } from "@auction-risk/shared";
+import { AuctionPlatformCode, ListingSnapshot } from "@ralph/shared";
 
 export interface PlatformListingExtractor {
   readonly platform: AuctionPlatformCode;

@@ -1,4 +1,4 @@
-import { AuctionPlatformCode } from "@auction-risk/shared";
+import { AuctionPlatformCode } from "@ralph/shared";
 
 export function detectPlatform(listingUrl: string): AuctionPlatformCode {
   const url = new URL(listingUrl);

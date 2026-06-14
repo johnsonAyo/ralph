@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AuctionPlatformCode, ListingSnapshot } from "@auction-risk/shared";
+import { AuctionPlatformCode, ListingSnapshot } from "@ralph/shared";
 import { detectPlatform } from "@/modules/extraction/application/detect-platform";
 import { ListingExtractorPort } from "@/modules/extraction/domain/listing-extractor.port";
 import { PlatformListingExtractor } from "@/modules/extraction/domain/interfaces/platform-listing-extractor.interface";

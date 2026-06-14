@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AuctionPlatformCode, ListingSnapshot } from "@auction-risk/shared";
+import { AuctionPlatformCode, ListingSnapshot } from "@ralph/shared";
 import {
   DOM_CONTENT_LOADED_TIMEOUT_MS,
   IAA_POST_LOAD_WAIT_MS,

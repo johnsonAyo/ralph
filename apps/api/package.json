@@ -1,5 +1,5 @@
 {
-  "name": "@auction-risk/api",
+  "name": "@ralph/api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,11 +7,11 @@
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "lint": "eslint \"src/**/*.ts\"",
-    "pretest": "npm run build --workspace @auction-risk/shared",
+    "pretest": "npm run build --workspace @ralph/shared",
     "test": "TS_NODE_TRANSPILE_ONLY=1 TS_NODE_PROJECT=tsconfig.json node --test --require ts-node/register/transpile-only --require tsconfig-paths/register test/extraction/*.test.ts"
   },
   "dependencies": {
-    "@auction-risk/shared": "0.1.0",
+    "@ralph/shared": "0.1.0",
     "@nestjs/common": "^11.1.9",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.9",

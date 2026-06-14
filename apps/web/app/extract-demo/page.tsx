@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { listingSnapshotSchema, ListingSnapshot } from "@auction-risk/shared";
+import { listingSnapshotSchema, ListingSnapshot } from "@ralph/shared";
 import { API_BASE_URL } from "../constants";
 
 export default function ExtractDemoPage() {

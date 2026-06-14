@@ -1,4 +1,4 @@
 export {
   createReportRequestSchema,
   type CreateReportRequest,
-} from "@auction-risk/shared";
+} from "@ralph/shared";

@@ -3,7 +3,7 @@ import {
   ExtractedImage,
   ListingSnapshot,
   listingSnapshotSchema,
-} from "@auction-risk/shared";
+} from "@ralph/shared";
 import {
   IAA_REQUIRED_FIELDS,
   IaaLabel,

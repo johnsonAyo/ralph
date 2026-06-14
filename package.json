@@ -1,5 +1,5 @@
 {
-  "name": "auction-car-risk-checker",
+  "name": "ralph",
   "version": "0.1.0",
   "private": true,
   "workspaces": [
@@ -7,14 +7,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @auction-risk/web",
-    "dev:web": "npm run dev --workspace @auction-risk/web",
-    "dev:api": "npm run start:dev --workspace @auction-risk/api",
-    "build": "npm run build --workspace @auction-risk/shared && npm run build --workspace @auction-risk/api && npm run build --workspace @auction-risk/web",
-    "build:web": "npm run build --workspace @auction-risk/web",
-    "build:api": "npm run build --workspace @auction-risk/api",
-    "build:shared": "npm run build --workspace @auction-risk/shared",
-    "test": "npm run test --workspace @auction-risk/api",
+    "dev": "npm run dev --workspace @ralph/web",
+    "dev:web": "npm run dev --workspace @ralph/web",
+    "dev:api": "npm run start:dev --workspace @ralph/api",
+    "build": "npm run build --workspace @ralph/shared && npm run build --workspace @ralph/api && npm run build --workspace @ralph/web",
+    "build:web": "npm run build --workspace @ralph/web",
+    "build:api": "npm run build --workspace @ralph/api",
+    "build:shared": "npm run build --workspace @ralph/shared",
+    "test": "npm run test --workspace @ralph/api",
     "lint": "npm run lint --workspaces"
   }
 }

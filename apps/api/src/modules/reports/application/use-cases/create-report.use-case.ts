@@ -9,7 +9,7 @@ import {
   RALPH_ANALYSER,
   REPORT_REPOSITORY,
 } from "@/common/tokens";
-import { CreateReportRequest, ExtractionConfidence, ReportSnapshot } from "@auction-risk/shared";
+import { CreateReportRequest, ExtractionConfidence, ReportSnapshot } from "@ralph/shared";
 import { Report } from "@/modules/reports/domain/report.entity";
 import { ReportRepository } from "@/modules/reports/domain/report.repository";
 

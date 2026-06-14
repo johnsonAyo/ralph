@@ -1,4 +1,4 @@
-import { ExtractedImage, ExtractionConfidence } from "@auction-risk/shared";
+import { ExtractedImage, ExtractionConfidence } from "@ralph/shared";
 import { JsonRecord } from "@/modules/extraction/domain/types/json-record.type";
 
 

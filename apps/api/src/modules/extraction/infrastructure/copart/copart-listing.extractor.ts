@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AuctionPlatformCode, ListingSnapshot } from "@auction-risk/shared";
+import { AuctionPlatformCode, ListingSnapshot } from "@ralph/shared";
 import {
   COPART_IMAGE_RESPONSE_MARKER,
 } from "@/modules/extraction/domain/constants/copart.constants";

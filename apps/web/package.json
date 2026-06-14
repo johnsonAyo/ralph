@@ -1,15 +1,16 @@
 {
-  "name": "@auction-risk/web",
+  "name": "@ralph/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "prebuild": "npm run build --workspace @ralph/shared",
+    "build": "npm run build --workspace @ralph/shared && next build",
     "start": "next start",
     "lint": "eslint \"app/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
-    "@auction-risk/shared": "0.1.0",
+    "@ralph/shared": "0.1.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.18.0",
     "next": "^16.2.9",

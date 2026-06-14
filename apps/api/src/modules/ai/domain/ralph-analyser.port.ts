@@ -1,4 +1,4 @@
-import { CreateReportRequest, ListingSnapshot, ReportResult } from "@auction-risk/shared";
+import { CreateReportRequest, ListingSnapshot, ReportResult } from "@ralph/shared";
 
 export interface RalphAnalyserPort {
   analyse(input: {

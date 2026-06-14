@@ -4,7 +4,7 @@ import {
   ReportResult,
   ReportVerdictCode,
   reportResultSchema,
-} from "@auction-risk/shared";
+} from "@ralph/shared";
 import { RalphAnalyserPort } from "@/modules/ai/domain/ralph-analyser.port";
 
 
