@@ -19,3 +19,7 @@ npm run build
 ## Backend
 
 Copy `apps/api/.env.example` to `apps/api/.env` and fill Supabase/OpenAI values. Apply `apps/api/supabase/schema.sql` in Supabase SQL editor before using the report endpoints.
+
+## Web
+
+Copy `apps/web/.env.example` to `apps/web/.env.local` and set the Supabase public URL and anon key. Ralph's browser session uses Supabase Auth directly, while the API validates the access token on protected report routes.

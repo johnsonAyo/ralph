@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { CTAProps, OutcomeType } from "./types";
 import { pricing, aiInputs, reportAnswers } from "./constants";
+import AuthMenu from "./components/auth-menu";
 
 function CTA({ children = "Ask Ralph", variant = "primary" }: CTAProps) {
   return (
@@ -275,7 +276,10 @@ export default function Home() {
           <a href="#answers">Report</a>
           <a href="#pricing">Pricing</a>
         </nav>
-        <CTA />
+        <div className="nav-actions">
+          <AuthMenu />
+          <CTA />
+        </div>
       </header>
 
       <section className="hero" id="top">
