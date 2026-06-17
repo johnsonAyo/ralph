@@ -6,5 +6,3 @@ export interface CTAProps {
 }
 
 export type PricingItem = [string, string, string, string[]];
-
-export type OutcomeType = "bought" | "walked-away" | "negotiated" | "deciding" | null;

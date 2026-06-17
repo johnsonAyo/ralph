@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
-const publicPaths = ["/", "/auth", "/opengraph-image"];
+const publicPaths = ["/", "/auth", "/dashboard", "/opengraph-image"];
 const staticPathPrefixes = ["/_next", "/favicon.ico", "/images", "/fonts"];
 
 function isPublicPath(pathname: string): boolean {
@@ -17,6 +17,14 @@ export async function proxy(request: NextRequest) {
       headers: request.headers,
     },
   });
+
+  const hasSupabaseConfig =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  if (!hasSupabaseConfig) {
+    return response;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
@@ -40,11 +48,15 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (isPublicPath(request.nextUrl.pathname)) {
-    if (request.nextUrl.pathname === "/auth" && user) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (
+    user &&
+    (request.nextUrl.pathname === "/" ||
+      request.nextUrl.pathname === "/auth")
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
+  if (isPublicPath(request.nextUrl.pathname)) {
     return response;
   }
 

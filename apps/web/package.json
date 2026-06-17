@@ -10,9 +10,10 @@
     "lint": "eslint \"app/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
+    "@ralph/shared": "0.1.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.0",
-    "@ralph/shared": "0.1.0",
+    "@tanstack/react-query": "^5.101.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.18.0",
     "next": "^16.2.9",

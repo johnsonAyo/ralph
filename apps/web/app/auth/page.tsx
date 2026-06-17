@@ -3,26 +3,31 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "../lib/supabase";
+import {
+  getSupabaseBrowserClient,
+  isSupabaseConfigured,
+  useSession,
+} from "../lib/supabase";
 
 export default function AuthPage() {
   const router = useRouter();
+  const configured = isSupabaseConfigured();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) {
-        router.replace(getNextPath());
-        return;
-      }
+  const { data: user, isLoading } = useSession();
 
-      setLoading(false);
-    });
-  }, [router]);
+  // Redirect when a session is resolved.
+  useEffect(() => {
+    if (user) {
+      router.replace(getNextPath());
+    }
+  }, [user, router]);
+
+  if (isLoading) {
+    return <main className="auth-page-shell">Loading Ralph auth...</main>;
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,10 +36,22 @@ export default function AuthPage() {
 
     try {
       const supabase = getSupabaseBrowserClient();
+      if (!supabase) {
+        setMessage(
+          "Sign-in isn't configured on this deployment. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then restart the dev server.",
+        );
+        return;
+      }
+
       const result = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${getSiteUrl()}${getNextPath()}`,
+          // Redirect back to /auth so the client-side useEffect can process
+          // the URL hash fragment and detect the session before navigating to
+          // the final destination. Redirecting directly to a server component
+          // (e.g. /dashboard) would cause a redirect loop because the server
+          // cannot see the hash fragment.
+          emailRedirectTo: `${getSiteUrl()}/auth?next=${encodeURIComponent(getNextPath())}`,
         },
       });
 
@@ -50,8 +67,37 @@ export default function AuthPage() {
     }
   }
 
-  if (loading) {
-    return <main className="auth-page-shell">Loading Ralph auth...</main>;
+  if (!configured) {
+    return (
+      <main className="auth-page-shell">
+        <section className="auth-card setup-card">
+          <div className="auth-card-header">
+            <Link className="auth-home-link" href="/">
+              Ralph
+            </Link>
+            <span className="auth-badge">Setup required</span>
+          </div>
+          <h1>Sign-in isn't configured on this deployment.</h1>
+          <p>
+            Add the Supabase keys below to <code>apps/web/.env.local</code>, then restart <code>next dev</code>:
+          </p>
+          <ul className="setup-card-keys">
+            <li>
+              <code>NEXT_PUBLIC_SUPABASE_URL</code>
+            </li>
+            <li>
+              <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>
+            </li>
+          </ul>
+          <p>
+            See <code>apps/web/.env.example</code> for the full template.
+          </p>
+          <Link className="auth-back-link" href="/">
+            Back to Ralph
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   return (

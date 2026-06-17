@@ -2,15 +2,30 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { User } from "@supabase/supabase-js";
-import { getSupabaseBrowserClient } from "../lib/supabase";
+import { LogOut, User as UserIcon } from "lucide-react";
+import { User as SupabaseUser } from "@supabase/supabase-js";
+import { getSupabaseBrowserClient, isSupabaseConfigured } from "../lib/supabase";
 
 export default function AuthMenu() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isReady, setIsReady] = useState(false);
+  // Re-evaluated each render; process.env.NEXT_PUBLIC_* is replaced at build
+  // time (production) or sourced live from .env.local in development, so
+  // this stays stable across renders.
+  const configured = isSupabaseConfigured();
 
   useEffect(() => {
+    if (!configured) {
+      setIsReady(true);
+      return;
+    }
+
     const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      setIsReady(true);
+      return;
+    }
+
     let mounted = true;
 
     supabase.auth.getSession().then(({ data }) => {
@@ -31,10 +46,18 @@ export default function AuthMenu() {
       mounted = false;
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, [configured]);
 
   async function handleSignOut() {
+    if (!configured) {
+      return;
+    }
+
     const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
+
     await supabase.auth.signOut();
   }
 
@@ -51,10 +74,18 @@ export default function AuthMenu() {
   }
 
   return (
-    <div className="auth-pill auth-user">
-      <span>{user.email ?? user.id}</span>
-      <button className="auth-signout" type="button" onClick={handleSignOut}>
-        Sign out
+    <div className="auth-menu-trigger">
+      <Link className="auth-pill auth-user" href="/dashboard">
+        <UserIcon size={14} aria-hidden="true" />
+        <span>{user.email ?? user.id}</span>
+      </Link>
+      <button
+        type="button"
+        className="auth-pill auth-icon-button"
+        onClick={handleSignOut}
+        aria-label="Sign out"
+      >
+        <LogOut size={14} aria-hidden="true" />
       </button>
     </div>
   );
