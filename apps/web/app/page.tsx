@@ -55,11 +55,11 @@ export default function Home() {
         <p className="eyebrow pill">Ralph guides your decision before you buy</p>
         <h1>Found a car online? Ask Ralph before you buy.</h1>
         <p className="hero-copy">
-          Paste a listing or start with the information you have. Ralph checks the price, mileage, damage, history, photos and your budget, then guides your decision in plain English.
+          Paste a listing or start with the information you have. Ralph checks the price, mileage, damage, history, photos and your budget.
         </p>
         <div className="hero-actions">
           <CTA>Ask Ralph About This Car</CTA>
-          <p>Get one sample check, then use paid credits when you want Ralph to check more cars or bring in an expert.</p>
+          <p>An intelligence layer that guides your decision before you buy. One sample check is on us.</p>
         </div>
       </section>
 
@@ -67,9 +67,9 @@ export default function Home() {
         <ReportPreview />
 
         <div className="ai-explainer">
-          <h3>He checks the car and checks the deal.</h3>
+          <h3>He reads the listing. He runs the numbers. He tells you what to pay.</h3>
           <p>
-            A car can be a good car and still be wrong for your budget. Ralph separates vehicle risk from budget fit so you can decide with your eyes open.
+            Ralph takes the car details, your budget, and your risk appetite, then estimates a cost-effective target price with a full breakdown from auction to your door. A good car at the wrong price is still the wrong buy.
           </p>
           <div>
             {aiInputs.map((input) => (
@@ -144,7 +144,7 @@ export default function Home() {
 
       <section className="answers-section" id="answers">
         <div className="section-heading">
-          <h2>Ralph answers what a normal buyer actually wants to know.</h2>
+          <h2>Ralph answers the questions every buyer should ask, but most don't.</h2>
         </div>
         <div className="answer-grid">
           {reportAnswers.map((answer) => (
@@ -157,26 +157,26 @@ export default function Home() {
 
       <section className="decision-section">
         <div className="section-heading">
-          <h2>He does not simply say good or bad.</h2>
+          <h2>He tells you the best price to pay, not just good or bad.</h2>
           <p className="pricing-note">
-            Ralph explains whether the car fits your budget, what price still makes sense, and what facts could change the decision.
+            Ralph estimates a reliable, cost-effective offer price based on condition, risk, and your full budget. Then he shows you exactly why.
           </p>
         </div>
         <div className="decision-grid">
           <article className="decision-card">
             <span>1</span>
-            <h3>Good fit for your budget</h3>
-            <p>The price, likely costs and visible condition leave enough room for normal surprises.</p>
+            <h3>Worth buying. Here's your target price</h3>
+            <p>The listing, condition, and estimated total costs fit your budget. Ralph gives you a confident offer price to negotiate from.</p>
           </article>
           <article className="decision-card">
             <span>2</span>
-            <h3>Slightly outside budget</h3>
-            <p>The car may still be a good buy, but you need to know exactly where the pressure is.</p>
+            <h3>Possible, but only at a lower price</h3>
+            <p>The car could work, but the asking price needs to come down. Ralph tells you exactly how much and why.</p>
           </article>
           <article className="decision-card">
             <span>3</span>
-            <h3>Risky for your budget</h3>
-            <p>The car may suit someone else, but the numbers or condition do not fit your situation.</p>
+            <h3>Not worth it at any price</h3>
+            <p>The risk, condition, or total cost puts this car outside your budget range. Ralph explains what would have to change.</p>
           </article>
         </div>
       </section>
@@ -185,7 +185,7 @@ export default function Home() {
         <div className="budget-text">
           <h2>A £4,000 budget can still fail on a £2,150 car.</h2>
           <p>
-            Buyers focus on the advertised price and miss fees, delivery, repairs and the cost of being wrong. Ralph maps those pressures before you commit.
+            Most buyers only see the asking price. Ralph breaks down every cost from auction to your doorstep: fees, delivery, repairs, and risk buffer, so you know your real spend before you commit.
           </p>
         </div>
         <div className="cost-list">
@@ -210,9 +210,9 @@ export default function Home() {
       <section className="expert-section">
         <div className="expert-card">
           <div>
-            <h2>When the report names uncertainty, get a human check.</h2>
+            <h2>When Ralph flags uncertainty, bring in a human expert.</h2>
             <p>
-              Expert review should not be a funnel. It appears when the photos, damage type, mileage pattern or budget pressure leave a real judgement gap.
+              Expert review is not a default upsell. Ralph surfaces it when the photos, damage type, mileage pattern, or cost analysis leave a real gap that needs a trained eye.
             </p>
           </div>
           <div className="expert-cta">
@@ -226,7 +226,7 @@ export default function Home() {
         <div className="section-heading">
           <h2>Choose how much help you want from Ralph.</h2>
           <p className="pricing-note">
-            Start with one car, compare a few options, or choose the protected plan when you want an expert to review the grey areas with Ralph.
+            Start with a free check on one car, analyse a shortlist, or go Protected when you want an expert to validate Ralph's analysis before you hand over your money.
           </p>
         </div>
         <div className="pricing-unlocks">
@@ -256,9 +256,9 @@ export default function Home() {
       </section>
 
       <footer className="footer">
-        <h2>Not sure about the car? Ralph has got you.</h2>
+        <h2>Don't buy blind. Let Ralph check it first.</h2>
         <CTA>Ask Ralph About This Car</CTA>
-        <p>A good car for someone else can still be the wrong buy for you.</p>
+        <p>Ralph guides your decision before you buy, from the listing price to your door.</p>
       </footer>
     </main>
   );
