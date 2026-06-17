@@ -3,11 +3,24 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BookmarkCheck, History, Lock, ScrollText, Warehouse } from "lucide-react";
 import {
   getSupabaseBrowserClient,
   isSupabaseConfigured,
   useSession,
 } from "../lib/supabase";
+import { authPlatforms, signInBenefits } from "../constants";
+
+const platformIcon = {
+  copart: Warehouse,
+  iaa: ScrollText
+} as const;
+
+const benefitIcon = {
+  BookmarkCheck,
+  History,
+  Lock
+} as const;
 
 export default function AuthPage() {
   const router = useRouter();
@@ -107,12 +120,41 @@ export default function AuthPage() {
           <Link className="auth-home-link" href="/">
             Ralph
           </Link>
-          <span className="auth-badge">Supabase Auth</span>
+          <span className="auth-badge">Magic link</span>
         </div>
-        <h1>Get a magic link for Ralph</h1>
-        <p>
-          Ralph signs you in by email link, then keeps the session in the browser and on the server.
+        <h1>Sign in to Ask Ralph</h1>
+        <p className="auth-card-copy">
+          Magic-link sign in. Your reports and history stay in sync across devices.
         </p>
+
+        <div className="auth-platforms">
+          <p className="auth-platforms-kicker">
+            Ralph reads live listings from these auction platforms
+          </p>
+          <ul className="auth-platforms-grid">
+            {authPlatforms.map((platform) => {
+              const Icon = platformIcon[platform.id];
+              return (
+                <li
+                  key={platform.id}
+                  className="auth-platform-tile"
+                  data-platform={platform.id}
+                >
+                  <span
+                    className={`auth-platform-icon auth-platform-icon--${platform.id}`}
+                    aria-hidden="true"
+                  >
+                    <Icon />
+                  </span>
+                  <div>
+                    <strong>{platform.name}</strong>
+                    <span>{platform.subtitle}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>
@@ -134,6 +176,27 @@ export default function AuthPage() {
         </form>
 
         {message ? <p className="auth-message">{message}</p> : null}
+
+        <div className="auth-divider">
+          <h2>Why sign in</h2>
+        </div>
+
+        <ul className="auth-benefits" aria-label="What you get when you sign in">
+          {signInBenefits.map((benefit) => {
+            const Icon = benefitIcon[benefit.iconName];
+            return (
+              <li key={benefit.title}>
+                <span className="auth-benefits-icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                <div className="auth-benefits-text">
+                  <strong>{benefit.title}</strong>
+                  <span>{benefit.body}</span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </main>
   );

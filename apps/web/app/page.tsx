@@ -2,11 +2,39 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Camera,
+  ChevronRight,
+  FileSearch,
+  Receipt,
+  ShieldCheck,
+  Target,
+  Users,
+} from "lucide-react";
 import { CTAProps } from "./types";
-import { pricing, aiInputs, reportAnswers } from "./constants";
+import {
+  pricing,
+  aiInputs,
+  reportAnswers,
+  aboutIntro,
+  aboutSections,
+  faqs,
+  whyUseCards,
+} from "./constants";
 import { useSession } from "./lib/supabase";
 import AuthMenu from "./components/auth-menu";
 import ReportPreview from "./components/report-preview";
+
+const whyIconMap = {
+  FileSearch,
+  Receipt,
+  ShieldCheck,
+  Target,
+  Camera,
+  Users,
+} as const;
+
+const whyIconVariants = ["ink", "blue", "gold", "clay", "soft", "blue"] as const;
 
 function CTA({ children = "Ask Ralph", variant = "primary" }: CTAProps) {
   return (
@@ -41,7 +69,9 @@ export default function Home() {
         <nav aria-label="Main navigation">
           <a href="#check">Check</a>
           <a href="#answers">Report</a>
+          <a href="#why">Why</a>
           <a href="#pricing">Pricing</a>
+          <a href="#faqs">FAQs</a>
         </nav>
         <div className="nav-actions">
           <AuthMenu />
@@ -67,7 +97,7 @@ export default function Home() {
         <ReportPreview />
 
         <div className="ai-explainer">
-          <h3>He reads the listing. He runs the numbers. He tells you what to pay.</h3>
+          <h3>How Ralph turns a listing into a budget-fit report.</h3>
           <p>
             Ralph takes the car details, your budget, and your risk appetite, then estimates a cost-effective target price with a full breakdown from auction to your door. A good car at the wrong price is still the wrong buy.
           </p>
@@ -155,35 +185,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="decision-section">
-        <div className="section-heading">
-          <h2>He tells you the best price to pay, not just good or bad.</h2>
-          <p className="pricing-note">
-            Ralph estimates a reliable, cost-effective offer price based on condition, risk, and your full budget. Then he shows you exactly why.
-          </p>
-        </div>
-        <div className="decision-grid">
-          <article className="decision-card">
-            <span>1</span>
-            <h3>Worth buying. Here's your target price</h3>
-            <p>The listing, condition, and estimated total costs fit your budget. Ralph gives you a confident offer price to negotiate from.</p>
-          </article>
-          <article className="decision-card">
-            <span>2</span>
-            <h3>Possible, but only at a lower price</h3>
-            <p>The car could work, but the asking price needs to come down. Ralph tells you exactly how much and why.</p>
-          </article>
-          <article className="decision-card">
-            <span>3</span>
-            <h3>Not worth it at any price</h3>
-            <p>The risk, condition, or total cost puts this car outside your budget range. Ralph explains what would have to change.</p>
-          </article>
-        </div>
-      </section>
 
       <section className="budget-section">
         <div className="budget-text">
-          <h2>A £4,000 budget can still fail on a £2,150 car.</h2>
+          <h2>Ralph adds up the costs the auction page leaves out.</h2>
           <p>
             Most buyers only see the asking price. Ralph breaks down every cost from auction to your doorstep: fees, delivery, repairs, and risk buffer, so you know your real spend before you commit.
           </p>
@@ -207,18 +212,27 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="expert-section">
-        <div className="expert-card">
-          <div>
-            <h2>When Ralph flags uncertainty, bring in a human expert.</h2>
-            <p>
-              Expert review is not a default upsell. Ralph surfaces it when the photos, damage type, mileage pattern, or cost analysis leave a real gap that needs a trained eye.
-            </p>
-          </div>
-          <div className="expert-cta">
-            <CTA>Ask Ralph About This Car</CTA>
-            <p>The decision stays with you.</p>
-          </div>
+      <section className="why-section" id="why">
+        <div className="section-heading">
+          <h2>Check the car before the auction price decides for you.</h2>
+        </div>
+        <div className="why-grid">
+          {whyUseCards.map((card, index) => {
+            const Icon = whyIconMap[card.iconName];
+            const variant = whyIconVariants[index % whyIconVariants.length];
+            return (
+              <article className="why-card" key={card.title}>
+                <span
+                  className={`why-icon why-icon--${variant}`}
+                  aria-hidden="true"
+                >
+                  <Icon />
+                </span>
+                <h3>{card.title}</h3>
+                <p>{card.body}</p>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -255,11 +269,75 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="about-section" id="about">
+        <div className="section-heading">
+          <h2>How Ask Ralph works, what he reads, and where he stops.</h2>
+        </div>
+        <p className="about-intro">{aboutIntro}</p>
+        <div className="about-mobile-toc" aria-label="">
+          {aboutSections.map((section) => (
+            <a key={section.id} href={`#${section.id}`}>
+              {section.heading}
+            </a>
+          ))}
+        </div>
+        <div className="about-layout">
+          <nav className="about-toc" aria-label="e">
+
+            {aboutSections.map((section) => (
+              <a key={section.id} href={`#${section.id}`}>
+                <ChevronRight aria-hidden="true" />
+                <span>{section.heading}</span>
+              </a>
+            ))}
+          </nav>
+          <div className="about-content">
+            {aboutSections.map((section) => (
+              <article
+                key={section.id}
+                id={section.id}
+                className="about-article"
+              >
+                <h3>{section.heading}</h3>
+                <p>{section.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="faqs-bridge">
+        <h2>Choose how much help you want from Ralph.</h2>
+      </div>
+
+      <section className="faqs-section" id="faqs">
+        <div className="section-heading">
+          <h2>The questions Ralph hears most often.</h2>
+        </div>
+        <ul className="faqs-list">
+          {faqs.map((faq) => (
+            <li key={faq.question}>
+              <details className="faqs-item">
+                <summary>{faq.question}</summary>
+                <div className="faqs-item-body">{faq.answer}</div>
+              </details>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <footer className="footer">
         <h2>Don't buy blind. Let Ralph check it first.</h2>
         <CTA>Ask Ralph About This Car</CTA>
         <p>Ralph guides your decision before you buy, from the listing price to your door.</p>
       </footer>
+
+      <nav className="mobile-anchor-bar" aria-label="Quick section navigation">
+        <a href="#check">Check</a>
+        <a href="#why">Why</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faqs">FAQs</a>
+      </nav>
     </main>
   );
 }
