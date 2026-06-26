@@ -4,14 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { User as SupabaseUser } from "@supabase/supabase-js";
-import { getSupabaseBrowserClient, isSupabaseConfigured } from "../lib/supabase";
+import { getSupabaseBrowserClient, isSupabaseConfigured } from "../../lib/supabase";
 
 export default function AuthMenu() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isReady, setIsReady] = useState(false);
-  // Re-evaluated each render; process.env.NEXT_PUBLIC_* is replaced at build
-  // time (production) or sourced live from .env.local in development, so
-  // this stays stable across renders.
   const configured = isSupabaseConfigured();
 
   useEffect(() => {

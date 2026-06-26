@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 import "./globals.css";
 import Providers from "./providers";
+import SiteHeader from "./components/site-header";
+
+import SiteFooter from "./components/site-footer";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -63,14 +66,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
   }
 
   return (
-    // `suppressHydrationWarning` on the root <html> silences a benign dev-only
-    // mismatch where Next.js 16 / React 19 (or a browser extension) attaches
-    // `data-processed-<id>` attributes to `<html>` during hydration that
-    // are not present in the SSR HTML. We do not emit these attributes from
-    // user code, so suppressing them here is the supported workaround.
-    <html lang="en-GB" suppressHydrationWarning>
-      <body>
-        <Providers>{children}</Providers>
+    <html lang="en-GB" suppressHydrationWarning data-scroll-behavior="smooth">
+      <body className="global-layout-wrapper">
+        <Providers>
+          <SiteHeader />
+          <div className="global-main-content">
+            {children}
+          </div>
+          <SiteFooter />
+        </Providers>
       </body>
     </html>
   );

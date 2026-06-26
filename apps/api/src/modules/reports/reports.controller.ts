@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Inject, Param, ParseUUIDPipe, Post, UseGuards } from "@nestjs/common";
 import { CurrentUser } from "@/modules/auth/current-user.decorator";
-import { AuthenticatedUser, SupabaseJwtGuard } from "@/modules/auth/supabase-jwt.guard";
+import { SupabaseJwtGuard } from "@/modules/auth/supabase-jwt.guard";
+import { AuthenticatedUser } from "@/modules/auth/types";
 import { REPORT_REPOSITORY } from "@/common/tokens";
 import { ReportRepository } from "@/modules/reports/domain/report.repository";
 import {
@@ -30,6 +31,12 @@ export class ReportsController {
       userId: user.id,
       request,
     });
+  }
+
+  @Get()
+  async findAll(@CurrentUser() user: AuthenticatedUser) {
+    const reports = await this.reports.findByUserId(user.id);
+    return reports.map((report) => report.toSnapshot());
   }
 
   @Get(":id")

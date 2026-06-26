@@ -15,7 +15,7 @@ const localWebOrigins = [
 
 async function bootstrap() {
   const logger = new AppLoggerService();
-  const app = await NestFactory.create(AppModule, { logger });
+  const app = await NestFactory.create(AppModule, { logger, rawBody: true });
   
   app.useGlobalFilters(new AppExceptionFilter());
 

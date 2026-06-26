@@ -8,11 +8,8 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_ADMIN } from "@/modules/supabase/supabase.module";
 import { UnauthorizedError } from "@/common/errors/app.error";
 
-
-export type AuthenticatedUser = {
-  id: string;
-  email?: string;
-};
+import { AuthenticatedUser } from "./types";
+export { AuthenticatedUser };
 
 @Injectable()
 export class SupabaseJwtGuard implements CanActivate {

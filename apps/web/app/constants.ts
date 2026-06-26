@@ -1,4 +1,4 @@
-import { PricingItem } from "./types";
+import { PricingItem, AuthPlatform, WhyUseCard, AboutSection, FaqItem } from "@/app/types";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -58,23 +58,6 @@ export const aiInputs: string[] = [
   "repair allowance"
 ];
 
-/**
- * Auction platforms Ralph reads live listings from.
- *
- * Each platform tile is rendered above the magic-link form on the
- * /auth page so signing in communicates what Ralph can check. Icon
- * names are mapped to Lucide components in auth/page.tsx — these are
- * generic, non-trademark visual signals (warehouse for one platform,
- * paperwork for the other) so the two brands read as distinct without
- * using either company's logo.
- */
-export interface AuthPlatform {
-  id: "copart" | "iaa";
-  name: string;
-  subtitle: string;
-  iconName: "Warehouse" | "ScrollText";
-}
-
 export const authPlatforms: AuthPlatform[] = [
   {
     id: "copart",
@@ -90,7 +73,6 @@ export const authPlatforms: AuthPlatform[] = [
   }
 ];
 
-/** Three-line value list shown below the magic-link form. */
 export const signInBenefits: Array<{
   title: string;
   body: string;
@@ -112,24 +94,6 @@ export const signInBenefits: Array<{
     iconName: "Lock"
   }
 ];
-
-/**
- * Why use Ask Ralph — six-card benefit grid.
- *
- * iconName maps to a Lucide icon in the page component so the full
- * component tree stays in one place.
- */
-export interface WhyUseCard {
-  title: string;
-  body: string;
-  iconName:
-    | "FileSearch"
-    | "Receipt"
-    | "ShieldCheck"
-    | "Target"
-    | "Camera"
-    | "Users";
-}
 
 export const whyUseCards: WhyUseCard[] = [
   {
@@ -163,18 +127,6 @@ export const whyUseCards: WhyUseCard[] = [
     iconName: "Users"
   }
 ];
-
-/**
- * All you need to know about Ask Ralph — anchored explainer.
- *
- * Each entry renders as a sub-article inside the about section; the
- * TOC at the top of the section links to these anchors.
- */
-export interface AboutSection {
-  id: string;
-  heading: string;
-  body: string;
-}
 
 export const aboutIntro =
   "Ask Ralph reads live Copart and IAA listings and turns each into a budget-fit report you can act on. Here is exactly how he reads the data, what he gives you, where he stops and what happens after you sign in.";
@@ -211,12 +163,6 @@ export const aboutSections: AboutSection[] = [
       "Magic-link sign-in via Supabase. Starter is £19 for one check, Buyer is £69 for five, and Protected is £149 for ten including one standard expert review. One sample check is free so you can see a full report before paying."
   }
 ];
-
-/** Frequently asked questions — collapsible accordion. */
-export interface FaqItem {
-  question: string;
-  answer: string;
-}
 
 export const faqs: FaqItem[] = [
   {

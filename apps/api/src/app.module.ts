@@ -5,6 +5,7 @@ import { AiModule } from "@/modules/ai/ai.module";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { CreditsModule } from "@/modules/credits/credits.module";
 import { ExtractionModule } from "@/modules/extraction/extraction.module";
+import { PaymentsModule } from "@/modules/payments/payments.module";
 import { ReportsModule } from "@/modules/reports/reports.module";
 import { SupabaseModule } from "@/modules/supabase/supabase.module";
 import { AppLoggerService } from "@/common/logging/app-logger.service";
@@ -32,6 +33,7 @@ import { AppLoggerService } from "@/common/logging/app-logger.service";
     ExtractionModule,
     AiModule,
     ReportsModule,
+    PaymentsModule,
   ],
   providers: [AppLoggerService],
   exports: [AppLoggerService],

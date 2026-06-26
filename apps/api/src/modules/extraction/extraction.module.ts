@@ -5,10 +5,9 @@ import { PlaywrightBrowserFactory } from "./infrastructure/browser/playwright-br
 import { CopartListingExtractor } from "./infrastructure/copart/copart-listing.extractor";
 import { IaaListingExtractor } from "./infrastructure/iaa/iaa-listing.extractor";
 import { ListingExtractorService } from "./infrastructure/listing-extractor.service";
-import { ExtractionPreviewController } from "./extraction-preview.controller";
 
 @Module({
-  controllers: [ExtractionPreviewController],
+  controllers: [],
   providers: [
     PlaywrightBrowserFactory,
     CopartListingExtractor,

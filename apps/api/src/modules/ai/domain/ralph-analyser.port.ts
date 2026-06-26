@@ -1,8 +1,6 @@
-import { CreateReportRequest, ListingSnapshot, ReportResult } from "@ralph/shared";
+import { ReportResult } from "@ralph/shared";
+import { RalphAnalysisContext } from "./ralph-analysis-context";
 
 export interface RalphAnalyserPort {
-  analyse(input: {
-    request: CreateReportRequest;
-    listing: ListingSnapshot;
-  }): Promise<ReportResult>;
+  analyse(input: RalphAnalysisContext): Promise<ReportResult>;
 }

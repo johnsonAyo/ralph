@@ -53,7 +53,7 @@ export class CopartListingExtractor implements PlatformListingExtractor {
             imagesResponses.push(JSON.parse(text) as JsonRecord);
           }
         } catch {
-          // Some browser responses are not replayable as text. Ignore those.
+          
         }
       });
 

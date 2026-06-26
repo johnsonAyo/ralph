@@ -11,7 +11,8 @@ import {
   Target,
   Users,
 } from "lucide-react";
-import { CTAProps } from "./types";
+import { getStripeLookupKey } from "./lib/site-url";
+import { landingLabels } from "./labels";
 import {
   pricing,
   aiInputs,
@@ -22,8 +23,56 @@ import {
   whyUseCards,
 } from "./constants";
 import { useSession } from "./lib/supabase";
-import AuthMenu from "./components/auth-menu";
-import ReportPreview from "./components/report-preview";
+import { useCheckout } from "./lib/use-checkout";
+import CTA from "./components/cta";
+import CheckForm from "./components/check-form";
+
+function VideoPlaceholder() {
+  return (
+    <div style={{
+      width: '100%',
+      height: '90vh',
+      backgroundColor: '#111',
+      borderRadius: '24px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#fff',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(45deg, rgba(59,130,246,0.2), rgba(16,185,129,0.2))'
+      }} />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', zIndex: 1 }}>
+        <div style={{
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(255,255,255,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '2px solid rgba(255,255,255,0.2)',
+          cursor: 'pointer'
+        }}>
+          <div style={{
+            width: 0,
+            height: 0,
+            borderTop: '15px solid transparent',
+            borderBottom: '15px solid transparent',
+            borderLeft: '24px solid #fff',
+            marginLeft: '8px'
+          }} />
+        </div>
+        <p style={{ fontSize: '1.2rem', fontWeight: 600, opacity: 0.8 }}>Video Placeholder</p>
+      </div>
+    </div>
+  );
+}
 
 const whyIconMap = {
   FileSearch,
@@ -36,19 +85,12 @@ const whyIconMap = {
 
 const whyIconVariants = ["ink", "blue", "gold", "clay", "soft", "blue"] as const;
 
-function CTA({ children = "Ask Ralph", variant = "primary" }: CTAProps) {
-  return (
-    <a className={`button ${variant}`} href="#check">
-      {children}
-    </a>
-  );
-}
 
 export default function Home() {
   const router = useRouter();
   const { data: user, isLoading } = useSession();
+  const checkout = useCheckout();
 
-  // Redirect to dashboard when a session is resolved.
   useEffect(() => {
     if (user) {
       router.replace("/dashboard");
@@ -59,47 +101,37 @@ export default function Home() {
     return <main className="auth-page-shell">Loading Ralph...</main>;
   }
 
+  
+  
+  const checkoutError = checkout.error?.message ?? null;
+
+  function startCheckout(tier: string) {
+    checkout.mutate(getStripeLookupKey(tier));
+  }
+
   return (
     <main>
-      <header className="nav">
-        <a className="brand" href="#top" aria-label="Ask Ralph home">
-          <span className="brand-mark">R</span>
-          <span>Ask<br />Ralph</span>
-        </a>
-        <nav aria-label="Main navigation">
-          <a href="#check">Check</a>
-          <a href="#answers">Report</a>
-          <a href="#why">Why</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#faqs">FAQs</a>
-        </nav>
-        <div className="nav-actions">
-          <AuthMenu />
-          <CTA />
-        </div>
-      </header>
-
       <section className="hero" id="top">
         <div className="dot dot-blue" />
         <div className="dot dot-gold" />
-        <p className="eyebrow pill">Ralph guides your decision before you buy</p>
-        <h1>Found a car online? Ask Ralph before you buy.</h1>
+        <p className="eyebrow pill">{landingLabels.hero.eyebrow}</p>
+        <h1>{landingLabels.hero.title}</h1>
         <p className="hero-copy">
-          Paste a listing or start with the information you have. Ralph checks the price, mileage, damage, history, photos and your budget.
+          {landingLabels.hero.copy}
         </p>
         <div className="hero-actions">
-          <CTA>Ask Ralph About This Car</CTA>
-          <p>An intelligence layer that guides your decision before you buy. One sample check is on us.</p>
+          <CTA>{landingLabels.hero.cta}</CTA>
+          <p>{landingLabels.hero.subtext}</p>
         </div>
       </section>
 
       <section className="check-section" id="check">
-        <ReportPreview />
+        <VideoPlaceholder />
 
         <div className="ai-explainer">
-          <h3>How Ralph turns a listing into a budget-fit report.</h3>
+          <h3>{landingLabels.aiExplainer.title}</h3>
           <p>
-            Ralph takes the car details, your budget, and your risk appetite, then estimates a cost-effective target price with a full breakdown from auction to your door. A good car at the wrong price is still the wrong buy.
+            {landingLabels.aiExplainer.copy}
           </p>
           <div>
             {aiInputs.map((input) => (
@@ -109,72 +141,13 @@ export default function Home() {
         </div>
 
         <div className="form-section">
-          <form className="check-panel">
-            <div className="form-intro">
-              <strong>Tell Ralph what you know</strong>
-              <p>Manual details and photo upload come inside the full check flow.</p>
-            </div>
-            <label>
-              Listing source
-              <select defaultValue="marketplace">
-                <option value="marketplace">Marketplace listing</option>
-                <option value="auction">Auction listing</option>
-                <option value="dealer">Dealer listing</option>
-                <option value="private">Private seller</option>
-              </select>
-              <span>Works best when the listing has photos, mileage, price and damage notes.</span>
-            </label>
-            <label>
-              Your full budget
-              <input placeholder="e.g. £4,000" />
-              <span>The most you want to spend in total, including known costs.</span>
-            </label>
-            <label>
-              Listing URL
-              <input placeholder="https://example.com/car-listing" />
-              <span>Paste the car advert, auction lot or dealer page.</span>
-            </label>
-            <div className="email-postcode-grid">
-              <label>
-                Email address
-                <input type="email" placeholder="you@example.co.uk" />
-                <span>We'll send your report link.</span>
-              </label>
-              <label>
-                Your postcode
-                <input placeholder="e.g. M12 4AB" />
-                <span>Used for delivery and distance pressure.</span>
-              </label>
-            </div>
-            <div className="risk-selector-container">
-              <span className="field-label">How cautious should the check be?</span>
-              <div className="risk-cards-grid">
-                <label className="risk-card risk-card-low">
-                  <input type="radio" name="riskTolerance" value="low" defaultChecked />
-                  <span className="risk-title">Careful</span>
-                  <span className="risk-desc">Best for normal buyers</span>
-                </label>
-                <label className="risk-card risk-card-balanced">
-                  <input type="radio" name="riskTolerance" value="balanced" />
-                  <span className="risk-title">Balanced</span>
-                  <span className="risk-desc">Some repair risk is okay</span>
-                </label>
-                <label className="risk-card risk-card-high">
-                  <input type="radio" name="riskTolerance" value="high" />
-                  <span className="risk-title">Experienced</span>
-                  <span className="risk-desc">For buyers with repair support</span>
-                </label>
-              </div>
-              <span className="field-hint">Careful is recommended when you do not know the car market well.</span>
-            </div>
-            <button type="button">Ask Ralph About This Car</button>
-          </form>
+          <CheckForm />
         </div>
       </section>
 
       <section className="answers-section" id="answers">
         <div className="section-heading">
-          <h2>Ralph answers the questions every buyer should ask, but most don't.</h2>
+          <h2>{landingLabels.answers.title}</h2>
         </div>
         <div className="answer-grid">
           {reportAnswers.map((answer) => (
@@ -185,12 +158,11 @@ export default function Home() {
         </div>
       </section>
 
-
       <section className="budget-section">
         <div className="budget-text">
-          <h2>Ralph adds up the costs the auction page leaves out.</h2>
+          <h2>{landingLabels.budget.title}</h2>
           <p>
-            Most buyers only see the asking price. Ralph breaks down every cost from auction to your doorstep: fees, delivery, repairs, and risk buffer, so you know your real spend before you commit.
+            {landingLabels.budget.copy}
           </p>
         </div>
         <div className="cost-list">
@@ -214,7 +186,7 @@ export default function Home() {
 
       <section className="why-section" id="why">
         <div className="section-heading">
-          <h2>Check the car before the auction price decides for you.</h2>
+          <h2>{landingLabels.why.title}</h2>
         </div>
         <div className="why-grid">
           {whyUseCards.map((card, index) => {
@@ -238,10 +210,11 @@ export default function Home() {
 
       <section className="pricing-section" id="pricing">
         <div className="section-heading">
-          <h2>Choose how much help you want from Ralph.</h2>
+          <h2>{landingLabels.pricing.title}</h2>
           <p className="pricing-note">
-            Start with a free check on one car, analyse a shortlist, or go Protected when you want an expert to validate Ralph's analysis before you hand over your money.
+            {landingLabels.pricing.note}
           </p>
+          {checkoutError && <p className="form-error">{checkoutError}</p>}
         </div>
         <div className="pricing-unlocks">
           <span>Paid checks can include</span>
@@ -263,7 +236,14 @@ export default function Home() {
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-              <CTA>{tier === "Protected" ? "Get Protected" : "Ask Ralph"}</CTA>
+              <button
+                type="button"
+                className={`button ${tier === "Buyer" ? "primary" : "secondary"}`}
+                onClick={() => startCheckout(tier)}
+                disabled={checkout.isPending}
+              >
+                {checkout.isPending ? "Connecting..." : tier === "Protected" ? "Get Protected" : "Ask Ralph"}
+              </button>
             </article>
           ))}
         </div>
@@ -271,7 +251,7 @@ export default function Home() {
 
       <section className="about-section" id="about">
         <div className="section-heading">
-          <h2>How Ask Ralph works, what he reads, and where he stops.</h2>
+          <h2>{landingLabels.about.title}</h2>
         </div>
         <p className="about-intro">{aboutIntro}</p>
         <div className="about-mobile-toc" aria-label="">
@@ -307,12 +287,12 @@ export default function Home() {
       </section>
 
       <div className="faqs-bridge">
-        <h2>Choose how much help you want from Ralph.</h2>
+        <h2>{landingLabels.pricing.title}</h2>
       </div>
 
       <section className="faqs-section" id="faqs">
         <div className="section-heading">
-          <h2>The questions Ralph hears most often.</h2>
+          <h2>{landingLabels.faqs.title}</h2>
         </div>
         <ul className="faqs-list">
           {faqs.map((faq) => (
@@ -326,11 +306,6 @@ export default function Home() {
         </ul>
       </section>
 
-      <footer className="footer">
-        <h2>Don't buy blind. Let Ralph check it first.</h2>
-        <CTA>Ask Ralph About This Car</CTA>
-        <p>Ralph guides your decision before you buy, from the listing price to your door.</p>
-      </footer>
 
       <nav className="mobile-anchor-bar" aria-label="Quick section navigation">
         <a href="#check">Check</a>

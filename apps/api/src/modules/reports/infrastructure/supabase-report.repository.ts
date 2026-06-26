@@ -5,17 +5,7 @@ import { SUPABASE_ADMIN } from "@/modules/supabase/supabase.module";
 import { Report } from "@/modules/reports/domain/report.entity";
 import { ReportRepository } from "@/modules/reports/domain/report.repository";
 
-
-type ReportRow = {
-  id: string;
-  user_id: string;
-  status: string;
-  request: unknown;
-  listing: unknown;
-  result: unknown;
-  created_at: string;
-  updated_at: string;
-};
+import { ReportRow } from "./types";
 
 @Injectable()
 export class SupabaseReportRepository implements ReportRepository {
@@ -44,6 +34,21 @@ export class SupabaseReportRepository implements ReportRepository {
     }
 
     return data ? Report.fromSnapshot(this.fromRow(data)) : null;
+  }
+
+  async findByUserId(userId: string): Promise<Report[]> {
+    const { data, error } = await this.supabase
+      .from("reports")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .returns<ReportRow[]>();
+
+    if (error) {
+      throw error;
+    }
+
+    return (data ?? []).map((row) => Report.fromSnapshot(this.fromRow(row)));
   }
 
   private toRow(snapshot: ReportSnapshot): ReportRow {
