@@ -20,7 +20,10 @@ RUN pnpm install --frozen-lockfile
 COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
 
-# Build the API
+# Build @ralph/shared first — the API's tsc cannot resolve it until dist/ exists
+RUN pnpm --filter @ralph/shared build
+
+# Now build the API
 RUN pnpm --filter @ralph/api build
 
 # ─── Stage 2: Runner ────────────────────────────────────────────────────────
