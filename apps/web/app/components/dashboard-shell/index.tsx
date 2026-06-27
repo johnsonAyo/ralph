@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, PlusCircle, Search, User as UserIcon, Coins } from "lucide-react";
+import { Button } from "@ralph/ui";
 import { useSession } from "../../lib/supabase";
 import { useCredits } from "../../lib/use-credits";
 const DASHBOARD_LINKS = [
@@ -78,10 +79,12 @@ export default function DashboardShell({ children }: DashboardShellProps) {
         <header className="dashboard-topbar">
           <p className="dashboard-topbar-page">{pageTitle}</p>
           <div className="dashboard-topbar-right">
-            <Link href="/dashboard/new" className="dashboard-topbar-cta">
-              <PlusCircle size={15} aria-hidden="true"/>
-              New check
-            </Link>
+            <Button asChild size="none" className="dashboard-topbar-cta">
+              <Link href="/dashboard/new">
+                <PlusCircle size={15} aria-hidden="true"/>
+                New check
+              </Link>
+            </Button>
             {user && (<Link href="/dashboard/profile" className="dashboard-topbar-avatar" aria-label="Profile">
                 {initials}
               </Link>)}
