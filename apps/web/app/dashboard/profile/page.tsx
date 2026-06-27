@@ -1,12 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, LogOut, Mail, Coins, CalendarDays, RefreshCw } from "lucide-react";
+import { LogOut, Mail, Coins, CalendarDays } from "lucide-react";
 import { getSupabaseBrowserClient, isSupabaseConfigured, useSession } from "../../lib/supabase";
+import { Button } from "@ralph/ui";
 import { useCredits } from "../../lib/use-credits";
-import { useSignInLinkResend } from "../../lib/use-sign-in-link-resend";
-import { getSiteUrl } from "../../lib/site-url";
-import { profileLabels } from "../../labels";
 import { ProfileBlockSkeleton, ProfileHeaderSkeleton } from "../../components/skeleton";
 function getInitials(email: string): string {
     const parts = email.split("@")[0].split(/[._-]/);
@@ -19,10 +17,6 @@ export default function ProfilePage() {
     const router = useRouter();
     const { data: user } = useSession();
     const { data: credits = 0, isLoading: loadingCredits } = useCredits();
-    const { resendMessage, resendSuccess, isSubmitting, submit } = useSignInLinkResend({
-        email: user?.email,
-        emailRedirectTo: `${getSiteUrl()}/auth?next=/dashboard`,
-    });
     const initials = user?.email ? getInitials(user.email) : "?";
     const memberSince = user?.created_at
         ? new Date(user.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })
@@ -98,9 +92,9 @@ export default function ProfilePage() {
             Sign out
           </p>
         </div>
-        <button type="button" className="profile-action-btn profile-action-btn--danger" onClick={handleSignOut}>
+        <Button type="button" variant="ghost" size="none" className="profile-action-btn profile-action-btn--danger" onClick={handleSignOut}>
           Sign out
-        </button>
+        </Button>
       </section>
 
     </div>);

@@ -4,7 +4,7 @@ import { CreditCheckerPort } from "@/modules/credits/domain/credit-checker.port"
 import { RalphAnalyserPort } from "@/modules/ai/domain/ralph-analyser.port";
 import { ListingExtractorPort } from "@/modules/extraction/domain/listing-extractor.port";
 import { CREDIT_SERVICE, LISTING_EXTRACTOR, RALPH_ANALYSER, REPORT_REPOSITORY, } from "@/common/tokens";
-import { CreateReportRequest, ExtractionConfidence, ReportSnapshot } from "@ralph/shared";
+import { CreateReportRequest, ReportSnapshot } from "@ralph/shared";
 import { Report } from "@/modules/reports/domain/report.entity";
 import { ReportRepository } from "@/modules/reports/domain/report.repository";
 @Injectable()

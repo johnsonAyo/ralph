@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Camera, ChevronRight, FileSearch, Receipt, ShieldCheck, Target, Users, } from "lucide-react";
+import { Button } from "@ralph/ui";
 import { getStripeLookupKey } from "./lib/site-url";
 import { landingLabels } from "./labels";
 import { pricing, aiInputs, reportAnswers, aboutIntro, aboutSections, faqs, whyUseCards, } from "./constants";
@@ -105,10 +106,12 @@ export default function Home() {
             <p style={{ margin: 0, maxWidth: "44ch", color: "var(--ink-dim, #5a6478)" }}>
               The full report form has moved to your dashboard. Sign in and open it from the sidebar.
             </p>
-            <Link href="/dashboard/new" className="button primary" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-              Open the new report form
-              <ChevronRight size={16} aria-hidden="true"/>
-            </Link>
+            <Button asChild>
+              <Link href="/dashboard/new">
+                Open the new report form
+                <ChevronRight size={16} aria-hidden="true"/>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -192,9 +195,9 @@ export default function Home() {
               <ul className="price-features">
                 {features.map((feature) => (<li key={feature}>{feature}</li>))}
               </ul>
-              <button type="button" className={`button ${tier === "Buyer" ? "primary" : "secondary"}`} onClick={() => startCheckout(tier)} disabled={checkout.isPending}>
+              <Button type="button" variant={tier === "Buyer" ? "gold" : "primary"} onClick={() => startCheckout(tier)} disabled={checkout.isPending} className="mt-auto w-full">
                 {checkout.isPending ? "Connecting..." : tier === "Protected" ? "Get Protected" : "Ask Ralph"}
-              </button>
+              </Button>
             </article>))}
         </div>
       </section>

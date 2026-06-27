@@ -1,3 +1,10 @@
+/* @ralph/ui design tokens (namespaced --rui-*) + Tailwind component/utility
+   layers. Preflight is disabled (see tailwind.config.ts) so the legacy styles
+   below remain authoritative during incremental migration to @ralph/ui. */
+@import "@ralph/ui/styles.css";
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --cream: #fbfaf6;
   --surface: #ffffff;

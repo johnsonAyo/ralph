@@ -2,6 +2,7 @@
 node_modules/
 out/
 dist/
+.turbo/
 .env*
 !.env.example
 npm-debug.log*

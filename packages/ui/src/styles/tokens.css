@@ -1,0 +1,79 @@
+/**
+ * Ralph design tokens — mirrors the product's existing visual language so
+ * @ralph/ui primitives render identically to the current design.
+ *
+ * All tokens are namespaced `--rui-*` so they never collide with the app's
+ * legacy globals.css variables (--muted, --gold, --clay, etc.) during
+ * incremental coexistence. Values are HSL channels consumed as hsl(var(--rui-x)).
+ *
+ * Palette maps to the original globals.css:
+ *   cream #fbfaf6 · ink #111 · blue #2f62e9 · blue-dark #204cc0
+ *   gold #ffd84d · clay #ff7448 · line #e6ded0 · soft #f4f0e7
+ */
+
+:root {
+  --rui-background: 48 33% 97%;
+  --rui-foreground: 0 0% 7%;
+
+  --rui-card: 0 0% 100%;
+  --rui-card-foreground: 0 0% 7%;
+
+  --rui-popover: 0 0% 100%;
+  --rui-popover-foreground: 0 0% 7%;
+
+  --rui-muted: 40 33% 93%;
+  --rui-muted-foreground: 36 9% 35%;
+
+  --rui-accent: 40 33% 93%;
+  --rui-accent-foreground: 0 0% 7%;
+
+  --rui-primary: 224 81% 55%; /* blue #2f62e9 */
+  --rui-primary-foreground: 0 0% 100%;
+  --rui-primary-hover: 224 71% 44%; /* blue-dark #204cc0 */
+
+  --rui-secondary: 40 33% 93%;
+  --rui-secondary-foreground: 0 0% 7%;
+
+  --rui-brand: 224 81% 55%;
+  --rui-brand-foreground: 0 0% 100%;
+  --rui-gold: 46 100% 65%;
+  --rui-gold-foreground: 0 0% 7%;
+  --rui-clay: 15 100% 64%;
+  --rui-clay-foreground: 0 0% 100%;
+
+  --rui-border: 39 30% 86%;
+  --rui-input: 39 30% 86%;
+  --rui-ring: 224 81% 55%;
+
+  --rui-success: 142 71% 45%;
+  --rui-success-foreground: 0 0% 100%;
+  --rui-success-subtle: 138 76% 97%;
+  --rui-success-subtle-foreground: 145 61% 20%;
+
+  --rui-warning: 38 92% 50%;
+  --rui-warning-foreground: 0 0% 7%;
+  --rui-warning-subtle: 48 100% 96%;
+  --rui-warning-subtle-foreground: 26 84% 27%;
+
+  --rui-destructive: 0 84% 60%;
+  --rui-destructive-foreground: 0 0% 100%;
+  --rui-destructive-subtle: 0 86% 97%;
+  --rui-destructive-subtle-foreground: 0 63% 31%;
+
+  --rui-info: 224 81% 55%;
+  --rui-info-foreground: 0 0% 100%;
+  --rui-info-subtle: 222 84% 95%;
+  --rui-info-subtle-foreground: 224 71% 44%;
+
+  --rui-radius: 1.75rem; /* 28px — matches card radius */
+
+  --rui-font-sans-loaded: "Trebuchet MS", "Avenir Next", Avenir, Arial,
+    sans-serif;
+  --rui-font-sans: var(--rui-font-sans-loaded);
+  --rui-font-serif: var(--rui-font-sans-loaded);
+  --rui-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --rui-shadow-sm: 0 4px 12px rgba(60, 45, 26, 0.04);
+  --rui-shadow-md: 0 12px 30px rgba(47, 40, 30, 0.1);
+  --rui-shadow-lg: 0 22px 60px rgba(60, 45, 26, 0.12);
+}

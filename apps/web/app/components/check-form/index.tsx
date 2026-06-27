@@ -8,16 +8,29 @@ import { useCredits } from "../../lib/use-credits";
 import { useSession, getSupabaseBrowserClient } from "../../lib/supabase";
 import Link from "next/link";
 import { API_BASE_URL } from "../../constants";
-import { CheckCircle2 } from "lucide-react";
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ralph/ui";
 
 interface CheckFormProps {
   hideIntro?: boolean;
   variant?: 'default' | 'dashboard';
 }
 
+// Trigger styling matched to the original .dashboard-form-panel select.
+const SELECT_TRIGGER_CLASS =
+  "min-h-[46px] rounded-[12px] border-[1.5px] border-input bg-[#fefdfb] px-4 text-[0.95rem] font-semibold focus:ring-[3px] focus:ring-ring/15";
+
 export default function CheckForm({ hideIntro = false, variant = 'default' }: CheckFormProps) {
   const router = useRouter();
   const [simpleUrl, setSimpleUrl] = useState("");
+  const [listingSource, setListingSource] = useState("auction");
 
   const {
     listingUrl,
@@ -124,7 +137,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
         )}
         <label>
           {landingLabels.form.listingUrlLabel}
-          <input
+          <Input
             id="listingUrl"
             type="url"
             value={simpleUrl}
@@ -135,9 +148,9 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
           />
           <span style={{ textAlign: 'center' }}>{landingLabels.form.listingUrlHint}</span>
         </label>
-        <button type="submit" disabled={!simpleReady}>
+        <Button type="submit" disabled={!simpleReady}>
           Ask Ralph About This Car
-        </button>
+        </Button>
       </form>
     );
   }
@@ -201,7 +214,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
 
         <form onSubmit={handleConfirmSubmit} className="confirm-listing-form-inline">
           <div className="confirm-layout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
-            
+
             {/* Media slider */}
             <div className="confirm-media-section">
               {images.length > 0 ? (
@@ -228,50 +241,50 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
             <div className="confirm-fields-section" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <label className="form-field">
                 <span className="field-label">Vehicle Title</span>
-                <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
+                <Input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
               </label>
 
               <div className="fields-row-2">
                 <label className="form-field">
                   <span className="field-label">Year</span>
-                  <input type="number" value={editYear} onChange={(e) => setEditYear(e.target.value)} />
+                  <Input type="number" value={editYear} onChange={(e) => setEditYear(e.target.value)} />
                 </label>
                 <label className="form-field">
                   <span className="field-label">Mileage (mi)</span>
-                  <input type="number" value={editMileage} onChange={(e) => setEditMileage(e.target.value)} />
+                  <Input type="number" value={editMileage} onChange={(e) => setEditMileage(e.target.value)} />
                 </label>
               </div>
 
               <div className="fields-row-2">
                 <label className="form-field">
                   <span className="field-label">Current Bid (£)</span>
-                  <input type="number" step="0.01" value={editCurrentBid} onChange={(e) => setEditCurrentBid(e.target.value)} />
+                  <Input type="number" step="0.01" value={editCurrentBid} onChange={(e) => setEditCurrentBid(e.target.value)} />
                 </label>
                 <label className="form-field">
                   <span className="field-label">Location</span>
-                  <input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} />
+                  <Input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} />
                 </label>
               </div>
 
               <div className="fields-row-2">
                 <label className="form-field">
                   <span className="field-label">Primary Damage</span>
-                  <input type="text" value={editPrimaryDamage} onChange={(e) => setEditPrimaryDamage(e.target.value)} />
+                  <Input type="text" value={editPrimaryDamage} onChange={(e) => setEditPrimaryDamage(e.target.value)} />
                 </label>
                 <label className="form-field">
                   <span className="field-label">Secondary Damage</span>
-                  <input type="text" value={editSecondaryDamage} onChange={(e) => setEditSecondaryDamage(e.target.value)} />
+                  <Input type="text" value={editSecondaryDamage} onChange={(e) => setEditSecondaryDamage(e.target.value)} />
                 </label>
               </div>
 
               <div className="fields-row-2">
                 <label className="form-field">
                   <span className="field-label">Run Condition</span>
-                  <input type="text" value={editRunCondition} onChange={(e) => setEditRunCondition(e.target.value)} />
+                  <Input type="text" value={editRunCondition} onChange={(e) => setEditRunCondition(e.target.value)} />
                 </label>
                 <label className="form-field">
                   <span className="field-label">V5 Logbook Status</span>
-                  <input type="text" value={editV5Status} onChange={(e) => setEditV5Status(e.target.value)} />
+                  <Input type="text" value={editV5Status} onChange={(e) => setEditV5Status(e.target.value)} />
                 </label>
               </div>
 
@@ -286,12 +299,12 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
           {formError && <p className="form-error" style={{ marginTop: '1.5rem' }}>{formError}</p>}
 
           <div className="confirm-actions-row" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--line, #e6ded0)' }}>
-            <button type="button" className="btn btn-secondary" onClick={handleWrongListing}>
+            <Button type="button" variant="secondary" size="md" onClick={handleWrongListing}>
               Wrong listing?
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Confirm & Run AI Analysis
-            </button>
+            </Button>
+            <Button type="submit" size="md">
+              Confirm &amp; Run AI Analysis
+            </Button>
           </div>
         </form>
       </div>
@@ -314,12 +327,17 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
       {/* Listing source */}
       <label>
         {landingLabels.form.sourceLabel}
-        <select defaultValue="auction">
-          <option value="marketplace">{landingLabels.form.sourceOptions.marketplace}</option>
-          <option value="auction">{landingLabels.form.sourceOptions.auction}</option>
-          <option value="dealer">{landingLabels.form.sourceOptions.dealer}</option>
-          <option value="private">{landingLabels.form.sourceOptions.private}</option>
-        </select>
+        <Select value={listingSource} onValueChange={setListingSource}>
+          <SelectTrigger className={SELECT_TRIGGER_CLASS}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="marketplace">{landingLabels.form.sourceOptions.marketplace}</SelectItem>
+            <SelectItem value="auction">{landingLabels.form.sourceOptions.auction}</SelectItem>
+            <SelectItem value="dealer">{landingLabels.form.sourceOptions.dealer}</SelectItem>
+            <SelectItem value="private">{landingLabels.form.sourceOptions.private}</SelectItem>
+          </SelectContent>
+        </Select>
         <span>{landingLabels.form.sourceHint}</span>
       </label>
 
@@ -336,7 +354,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
         <div className="budget-range-row">
           <div className="budget-range-col">
             <p className="budget-range-sublabel">Minimum</p>
-            <input
+            <Input
               id="budgetMin"
               type="text"
               inputMode="numeric"
@@ -350,7 +368,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
           <span className="budget-range-sep" aria-hidden="true">–</span>
           <div className="budget-range-col">
             <p className="budget-range-sublabel">Maximum</p>
-            <input
+            <Input
               id="budgetMax"
               type="text"
               inputMode="numeric"
@@ -368,7 +386,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
       {/* Listing URL */}
       <label>
         {landingLabels.form.listingUrlLabel}
-        <input
+        <Input
           id="listingUrl"
           type="url"
           value={listingUrl}
@@ -382,7 +400,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
       {/* Postcode */}
       <label>
         {landingLabels.form.postcodeLabel}
-        <input
+        <Input
           id="postcode"
           value={postcode}
           onChange={(e) => setPostcode(e.target.value)}
@@ -433,14 +451,14 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
 
       {hasInsufficientCredits ? (
         <div className="button-tooltip-container" data-tooltip="You don't have enough credits to run a check. Please purchase more credits.">
-          <button type="submit" disabled={!isReady || isSubmitting || hasInsufficientCredits} style={{ width: "100%", cursor: "not-allowed" }}>
+          <Button type="submit" disabled={!isReady || isSubmitting || hasInsufficientCredits} className="w-full cursor-not-allowed">
             Ask Ralph About This Car
-          </button>
+          </Button>
         </div>
       ) : (
-        <button type="submit" disabled={!isReady || isSubmitting}>
+        <Button type="submit" disabled={!isReady || isSubmitting}>
           Ask Ralph About This Car
-        </button>
+        </Button>
       )}
     </form>
   );

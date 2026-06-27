@@ -41,16 +41,6 @@ export function SkeletonText({ lines = 1, lastLineWidth = "60%", gap = "0.5rem",
       {stack}
     </span>);
 }
-const statTileStyle: CSSProperties = {
-    display: "grid",
-    gap: "8px",
-    alignContent: "start",
-    border: "1px solid rgba(230, 222, 208, 0.8)",
-    borderRadius: "18px",
-    background: "rgba(255, 255, 255, 0.86)",
-    padding: "14px 16px",
-    minWidth: 0,
-};
 export function DashboardStatsSkeleton(): ReactElement {
     return (<div className="dash-stat-grid" role="status" aria-live="polite" aria-busy="true" aria-label="Loading dashboard statistics">
       {[0, 1, 2, 3].map((i) => {

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Car, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Button, Input } from "@ralph/ui";
 import { ReportSnapshot, ReportVerdictCode } from "@ralph/shared";
 import { useReports } from "../lib/use-reports";
 import { dashboardLabels } from "../labels";
@@ -17,11 +18,11 @@ function QuickCheckWidget() {
         router.push(`/dashboard/new?${params.toString()}`);
     }
     return (<form className="quick-check-widget" onSubmit={handleSubmit}>
-      <input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart or Autotrader listing URL..." required/>
-      <button type="submit" className="button primary">
+      <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart or Autotrader listing URL..." required/>
+      <Button type="submit" className="h-[46px] min-h-0 shrink-0 gap-1.5 rounded-[12px] px-5 text-[0.88rem] shadow-[0_6px_18px_rgba(47,98,233,0.18)]">
         Analyse
         <ArrowRight size={15} aria-hidden="true"/>
-      </button>
+      </Button>
     </form>);
 }
 function verdictLabel(snapshot: ReportSnapshot): string {

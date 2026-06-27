@@ -3,6 +3,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { BookmarkCheck, History, ScrollText, Warehouse } from "lucide-react";
 import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../lib/supabase";
+import { Button, Input } from "@ralph/ui";
 import { authPlatforms, signInBenefits } from "../constants";
 import { AuthShellSkeleton } from "../components/skeleton";
 const platformIcon = {
@@ -104,13 +105,13 @@ export default function AuthPage() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>
             Email address
-            <input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required/>
+            <Input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required/>
           </label>
 
           <div className="auth-actions">
-            <button type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting}>
               {submitting ? "Working..." : "Send sign-in link"}
-            </button>
+            </Button>
           </div>
         </form>
 
