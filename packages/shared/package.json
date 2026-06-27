@@ -7,15 +7,16 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint \"src/**/*.ts\""
   },
   "dependencies": {
     "zod": "^4.2.0"
   },
   "devDependencies": {
+    "@ralph/eslint-config": "workspace:*",
+    "@ralph/typescript-config": "workspace:*",
     "@types/node": "^24.10.4",
-    "@typescript-eslint/eslint-plugin": "^8.49.0",
-    "@typescript-eslint/parser": "^8.49.0",
     "eslint": "^9.29.0",
     "typescript": "^5.9.3"
   }
