@@ -12,9 +12,9 @@ import { ListingExtractorService } from "./infrastructure/listing-extractor.serv
     providers: [
         ScrapeDoProvider,
         {
-            // The chain, in priority order. Only configured providers (token set) are
-            // included. To add a provider: implement ScrapeProvider, register the class
-            // above, inject it here, and append it to the returned array.
+            
+            
+            
             provide: SCRAPE_PROVIDERS,
             inject: [ScrapeDoProvider],
             useFactory: (scrapeDo: ScrapeDoProvider): ScrapeProvider[] => {

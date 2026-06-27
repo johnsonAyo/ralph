@@ -14,7 +14,7 @@ export async function proxy(request: NextRequest) {
         },
     });
 
-    // DEV MODE: temporarily disable auth gating (see lib/dev-auth).
+    
     if (isDevAuthBypassEnabled()) {
         return response;
     }

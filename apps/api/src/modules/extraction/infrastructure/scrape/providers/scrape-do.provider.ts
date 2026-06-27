@@ -28,7 +28,7 @@ export class ScrapeDoProvider implements ScrapeProvider {
         }
         const { renderJs = false, residential = true, geoCode = "GB", browserActions } = options;
         const hasActions = Array.isArray(browserActions) && browserActions.length > 0;
-        // Browser actions require a rendered browser.
+        
         const render = renderJs || hasActions;
         this.logger.debug(`[scrape.do] render=${render} residential=${residential} geo=${geoCode} actions=${hasActions}: ${targetUrl}`);
 

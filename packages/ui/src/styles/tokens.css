@@ -27,9 +27,9 @@
   --rui-accent: 40 33% 93%;
   --rui-accent-foreground: 0 0% 7%;
 
-  --rui-primary: 224 81% 55%; /* blue #2f62e9 */
+  --rui-primary: 224 81% 55%;  
   --rui-primary-foreground: 0 0% 100%;
-  --rui-primary-hover: 224 71% 44%; /* blue-dark #204cc0 */
+  --rui-primary-hover: 224 71% 44%;  
 
   --rui-secondary: 40 33% 93%;
   --rui-secondary-foreground: 0 0% 7%;
@@ -65,7 +65,7 @@
   --rui-info-subtle: 222 84% 95%;
   --rui-info-subtle-foreground: 224 71% 44%;
 
-  --rui-radius: 1.75rem; /* 28px — matches card radius */
+  --rui-radius: 1.75rem;  
 
   --rui-font-sans-loaded: "Trebuchet MS", "Avenir Next", Avenir, Arial,
     sans-serif;

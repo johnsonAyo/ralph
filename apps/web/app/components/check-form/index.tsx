@@ -24,7 +24,7 @@ interface CheckFormProps {
   variant?: 'default' | 'dashboard';
 }
 
-// Trigger styling matched to the original .dashboard-form-panel select.
+
 const SELECT_TRIGGER_CLASS =
   "min-h-[46px] rounded-[12px] border-[1.5px] border-input bg-[#fefdfb] px-4 text-[0.95rem] font-semibold focus:ring-[3px] focus:ring-ring/15";
 
@@ -50,7 +50,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
     submit,
   } = useReportForm();
 
-  // Multi-stage states
+  
   const [stage, setStage] = useState<'form' | 'scraping' | 'confirm'>('form');
   const [extractedListing, setExtractedListing] = useState<any | null>(null);
   const [scrapingError, setScrapingError] = useState("");

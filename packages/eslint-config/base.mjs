@@ -33,7 +33,7 @@ export const baseConfig = [
           caughtErrorsIgnorePattern: "^_",
         },
       ],
-      // Allowed but flagged during the design-system migration; tightened in cleanup.
+      
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },

@@ -21,7 +21,7 @@ export enum CopartFieldCode {
     V5Status = "v5s",
     Year = "lcy"
 }
-// Copart CDN image URL suffixes: thumbnail / full / high-res of the same photo.
+
 export const COPART_IMG_SUFFIX_THUMB = "_thb";
 export const COPART_IMG_SUFFIX_FULL = "_ful";
 export const COPART_IMG_SUFFIX_HIRES = "_hrs";

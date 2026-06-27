@@ -5109,7 +5109,7 @@ select {
   }
 }
 
-/* Image slider / carousel on confirmation page */
+ 
 .slider-wrapper {
   position: relative;
   width: 100%;
@@ -5194,7 +5194,7 @@ select {
   font-size: 0.95rem;
 }
 
-/* Form structure */
+ 
 .confirm-listing-form {
   background: #ffffff;
   border: 1px solid var(--line, #e6ded0);

@@ -24,8 +24,8 @@ export default function AuthGate({ children }: {
     const pathname = usePathname();
     const router = useRouter();
     useEffect(() => {
-        // DEV MODE: skip the redirect gate so authenticated surfaces are
-        // viewable without a session (see lib/dev-auth).
+        
+        
         if (isDevAuthBypassEnabled()) {
             return;
         }

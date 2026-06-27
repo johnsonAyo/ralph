@@ -7,7 +7,7 @@ import { isDevAuthBypassEnabled } from "../lib/dev-auth";
 export default function DashboardLayout({ children }: {
     children: ReactNode;
 }) {
-    // DEV MODE: temporarily disable auth gate (see lib/dev-auth).
+    
     const devAuthDisabled = isDevAuthBypassEnabled();
     const { data: user, isLoading } = useSession();
     if (!devAuthDisabled) {

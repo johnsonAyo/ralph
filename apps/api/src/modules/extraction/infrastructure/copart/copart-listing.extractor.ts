@@ -28,10 +28,10 @@ export class CopartListingExtractor implements PlatformListingExtractor {
 
     async extract(listingUrl: string): Promise<ListingSnapshot> {
         try {
-            // 1. Render the page via Scrape.do (residential + JS render to clear the WAF).
-            //    If we can read the lot number from the URL, also run in-page browser actions
-            //    that fetch the WAF-gated gallery endpoint with the page's own session cookies
-            //    — the only way to get the full photo set from a datacenter IP (Fly).
+            
+            
+            
+            
             const lotNumber = extractCopartLotNumber(listingUrl);
             const html = await this.scrapeClient.fetchHtml(listingUrl, {
                 renderJs: true,
@@ -40,11 +40,11 @@ export class CopartListingExtractor implements PlatformListingExtractor {
             });
             const $ = cheerio.load(html);
 
-            // 2. Parse Cached Lot Details from HTML
+            
             const cachedLotDetails = extractCachedCopartLotDetails(html);
 
-            // 3. Images: prefer the full gallery injected by the in-page fetch above. Fall back
-            //    to the native API (works from residential IPs) → embedded hero thumbnail.
+            
+            
             let directImages = parseCopartGalleryJson($(`#${COPART_GALLERY_MARKER_ID}`).text());
             if (directImages.length === 0) {
                 directImages = await fetchCopartLotImages(listingUrl, cachedLotDetails);

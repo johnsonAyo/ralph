@@ -34,7 +34,7 @@ export class IaaListingExtractor implements PlatformListingExtractor {
                     try {
                         return new URL(src, listingUrl).href;
                     } catch {
-                        return src; // fallback if URL parsing fails
+                        return src; 
                     }
                 });
 
