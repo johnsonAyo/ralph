@@ -3038,6 +3038,7 @@ select {
   padding-inline: clamp(20px, 4vw, 56px);
   padding-bottom: clamp(40px, 6vw, 80px);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
   align-content: start;
   min-width: 0;
@@ -3045,6 +3046,7 @@ select {
 
 .dashboard-page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 32px;
 }
 
@@ -3211,6 +3213,7 @@ select {
 
 .dash-section {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 

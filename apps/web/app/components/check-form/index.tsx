@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ralph/ui";
+import ConfirmListing from "./confirm-listing";
 
 interface CheckFormProps {
   hideIntro?: boolean;
@@ -54,19 +55,6 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
   const [extractedListing, setExtractedListing] = useState<any | null>(null);
   const [scrapingError, setScrapingError] = useState("");
 
-  // Edit fields for confirmation stage
-  const [editTitle, setEditTitle] = useState("");
-  const [editYear, setEditYear] = useState("");
-  const [editMileage, setEditMileage] = useState("");
-  const [editCurrentBid, setEditCurrentBid] = useState("");
-  const [editLocation, setEditLocation] = useState("");
-  const [editPrimaryDamage, setEditPrimaryDamage] = useState("");
-  const [editSecondaryDamage, setEditSecondaryDamage] = useState("");
-  const [editRunCondition, setEditRunCondition] = useState("");
-  const [editHasKeys, setEditHasKeys] = useState(true);
-  const [editV5Status, setEditV5Status] = useState("");
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const handleStartCheck = async (e: React.FormEvent) => {
     e.preventDefault();
     setScrapingError("");
@@ -92,17 +80,6 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
 
       const listingData = await response.json();
       setExtractedListing(listingData);
-      setEditTitle(listingData.title ?? "");
-      setEditYear(listingData.year?.toString() ?? "");
-      setEditMileage(listingData.mileage?.toString() ?? "");
-      setEditCurrentBid(listingData.currentBid?.toString() ?? "");
-      setEditLocation(listingData.location ?? "");
-      setEditPrimaryDamage(listingData.primaryDamage ?? "");
-      setEditSecondaryDamage(listingData.secondaryDamage ?? "");
-      setEditRunCondition(listingData.runCondition ?? "");
-      setEditHasKeys(listingData.hasKeys ?? true);
-      setEditV5Status(listingData.v5Status ?? "");
-      setCurrentImageIndex(0);
       setStage('confirm');
     } catch (err) {
       setScrapingError(err instanceof Error ? err.message : "Scraping failed.");
@@ -177,136 +154,15 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
   }
 
   if (stage === 'confirm') {
-    const images = extractedListing?.images || [];
-    const mainImageUrl = images[currentImageIndex]?.fullUrl || images[currentImageIndex]?.highResUrl;
-
-    const handleConfirmSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      submit(e, {
-        ...extractedListing,
-        title: editTitle,
-        year: editYear ? parseInt(editYear, 10) : undefined,
-        mileage: editMileage ? parseInt(editMileage, 10) : undefined,
-        currentBid: editCurrentBid ? parseFloat(editCurrentBid) : undefined,
-        location: editLocation,
-        primaryDamage: editPrimaryDamage,
-        secondaryDamage: editSecondaryDamage,
-        runCondition: editRunCondition,
-        hasKeys: editHasKeys,
-        v5Status: editV5Status,
-      });
-    };
-
-    const nextImage = () => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    };
-
-    const prevImage = () => {
-      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-    };
-
     return (
-      <div className="dashboard-form-panel" style={{ maxWidth: '100%' }}>
-        <div className="form-intro" style={{ marginBottom: '2rem' }}>
-          <strong>Confirm Car Details</strong>
-          <p>Please review the details Ralph extracted from the listing. Correct any errors or add missing details before generating the analysis.</p>
-        </div>
-
-        <form onSubmit={handleConfirmSubmit} className="confirm-listing-form-inline">
-          <div className="confirm-layout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
-
-            {/* Media slider */}
-            <div className="confirm-media-section">
-              {images.length > 0 ? (
-                <div className="slider-wrapper" style={{ margin: '0 auto', maxWidth: '480px' }}>
-                  <div className="slider-image-container">
-                    <img src={mainImageUrl} alt={editTitle || "Car listing photo"} />
-                    {images.length > 1 && (
-                      <>
-                        <button type="button" className="slider-nav-btn slider-nav-btn--left" onClick={prevImage}>&larr;</button>
-                        <button type="button" className="slider-nav-btn slider-nav-btn--right" onClick={nextImage}>&rarr;</button>
-                        <div className="slider-counter">
-                          {currentImageIndex + 1} / {images.length}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="slider-placeholder">No images found</div>
-              )}
-            </div>
-
-            {/* Editable fields */}
-            <div className="confirm-fields-section" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <label className="form-field">
-                <span className="field-label">Vehicle Title</span>
-                <Input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
-              </label>
-
-              <div className="fields-row-2">
-                <label className="form-field">
-                  <span className="field-label">Year</span>
-                  <Input type="number" value={editYear} onChange={(e) => setEditYear(e.target.value)} />
-                </label>
-                <label className="form-field">
-                  <span className="field-label">Mileage (mi)</span>
-                  <Input type="number" value={editMileage} onChange={(e) => setEditMileage(e.target.value)} />
-                </label>
-              </div>
-
-              <div className="fields-row-2">
-                <label className="form-field">
-                  <span className="field-label">Current Bid (£)</span>
-                  <Input type="number" step="0.01" value={editCurrentBid} onChange={(e) => setEditCurrentBid(e.target.value)} />
-                </label>
-                <label className="form-field">
-                  <span className="field-label">Location</span>
-                  <Input type="text" value={editLocation} onChange={(e) => setEditLocation(e.target.value)} />
-                </label>
-              </div>
-
-              <div className="fields-row-2">
-                <label className="form-field">
-                  <span className="field-label">Primary Damage</span>
-                  <Input type="text" value={editPrimaryDamage} onChange={(e) => setEditPrimaryDamage(e.target.value)} />
-                </label>
-                <label className="form-field">
-                  <span className="field-label">Secondary Damage</span>
-                  <Input type="text" value={editSecondaryDamage} onChange={(e) => setEditSecondaryDamage(e.target.value)} />
-                </label>
-              </div>
-
-              <div className="fields-row-2">
-                <label className="form-field">
-                  <span className="field-label">Run Condition</span>
-                  <Input type="text" value={editRunCondition} onChange={(e) => setEditRunCondition(e.target.value)} />
-                </label>
-                <label className="form-field">
-                  <span className="field-label">V5 Logbook Status</span>
-                  <Input type="text" value={editV5Status} onChange={(e) => setEditV5Status(e.target.value)} />
-                </label>
-              </div>
-
-              <label className="form-field checkbox-field" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input type="checkbox" checked={editHasKeys} onChange={(e) => setEditHasKeys(e.target.checked)} />
-                <span className="field-label" style={{ marginBottom: 0 }}>Has Keys</span>
-              </label>
-            </div>
-
-          </div>
-
-          {formError && <p className="form-error" style={{ marginTop: '1.5rem' }}>{formError}</p>}
-
-          <div className="confirm-actions-row" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--line, #e6ded0)' }}>
-            <Button type="button" variant="secondary" size="md" onClick={handleWrongListing}>
-              Wrong listing?
-            </Button>
-            <Button type="submit" size="md">
-              Confirm &amp; Run AI Analysis
-            </Button>
-          </div>
-        </form>
+      <div className="rounded-[24px] border border-[#e6ded0] bg-white p-5 shadow-[0_22px_60px_rgba(60,45,26,0.12)] sm:p-7">
+        <ConfirmListing
+          listing={extractedListing}
+          submitting={isSubmitting}
+          error={formError}
+          onBack={handleWrongListing}
+          onConfirm={(event, edited) => submit(event, edited)}
+        />
       </div>
     );
   }
