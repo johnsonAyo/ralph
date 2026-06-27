@@ -70,13 +70,16 @@ export async function fetchCopartLotImages(scrapeClient: ScrapeClient, baseUrl: 
     let responseJson: JsonRecord | null = null;
 
     for (const path of paths) {
-        // 1. Fast path: native fetch (free, works from residential IPs).
+        // 1. Fast path: native fetch (free, works from residential IPs). Hard 7s timeout —
+        //    on a datacenter IP (Fly) Copart tarpits the connection instead of returning a
+        //    403, so without this the request hangs forever and the fallback never fires.
         try {
             const res = await fetch(path, {
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
                     "Accept": "application/json",
                 },
+                signal: AbortSignal.timeout(7000),
             });
 
             if (res.ok) {
@@ -86,7 +89,7 @@ export async function fetchCopartLotImages(scrapeClient: ScrapeClient, baseUrl: 
                     break;
                 }
             } else {
-                imageLogger.warn(`Native image fetch returned ${res.status} for ${path}; trying ScraperAPI fallback.`);
+                imageLogger.warn(`Native image fetch returned ${res.status} for ${path}; trying Scrape.do fallback.`);
             }
         } catch (error) {
             imageLogger.warn(`Native image fetch failed for ${path}: ${error}; trying ScraperAPI fallback.`);

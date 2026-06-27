@@ -43,10 +43,14 @@ export class ScrapeDoProvider implements ScrapeProvider {
 
         const url = `${this.baseUrl}?${params.toString()}`;
 
+        // JS rendering legitimately takes time; cap it so a stalled upstream can't hang
+        // the whole request (and the user's spinner) indefinitely.
+        const timeoutMs = renderJs ? 65000 : 20000;
+
         const maxRetries = 3;
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const response = await fetch(url);
+                const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
                 if (!response.ok) {
                     const text = await response.text();
                     // Scrape.do charges only successful requests, so retrying a 5xx is free.
