@@ -83,8 +83,8 @@ COPY apps/api/package.json ./apps/api/
 # Install production deps only
 RUN pnpm install --frozen-lockfile --prod
 
-# Install Playwright Chromium browser
-RUN npx playwright install chromium
+# Install Playwright Chromium browser (use pnpm exec so it resolves from node_modules/.bin)
+RUN pnpm exec playwright install chromium
 
 # Copy built output from builder stage
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
