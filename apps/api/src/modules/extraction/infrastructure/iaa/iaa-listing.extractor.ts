@@ -50,8 +50,8 @@ export class IaaListingExtractor implements PlatformListingExtractor {
             });
         }
         finally {
-            await context.close();
-            await browser?.close();
+            await context.close().catch(() => {});
+            await browser?.close().catch(() => {});
         }
     }
 }

@@ -96,8 +96,8 @@ export class CopartListingExtractor implements PlatformListingExtractor {
             });
         }
         finally {
-            await context.close();
-            await browser?.close();
+            await context.close().catch(() => {});
+            await browser?.close().catch(() => {});
         }
     }
 }
