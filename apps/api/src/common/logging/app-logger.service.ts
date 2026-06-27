@@ -44,11 +44,19 @@ export class AppLoggerService extends ConsoleLogger implements LoggerService {
         }
     }
     private printJson(level: string, message: unknown, context?: string, stack?: string) {
+        let serializedMessage: unknown;
+        if (message instanceof Error) {
+            serializedMessage = { name: message.name, message: message.message, stack: message.stack };
+        } else if (typeof message === "object" && message !== null) {
+            serializedMessage = message;
+        } else {
+            serializedMessage = String(message);
+        }
         const logObject = {
             timestamp: new Date().toISOString(),
             level,
             context: context || "Application",
-            message: typeof message === "object" ? message : String(message),
+            message: serializedMessage,
             ...(stack ? { stack } : {}),
         };
         if (level === "error") {
