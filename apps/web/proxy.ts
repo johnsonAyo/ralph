@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
+import { isDevAuthBypassEnabled } from "./app/lib/dev-auth";
 const publicPaths = ["/", "/auth", "/dashboard", "/opengraph-image"];
 const staticPathPrefixes = ["/_next", "/favicon.ico", "/images", "/fonts"];
 function isPublicPath(pathname: string): boolean {
@@ -13,8 +14,8 @@ export async function proxy(request: NextRequest) {
         },
     });
 
-    // DEV MODE: temporarily disable auth gating. Set DISABLE_AUTH_FOR_DEV=true in apps/web/.env.local.
-    if (process.env.DISABLE_AUTH_FOR_DEV === "true") {
+    // DEV MODE: temporarily disable auth gating (see lib/dev-auth).
+    if (isDevAuthBypassEnabled()) {
         return response;
     }
     const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
