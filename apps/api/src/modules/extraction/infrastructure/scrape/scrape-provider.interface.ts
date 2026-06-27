@@ -5,6 +5,12 @@ export interface ScrapeOptions {
     residential?: boolean;
     /** ISO country code for geo-targeting the exit IP. Defaults to GB (UK auction sites). */
     geoCode?: string;
+    /**
+     * Browser actions to run inside the rendered page (provider-specific; Scrape.do
+     * "playWithBrowser"). Lets us execute in-page JS — e.g. fetch a session-gated endpoint
+     * with the page's own cookies. Implies a rendered browser.
+     */
+    browserActions?: unknown[];
 }
 
 /**

@@ -26,8 +26,11 @@ export class ScrapeDoProvider implements ScrapeProvider {
         if (!this.token) {
             throw new Error("SCRAPE_DO_TOKEN is not set.");
         }
-        const { renderJs = false, residential = true, geoCode = "GB" } = options;
-        this.logger.debug(`[scrape.do] render=${renderJs} residential=${residential} geo=${geoCode}: ${targetUrl}`);
+        const { renderJs = false, residential = true, geoCode = "GB", browserActions } = options;
+        const hasActions = Array.isArray(browserActions) && browserActions.length > 0;
+        // Browser actions require a rendered browser.
+        const render = renderJs || hasActions;
+        this.logger.debug(`[scrape.do] render=${render} residential=${residential} geo=${geoCode} actions=${hasActions}: ${targetUrl}`);
 
         const params = new URLSearchParams({
             token: this.token,
@@ -37,8 +40,11 @@ export class ScrapeDoProvider implements ScrapeProvider {
         if (residential) {
             params.append("super", "true");
         }
-        if (renderJs) {
+        if (render) {
             params.append("render", "true");
+        }
+        if (hasActions) {
+            params.append("playWithBrowser", JSON.stringify(browserActions));
         }
 
         const url = `${this.baseUrl}?${params.toString()}`;

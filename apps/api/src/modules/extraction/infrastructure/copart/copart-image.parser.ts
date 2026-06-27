@@ -64,6 +64,42 @@ export function normalizeCopartImagesResponse(json: JsonRecord): ExtractedImage[
     }
     return images;
 }
+/** Hidden element id we inject the gallery JSON into via in-page browser actions. */
+export const COPART_GALLERY_MARKER_ID = "ralph-imgs";
+
+/**
+ * Browser actions (Scrape.do "playWithBrowser") that fetch Copart's WAF-gated gallery
+ * endpoint *from inside the rendered page* — so the request carries the page's Incapsula
+ * session cookies and succeeds even from a datacenter IP. The JSON is written into a hidden
+ * element so it comes back in the returned HTML. This is the only path that reliably gets
+ * the full gallery on Fly.
+ */
+export function buildCopartGalleryActions(lotNumber: string, countryCode = "GB"): unknown[] {
+    const path = `/public/data/lotdetails/solr/lotImages/${lotNumber}/${countryCode}`;
+    const execute =
+        `fetch('${path}',{credentials:'include'})` +
+        `.then(function(r){return r.text();})` +
+        `.then(function(t){var e=document.createElement('div');e.id='${COPART_GALLERY_MARKER_ID}';e.style.display='none';e.textContent=t;document.body.appendChild(e);})` +
+        `.catch(function(){});`;
+    return [
+        { Action: "Execute", Execute: execute },
+        { Action: "WaitForRequestCompletion", UrlPattern: "*lotImages*", Timeout: 15000 },
+        { Action: "Wait", Timeout: 3000 },
+    ];
+}
+
+/** Parse the gallery JSON injected by buildCopartGalleryActions out of the returned HTML text. */
+export function parseCopartGalleryJson(injectedText: string | undefined): ExtractedImage[] {
+    if (!injectedText || !injectedText.includes(COPART_IMAGE_RESPONSE_MARKER)) {
+        return [];
+    }
+    try {
+        return normalizeCopartImagesResponse(JSON.parse(injectedText) as JsonRecord);
+    } catch {
+        return [];
+    }
+}
+
 /**
  * Resolves Copart lot photos. The full gallery lives behind Copart's `lotImages` JSON
  * endpoint, which is WAF-gated and only reachable from a clean (residential) IP with the
