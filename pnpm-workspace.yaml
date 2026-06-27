@@ -1,3 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Pin postcss (moved here from package.json#pnpm.overrides for pnpm 10+)
+overrides:
+  postcss: 8.5.10
