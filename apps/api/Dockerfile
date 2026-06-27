@@ -1,5 +1,5 @@
 # ─── Stage 1: Builder ───────────────────────────────────────────────────────
-FROM node:20-slim AS builder
+FROM node:22-slim AS builder
 
 # Install Chromium system deps (needed for playwright install to succeed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -71,7 +71,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 RUN node apps/api/node_modules/playwright/cli.js install chromium
 
 # ─── Stage 2: Runner ────────────────────────────────────────────────────────
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 
 # Install system deps required by Playwright Chromium at runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
