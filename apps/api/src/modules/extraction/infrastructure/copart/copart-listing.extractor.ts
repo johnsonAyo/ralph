@@ -1,103 +1,82 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { AuctionPlatformCode, ListingSnapshot } from "@ralph/shared";
-import { COPART_IMAGE_RESPONSE_MARKER, } from "@/modules/extraction/domain/constants/copart.constants";
-import { COPART_POST_LOAD_WAIT_MS, DOM_CONTENT_LOADED_TIMEOUT_MS, NETWORK_IDLE_TIMEOUT_MS, } from "@/modules/extraction/domain/constants/browser.constants";
 import { PlatformListingExtractor } from "@/modules/extraction/domain/interfaces/platform-listing-extractor.interface";
 import { JsonRecord } from "@/modules/extraction/domain/types/json-record.type";
-import { PlaywrightBrowserFactory } from "@/modules/extraction/infrastructure/browser/playwright-browser.factory";
+import { ScrapeClient } from "@/modules/extraction/infrastructure/scrape/scrape.client";
 import { uniqueImages } from "@/modules/extraction/infrastructure/shared/parsing.utils";
 import { extractCachedCopartLotDetails } from "./copart-html.parser";
-import { fetchCopartLotImages, normalizeCopartImagesResponse, } from "./copart-image.parser";
+import { fetchCopartLotImages } from "./copart-image.parser";
 import { buildCopartListingSnapshot } from "./copart-snapshot.mapper";
+import * as cheerio from "cheerio";
+
 @Injectable()
 export class CopartListingExtractor implements PlatformListingExtractor {
     readonly platform = AuctionPlatformCode.CopartUk;
-    constructor(private readonly browserFactory: PlaywrightBrowserFactory) { }
+    private readonly logger = new Logger(CopartListingExtractor.name);
+
+    constructor(private readonly scrapeClient: ScrapeClient) { }
+
     async extract(listingUrl: string): Promise<ListingSnapshot> {
-        const imagesResponses: JsonRecord[] = [];
-        const context = await this.browserFactory.createContext();
-        const browser = context.browser();
         try {
-            const page = await context.newPage();
-            page.on("response", async (response) => {
-                const responseUrl = response.url();
-                const contentType = response.headers()["content-type"] ?? "";
-                const looksUseful = responseUrl.includes("lot-images") ||
-                    responseUrl.includes("lotImages") ||
-                    contentType.includes("application/json");
-                if (!looksUseful) {
-                    return;
-                }
-                try {
-                    const text = await response.text();
-                    if (text.includes(COPART_IMAGE_RESPONSE_MARKER)) {
-                        imagesResponses.push(JSON.parse(text) as JsonRecord);
-                    }
-                }
-                catch {
-                }
-            });
-            await page.goto(listingUrl, {
-                waitUntil: "domcontentloaded",
-                timeout: DOM_CONTENT_LOADED_TIMEOUT_MS,
-            });
-            const cachedLotDetails = extractCachedCopartLotDetails(await page.content());
-            const directImages = await fetchCopartLotImages(page, cachedLotDetails);
-            await page.waitForLoadState("networkidle", { timeout: NETWORK_IDLE_TIMEOUT_MS }).catch(() => { });
-            await page.waitForTimeout(COPART_POST_LOAD_WAIT_MS);
-            const pageData = await page.evaluate(() => {
-                const jsonLd = [...document.querySelectorAll('script[type="application/ld+json"]')]
-                    .map((script) => {
+            // 1. Fetch HTML via ScraperAPI (premium + JS render to clear the WAF)
+            const html = await this.scrapeClient.fetchHtml(listingUrl, { renderJs: true, residential: true });
+            const $ = cheerio.load(html);
+
+            // 2. Parse Cached Lot Details from HTML
+            const cachedLotDetails = extractCachedCopartLotDetails(html);
+
+            // 3. Fetch images via API
+            const directImages = await fetchCopartLotImages(this.scrapeClient, listingUrl, cachedLotDetails);
+
+            // 4. Extract schema.org JSON-LD data
+            const jsonLd = $('script[type="application/ld+json"]')
+                .map((_, script) => {
                     try {
-                        return JSON.parse(script.textContent ?? "{}") as unknown;
-                    }
-                    catch {
+                        return JSON.parse($(script).html() ?? "{}") as unknown;
+                    } catch {
                         return null;
                     }
                 })
-                    .filter(Boolean);
-                const nodes = jsonLd.flatMap((item) => {
-                    if (typeof item !== "object" || item === null) {
-                        return [];
-                    }
-                    const graph = (item as {
-                        "@graph"?: unknown;
-                    })["@graph"];
-                    return Array.isArray(graph) ? graph : [item];
-                });
-                const nodeByType = (type: string) => nodes.find((node) => {
-                    return (typeof node === "object" &&
-                        node !== null &&
-                        (node as {
-                            "@type"?: unknown;
-                        })["@type"] === type);
-                });
-                return {
-                    vehicle: nodeByType("Vehicle"),
-                    product: nodeByType("Product"),
-                    lines: (document.body?.innerText ?? "")
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .filter(Boolean),
-                    finalUrl: window.location.href,
-                };
+                .get()
+                .filter(Boolean);
+
+            const nodes = jsonLd.flatMap((item) => {
+                if (typeof item !== "object" || item === null) {
+                    return [];
+                }
+                const graph = (item as { "@graph"?: unknown })["@graph"];
+                return Array.isArray(graph) ? graph : [item];
             });
-            const images = uniqueImages([
-                ...directImages,
-                ...imagesResponses.flatMap(normalizeCopartImagesResponse),
-            ]);
+
+            const nodeByType = (type: string) => nodes.find((node) => {
+                return (
+                    typeof node === "object" &&
+                    node !== null &&
+                    (node as { "@type"?: unknown })["@type"] === type
+                );
+            });
+
+            // 5. Extract lines from text (similar to innerText)
+            const lines = $('body').text()
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean);
+
+            // Combine all image sources (since we don't intercept XHRs, we just use directImages)
+            const images = uniqueImages([...directImages]);
+
             return buildCopartListingSnapshot({
-                listingUrl: pageData.finalUrl || listingUrl,
+                listingUrl,
                 cachedLotDetails,
-                vehicle: pageData.vehicle as JsonRecord | undefined,
-                product: pageData.product as JsonRecord | undefined,
-                lines: pageData.lines,
+                vehicle: nodeByType("Vehicle") as JsonRecord | undefined,
+                product: nodeByType("Product") as JsonRecord | undefined,
+                lines,
                 images,
             });
-        }
-        finally {
-            await context.close().catch(() => {});
-            await browser?.close().catch(() => {});
+        } catch (error) {
+            this.logger.error(`Copart extraction failed for ${listingUrl}: ${error}`);
+            throw error;
         }
     }
 }
+

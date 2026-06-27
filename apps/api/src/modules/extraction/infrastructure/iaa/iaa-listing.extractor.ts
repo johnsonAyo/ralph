@@ -1,57 +1,53 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { AuctionPlatformCode, ListingSnapshot } from "@ralph/shared";
-import { DOM_CONTENT_LOADED_TIMEOUT_MS, IAA_POST_LOAD_WAIT_MS, } from "@/modules/extraction/domain/constants/browser.constants";
 import { IAA_IMAGE_SELECTOR, IAA_PAGE_TITLE_SUFFIX_PATTERN, } from "@/modules/extraction/domain/constants/iaa.constants";
 import { PlatformListingExtractor } from "@/modules/extraction/domain/interfaces/platform-listing-extractor.interface";
-import { PlaywrightBrowserFactory } from "@/modules/extraction/infrastructure/browser/playwright-browser.factory";
+import { ScrapeClient } from "@/modules/extraction/infrastructure/scrape/scrape.client";
 import { buildIaaListingSnapshot } from "./iaa-snapshot.mapper";
+import * as cheerio from "cheerio";
+
 @Injectable()
 export class IaaListingExtractor implements PlatformListingExtractor {
     readonly platform = AuctionPlatformCode.IaaSynetiqUk;
-    constructor(private readonly browserFactory: PlaywrightBrowserFactory) { }
+    private readonly logger = new Logger(IaaListingExtractor.name);
+
+    constructor(private readonly scrapeClient: ScrapeClient) { }
+
     async extract(listingUrl: string): Promise<ListingSnapshot> {
-        const context = await this.browserFactory.createContext();
-        const browser = context.browser();
         try {
-            const page = await context.newPage();
-            await page.goto(listingUrl, {
-                waitUntil: "domcontentloaded",
-                timeout: DOM_CONTENT_LOADED_TIMEOUT_MS,
-            });
-            await page.waitForTimeout(IAA_POST_LOAD_WAIT_MS);
-            const pageData = await page.evaluate(({ imageSelector, titleSuffixPattern }) => {
-                const lines = (document.body?.innerText ?? "")
-                    .split("\n")
-                    .map((line) => line.trim())
-                    .filter(Boolean);
-                const title = document.querySelector("h1")?.textContent?.trim() ??
-                    document.title.replace(new RegExp(titleSuffixPattern, "i"), "").trim();
-                const images = [...document.querySelectorAll(imageSelector)]
-                    .map((image) => image.getAttribute("src"))
-                    .filter((src): src is string => Boolean(src))
-                    .map((src) => new URL(src, window.location.href).href);
-                return {
-                    finalUrl: window.location.href,
-                    html: document.documentElement.outerHTML,
-                    lines,
-                    title,
-                    images,
-                };
-            }, {
-                imageSelector: IAA_IMAGE_SELECTOR,
-                titleSuffixPattern: IAA_PAGE_TITLE_SUFFIX_PATTERN.source,
-            });
+            const html = await this.scrapeClient.fetchHtml(listingUrl, { renderJs: true, residential: true });
+            const $ = cheerio.load(html);
+
+            const lines = $('body').text()
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean);
+
+            const rawTitle = $("h1").first().text().trim() || $("title").text().trim();
+            const title = rawTitle.replace(IAA_PAGE_TITLE_SUFFIX_PATTERN, "").trim();
+
+            const images = $(IAA_IMAGE_SELECTOR)
+                .map((_, image) => $(image).attr("src"))
+                .get()
+                .filter((src): src is string => Boolean(src))
+                .map((src) => {
+                    try {
+                        return new URL(src, listingUrl).href;
+                    } catch {
+                        return src; // fallback if URL parsing fails
+                    }
+                });
+
             return buildIaaListingSnapshot({
-                listingUrl: pageData.finalUrl || listingUrl,
-                title: pageData.title,
-                html: pageData.html,
-                lines: pageData.lines,
-                images: pageData.images,
+                listingUrl,
+                title,
+                html,
+                lines,
+                images,
             });
-        }
-        finally {
-            await context.close().catch(() => {});
-            await browser?.close().catch(() => {});
+        } catch (error) {
+            this.logger.error(`IAA extraction failed for ${listingUrl}: ${error}`);
+            throw error;
         }
     }
 }
