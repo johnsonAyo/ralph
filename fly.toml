@@ -1,55 +1,51 @@
-# fly.toml — Ralph API deployment on Fly.io
-# Run `fly launch --no-deploy` from the repo root to register this app,
-# then `fly deploy` from the same directory to build & ship.
+# fly.toml app configuration file generated for ralph-api-frosty-silence-3545 on 2026-06-27T17:59:15+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "ralph-api"
-primary_region = "lhr"        # London — change to your preferred region
+app = 'ralph-api-frosty-silence-3545'
+primary_region = 'lhr'
 
 [build]
-  # Fly.io will find the Dockerfile automatically in apps/api/
-  dockerfile = "apps/api/Dockerfile"
-  # Build context is the monorepo root so pnpm workspace files are available
-  build_target = "runner"
+  dockerfile = 'apps/api/Dockerfile'
+  build-target = 'runner'
 
 [env]
-  NODE_ENV = "production"
-  PORT     = "4000"
-  # All secrets (SUPABASE_URL, OPENAI_API_KEY, etc.) are set via:
-  #   fly secrets set KEY=value
-  # Do NOT put secret values here.
+  NODE_ENV = 'production'
+  PORT = '4000'
+
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
 
 [[services]]
-  protocol    = "tcp"
+  protocol = 'tcp'
   internal_port = 4000
 
   [[services.ports]]
-    port     = 80
-    handlers = ["http"]
+    port = 80
+    handlers = ['http']
 
   [[services.ports]]
-    port     = 443
-    handlers = ["tls", "http"]
+    port = 443
+    handlers = ['tls', 'http']
 
   [services.concurrency]
-    type       = "requests"
-    soft_limit = 200
+    type = 'requests'
     hard_limit = 250
+    soft_limit = 200
 
   [[services.http_checks]]
-    interval     = "15s"
-    timeout      = "5s"
-    grace_period = "30s"
-    method       = "GET"
-    path         = "/health"
-
-[http_service]
-  internal_port       = 4000
-  force_https         = true
-  auto_stop_machines  = false   # ← keeps machine always-on (no cold starts)
-  auto_start_machines = true
-  min_machines_running = 1      # ← always at least 1 machine alive
+    interval = '15s'
+    timeout = '5s'
+    grace_period = '30s'
+    method = 'GET'
+    path = '/health'
 
 [[vm]]
-  cpu_kind = "shared"
-  cpus     = 1
-  memory_mb = 512              # 512MB is enough for NestJS; bump to 1024 if Playwright needs it
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 512
