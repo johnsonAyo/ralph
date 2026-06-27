@@ -1,88 +1,128 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Search, User as UserIcon } from "lucide-react";
-import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../lib/supabase";
+import { LogOut } from "lucide-react";
+import {
+  Button,
+  Container,
+  Separator,
+} from "@ralph/ui";
+import {
+  getSupabaseBrowserClient,
+  isSupabaseConfigured,
+  useSession,
+} from "../lib/supabase";
 import { useCredits } from "../lib/use-credits";
+
 const HOME_ANCHORS = [
-    { href: "#check", label: "Check" },
-    { href: "#answers", label: "Report" },
-    { href: "#why", label: "Why" },
-    { href: "#pricing", label: "Pricing" },
-    { href: "#faqs", label: "FAQs" },
+  { href: "#check", label: "Check" },
+  { href: "#answers", label: "Report" },
+  { href: "#why", label: "Why" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#faqs", label: "FAQs" },
 ] as const;
-const DASHBOARD_LINKS = [
-    { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
-    { href: "/dashboard/listings", label: "Listings", Icon: Search },
-    { href: "/dashboard/profile", label: "Profile", Icon: UserIcon },
-] as const;
+
+function BrandMark() {
+  return (
+    <Link
+      href="/"
+      aria-label="Ask Ralph home"
+      className="flex items-center gap-2.5"
+    >
+      <span className="flex size-9 items-center justify-center rounded-md bg-primary font-serif text-lg font-semibold text-primary-foreground">
+        R
+      </span>
+      <span className="text-sm font-semibold leading-none tracking-tight">
+        Ask
+        <br />
+        Ralph
+      </span>
+    </Link>
+  );
+}
+
 export default function SiteHeader() {
-    const pathname = usePathname() ?? "/";
-    const isHome = pathname === "/";
-    const isOnDashboard = pathname.startsWith("/dashboard");
-    const isAuthPage = pathname.startsWith("/auth");
-    const { data: user } = useSession();
-    const { data: credits = 0, isLoading: loadingCredits } = useCredits();
-    async function handleSignOut() {
-        if (!isSupabaseConfigured()) {
-            window.location.href = "/";
-            return;
-        }
-        const supabase = getSupabaseBrowserClient();
-        if (!supabase) {
-            window.location.href = "/";
-            return;
-        }
-        await supabase.auth.signOut();
-        window.location.href = "/";
-    }
-    if (!isSupabaseConfigured() || isOnDashboard) {
-        return null;
-    }
-    return (<header className={`nav ${isOnDashboard ? "dashboard-nav" : ""}`}>
-      <Link className="brand" href="/" aria-label="Ask Ralph home">
-        <span className="brand-mark">R</span>
-        <span>
-          Ask
-          <br />
-          Ralph
-        </span>
-      </Link>
+  const pathname = usePathname() ?? "/";
+  const isHome = pathname === "/";
+  const isOnDashboard = pathname.startsWith("/dashboard");
+  const isAuthPage = pathname.startsWith("/auth");
+  const { data: user } = useSession();
+  const { data: credits = 0, isLoading: loadingCredits } = useCredits();
 
-      {isOnDashboard ? (<nav aria-label="Dashboard sections">
-          {DASHBOARD_LINKS.map((link) => {
-                const Icon = link.Icon;
-                return (<Link key={link.label} href={link.href}>
-                <Icon size={16} aria-hidden="true"/>
-                {link.label}
-              </Link>);
-            })}
-        </nav>) : (<nav aria-label="Marketing sections">
-          {HOME_ANCHORS.map((link) => (<Link key={link.label} href={{ pathname: "/", hash: link.href }}>
+  async function handleSignOut() {
+    const supabase = isSupabaseConfigured() ? getSupabaseBrowserClient() : null;
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+    window.location.href = "/";
+  }
+
+  if (!isSupabaseConfigured() || isOnDashboard) {
+    return null;
+  }
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+      <Container className="flex h-16 items-center justify-between gap-4">
+        <BrandMark />
+
+        <nav
+          aria-label="Marketing sections"
+          className="hidden items-center gap-1 md:flex"
+        >
+          {HOME_ANCHORS.map((link) => (
+            <Link
+              key={link.label}
+              href={{ pathname: "/", hash: link.href }}
+              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
               {link.label}
-            </Link>))}
-        </nav>)}
+            </Link>
+          ))}
+        </nav>
 
-      {!isAuthPage ? (<div className="nav-actions">
-          {user ? (<>
-              <span className="dashboard-nav-credits" style={{ opacity: 0.8, fontSize: "0.85rem", fontWeight: 500 }}>
-                {loadingCredits ? "..." : `${credits} check${credits === 1 ? "" : "s"} left`}
-              </span>
-              <span className="dashboard-nav-email" title={user.email ?? user.id}>
-                {user.email ?? user.id}
-              </span>
-              <button type="button" className="button dashboard-logout" onClick={handleSignOut}>
-                <LogOut size={14} aria-hidden="true"/>
-                Logout
-              </button>
-            </>) : (<>
-              <Link className="auth-pill auth-link" href="/auth">
-                Sign in
-              </Link>
-              {isHome ? (<a className="button primary" href="#check">
-                  Ask Ralph
-                </a>) : null}
-            </>)}
-        </div>) : null}
-    </header>);
+        {!isAuthPage ? (
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <span className="hidden text-sm text-muted-foreground sm:inline tabular">
+                  {loadingCredits
+                    ? "…"
+                    : `${credits} check${credits === 1 ? "" : "s"} left`}
+                </span>
+                <Separator
+                  orientation="vertical"
+                  className="hidden h-5 sm:block"
+                />
+                <span
+                  className="hidden max-w-[14ch] truncate text-sm text-muted-foreground lg:inline"
+                  title={user.email ?? user.id}
+                >
+                  {user.email ?? user.id}
+                </span>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/dashboard">Dashboard</Link>
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/auth">Sign in</Link>
+                </Button>
+                {isHome ? (
+                  <Button asChild size="sm">
+                    <a href="#check">Ask Ralph</a>
+                  </Button>
+                ) : null}
+              </>
+            )}
+          </div>
+        ) : null}
+      </Container>
+    </header>
+  );
 }
