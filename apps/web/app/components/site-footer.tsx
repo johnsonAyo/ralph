@@ -2,7 +2,6 @@
 import { usePathname } from "next/navigation";
 import { landingLabels } from "../labels";
 import CTA from "./cta";
-import Link from "next/link";
 export default function SiteFooter() {
     const pathname = usePathname() ?? "/";
     const isOnDashboard = pathname.startsWith("/dashboard");

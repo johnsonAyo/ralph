@@ -12,6 +12,11 @@ export async function proxy(request: NextRequest) {
             headers: request.headers,
         },
     });
+
+    // DEV MODE: temporarily disable auth gating. Set DISABLE_AUTH_FOR_DEV=true in apps/web/.env.local.
+    if (process.env.DISABLE_AUTH_FOR_DEV === "true") {
+        return response;
+    }
     const hasSupabaseConfig = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
         Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
     if (!hasSupabaseConfig) {

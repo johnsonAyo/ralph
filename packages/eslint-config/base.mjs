@@ -26,8 +26,12 @@ export const baseConfig = [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
       ],
       // Allowed but flagged during the design-system migration; tightened in cleanup.
       "@typescript-eslint/no-explicit-any": "warn",
