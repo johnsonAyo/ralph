@@ -2,6 +2,7 @@
 import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { isSupabaseConfigured, useSession } from "./supabase";
+import { isDevAuthBypassEnabled } from "./dev-auth";
 const PUBLIC_ONLY_PATHS = new Set(["/", "/auth"]);
 function isPublicOnly(pathname: string): boolean {
     return PUBLIC_ONLY_PATHS.has(pathname);
@@ -23,6 +24,11 @@ export default function AuthGate({ children }: {
     const pathname = usePathname();
     const router = useRouter();
     useEffect(() => {
+        // DEV MODE: skip the redirect gate so authenticated surfaces are
+        // viewable without a session (see lib/dev-auth).
+        if (isDevAuthBypassEnabled()) {
+            return;
+        }
         if (!isSupabaseConfigured()) {
             return;
         }
