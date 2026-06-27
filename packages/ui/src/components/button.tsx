@@ -3,30 +3,35 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/cn";
 
+/**
+ * Button variants mirror the product's original `.button` styles so primitives
+ * render identically to the current design (blue pill, soft blue shadow,
+ * blue-dark hover lift). Refine from tokens later.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-black leading-none transition-[transform,background-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-55 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-        brand: "bg-brand text-brand-foreground hover:bg-brand/90",
+        primary:
+          "bg-primary text-primary-foreground shadow-[0_14px_28px_rgba(47,98,233,0.2)] hover:bg-primary-hover hover:-translate-y-0.5 hover:shadow-[0_18px_34px_rgba(47,98,233,0.27)] disabled:shadow-none disabled:translate-y-0",
+        gold: "bg-gold text-gold-foreground shadow-[0_14px_28px_rgba(255,216,77,0.28)] hover:-translate-y-0.5 hover:brightness-95 disabled:shadow-none disabled:translate-y-0",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/70",
-        outline:
-          "border border-border bg-card text-foreground hover:bg-muted",
+          "border border-border bg-secondary text-secondary-foreground hover:bg-border",
+        outline: "border border-border bg-card text-foreground hover:bg-muted",
         ghost: "text-foreground hover:bg-muted",
-        link: "text-brand underline-offset-4 hover:underline",
+        link: "font-bold text-primary underline-offset-4 hover:underline",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:brightness-95",
       },
       size: {
-        sm: "h-9 px-3.5",
-        md: "h-10 px-5",
-        lg: "h-12 px-7 text-[0.95rem]",
-        icon: "h-10 w-10",
+        sm: "min-h-[40px] rounded-[14px] px-4 text-sm",
+        md: "min-h-[48px] rounded-2xl px-5 text-sm",
+        lg: "min-h-[56px] rounded-[21px] px-[30px] text-[0.95rem]",
+        icon: "size-11 rounded-2xl",
       },
     },
-    defaultVariants: { variant: "primary", size: "md" },
+    defaultVariants: { variant: "primary", size: "lg" },
   },
 );
 

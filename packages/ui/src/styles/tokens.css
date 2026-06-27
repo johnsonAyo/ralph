@@ -1,80 +1,79 @@
 /**
- * Ralph design tokens — editorial-premium / warm-utilitarian system.
+ * Ralph design tokens — mirrors the product's existing visual language so
+ * @ralph/ui primitives render identically to the current design.
  *
- * Single source of truth for the whole product. Values are HSL channels
- * (shadcn convention) consumed as hsl(var(--token)). Change a value here and
- * every surface across web (and any future app) updates with it.
+ * All tokens are namespaced `--rui-*` so they never collide with the app's
+ * legacy globals.css variables (--muted, --gold, --clay, etc.) during
+ * incremental coexistence. Values are HSL channels consumed as hsl(var(--rui-x)).
  *
- * Palette intent:
- *  - Warm bone canvas, white surfaces, warm-ink text. No pure black/white.
- *  - One ink-forward primary for actions. One terracotta brand spot color.
- *  - Muted pale status colors for risk signalling (low / caution / high).
+ * Palette maps to the original globals.css:
+ *   cream #fbfaf6 · ink #111 · blue #2f62e9 · blue-dark #204cc0
+ *   gold #ffd84d · clay #ff7448 · line #e6ded0 · soft #f4f0e7
  */
 
 :root {
-  /* Surfaces & text */
-  --background: 45 33% 98%; /* #FBFAF7 warm bone */
-  --foreground: 40 7% 11%; /* #1D1B18 warm ink */
+  --rui-background: 48 33% 97%;
+  --rui-foreground: 0 0% 7%;
 
-  --card: 0 0% 100%;
-  --card-foreground: 40 7% 11%;
+  --rui-card: 0 0% 100%;
+  --rui-card-foreground: 0 0% 7%;
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 40 7% 11%;
+  --rui-popover: 0 0% 100%;
+  --rui-popover-foreground: 0 0% 7%;
 
-  --muted: 42 30% 93%; /* #F3EFE7 soft */
-  --muted-foreground: 36 9% 38%; /* #6B6459 */
+  --rui-muted: 40 33% 93%;
+  --rui-muted-foreground: 36 9% 35%;
 
-  --accent: 42 30% 93%; /* hover/active surface = muted */
-  --accent-foreground: 40 7% 11%;
+  --rui-accent: 40 33% 93%;
+  --rui-accent-foreground: 0 0% 7%;
 
-  /* Actions */
-  --primary: 40 7% 13%; /* near-ink button */
-  --primary-foreground: 45 33% 98%;
+  --rui-primary: 224 81% 55%; /* blue #2f62e9 */
+  --rui-primary-foreground: 0 0% 100%;
+  --rui-primary-hover: 224 71% 44%; /* blue-dark #204cc0 */
 
-  --secondary: 42 30% 93%;
-  --secondary-foreground: 40 7% 13%;
+  --rui-secondary: 40 33% 93%;
+  --rui-secondary-foreground: 0 0% 7%;
 
-  /* Brand spot color — terracotta. Used sparingly for emphasis. */
-  --brand: 16 58% 46%; /* #BE522F */
-  --brand-foreground: 45 33% 98%;
+  --rui-brand: 224 81% 55%;
+  --rui-brand-foreground: 0 0% 100%;
+  --rui-gold: 46 100% 65%;
+  --rui-gold-foreground: 0 0% 7%;
+  --rui-clay: 15 100% 64%;
+  --rui-clay-foreground: 0 0% 100%;
 
-  /* Lines & focus */
-  --border: 39 26% 86%; /* #E6DFD3 warm hairline */
-  --input: 39 26% 86%;
-  --ring: 16 58% 46%; /* focus ring = brand */
+  --rui-border: 39 30% 86%;
+  --rui-input: 39 30% 86%;
+  --rui-ring: 224 81% 55%;
 
-  /* Status (semantic) — solid + pale surface pairs */
-  --success: 142 34% 30%; /* #336B43 */
-  --success-foreground: 0 0% 100%;
-  --success-subtle: 140 33% 94%; /* #EBF3ED */
-  --success-subtle-foreground: 142 38% 24%;
+  --rui-success: 142 71% 45%;
+  --rui-success-foreground: 0 0% 100%;
+  --rui-success-subtle: 138 76% 97%;
+  --rui-success-subtle-foreground: 145 61% 20%;
 
-  --warning: 36 78% 33%; /* #97600F */
-  --warning-foreground: 0 0% 100%;
-  --warning-subtle: 41 78% 92%; /* #FBF1D9 */
-  --warning-subtle-foreground: 33 70% 28%;
+  --rui-warning: 38 92% 50%;
+  --rui-warning-foreground: 0 0% 7%;
+  --rui-warning-subtle: 48 100% 96%;
+  --rui-warning-subtle-foreground: 26 84% 27%;
 
-  --destructive: 6 56% 41%; /* #A23A2E */
-  --destructive-foreground: 0 0% 100%;
-  --destructive-subtle: 6 64% 95%; /* #FBEAE8 */
-  --destructive-subtle-foreground: 6 56% 36%;
+  --rui-destructive: 0 84% 60%;
+  --rui-destructive-foreground: 0 0% 100%;
+  --rui-destructive-subtle: 0 86% 97%;
+  --rui-destructive-subtle-foreground: 0 63% 31%;
 
-  --info: 214 55% 42%; /* #2F5EA8 */
-  --info-foreground: 0 0% 100%;
-  --info-subtle: 208 78% 95%; /* #E6F1FC */
-  --info-subtle-foreground: 211 60% 34%;
+  --rui-info: 224 81% 55%;
+  --rui-info-foreground: 0 0% 100%;
+  --rui-info-subtle: 222 84% 95%;
+  --rui-info-subtle-foreground: 224 71% 44%;
 
-  /* Geometry */
-  --radius: 0.75rem; /* 12px crisp, not pill */
+  --rui-radius: 1.75rem; /* 28px — matches card radius */
 
-  /* Typography (font families are wired by the app via next/font) */
-  --font-sans: var(--font-sans-loaded, ui-sans-serif, system-ui, sans-serif);
-  --font-serif: var(--font-serif-loaded, ui-serif, Georgia, serif);
-  --font-mono: var(--font-mono-loaded, ui-monospace, SFMono-Regular, monospace);
+  --rui-font-sans-loaded: "Trebuchet MS", "Avenir Next", Avenir, Arial,
+    sans-serif;
+  --rui-font-sans: var(--rui-font-sans-loaded);
+  --rui-font-serif: var(--rui-font-sans-loaded);
+  --rui-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 
-  /* Elevation — ultra-diffuse, low opacity. No harsh drop shadows. */
-  --shadow-sm: 0 1px 2px hsl(40 10% 20% / 0.04);
-  --shadow-md: 0 4px 24px -8px hsl(40 12% 22% / 0.08);
-  --shadow-lg: 0 24px 60px -24px hsl(40 14% 22% / 0.12);
+  --rui-shadow-sm: 0 4px 12px rgba(60, 45, 26, 0.04);
+  --rui-shadow-md: 0 12px 30px rgba(47, 40, 30, 0.1);
+  --rui-shadow-lg: 0 22px 60px rgba(60, 45, 26, 0.12);
 }

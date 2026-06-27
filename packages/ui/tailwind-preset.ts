@@ -6,7 +6,7 @@ import animate from "tailwindcss-animate";
  * own config and only add `content` globs. Colors resolve to the CSS variables
  * defined in @ralph/ui/styles.css, so theming stays centralized.
  */
-const hsl = (token: string) => `hsl(var(--${token}) / <alpha-value>)`;
+const hsl = (token: string) => `hsl(var(--rui-${token}) / <alpha-value>)`;
 
 const preset: Omit<Config, "content"> = {
   darkMode: ["class"],
@@ -26,6 +26,15 @@ const preset: Omit<Config, "content"> = {
         primary: {
           DEFAULT: hsl("primary"),
           foreground: hsl("primary-foreground"),
+          hover: hsl("primary-hover"),
+        },
+        gold: {
+          DEFAULT: hsl("gold"),
+          foreground: hsl("gold-foreground"),
+        },
+        clay: {
+          DEFAULT: hsl("clay"),
+          foreground: hsl("clay-foreground"),
         },
         secondary: {
           DEFAULT: hsl("secondary"),
@@ -77,19 +86,19 @@ const preset: Omit<Config, "content"> = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 6px)",
+        lg: "var(--rui-radius)",
+        md: "calc(var(--rui-radius) - 4px)",
+        sm: "calc(var(--rui-radius) - 6px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)"],
-        serif: ["var(--font-serif)"],
-        mono: ["var(--font-mono)"],
+        sans: ["var(--rui-font-sans)"],
+        serif: ["var(--rui-font-serif)"],
+        mono: ["var(--rui-font-mono)"],
       },
       boxShadow: {
-        sm: "var(--shadow-sm)",
-        md: "var(--shadow-md)",
-        lg: "var(--shadow-lg)",
+        sm: "var(--rui-shadow-sm)",
+        md: "var(--rui-shadow-md)",
+        lg: "var(--rui-shadow-lg)",
       },
       fontSize: {
         // Editorial display scale with tight tracking baked in via lineHeight.

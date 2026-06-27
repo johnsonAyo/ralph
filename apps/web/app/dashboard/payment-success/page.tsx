@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Button } from "@ralph/ui";
 import { successLabels } from "../../labels";
 export default function PaymentSuccessPage() {
     const queryClient = useQueryClient();
@@ -36,13 +37,15 @@ export default function PaymentSuccessPage() {
       </p>
 
       <div style={{ display: "flex", gap: "1rem" }}>
-        <Link href="/dashboard" className="button">
-          Go to dashboard
-          <ArrowRight size={16} aria-hidden="true" style={{ marginLeft: "0.5rem" }}/>
-        </Link>
-        <Link href="/#check" className="button secondary">
-          Check a car
-        </Link>
+        <Button asChild>
+          <Link href="/dashboard">
+            Go to dashboard
+            <ArrowRight size={16} aria-hidden="true"/>
+          </Link>
+        </Button>
+        <Button asChild variant="primary">
+          <Link href="/#check">Check a car</Link>
+        </Button>
       </div>
     </div>);
 }
