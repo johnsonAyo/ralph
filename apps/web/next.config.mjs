@@ -1,4 +1,4 @@
 const nextConfig = {
-    transpilePackages: ["@ralph/shared", "@ralph/ui"],
+    transpilePackages: ["@ralph/shared"],
 };
 export default nextConfig;
