@@ -1,6 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import ws from "ws";
 export const SUPABASE_ADMIN = Symbol("SUPABASE_ADMIN");
 @Global()
 @Module({
@@ -15,6 +16,9 @@ export const SUPABASE_ADMIN = Symbol("SUPABASE_ADMIN");
                     auth: {
                         autoRefreshToken: false,
                         persistSession: false,
+                    },
+                    realtime: {
+                        transport: ws,
                     },
                 });
             },
