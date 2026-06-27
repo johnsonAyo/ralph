@@ -6,31 +6,21 @@ import { PlatformListingExtractor } from "@/modules/extraction/domain/interfaces
 import { CopartListingExtractor } from "@/modules/extraction/infrastructure/copart/copart-listing.extractor";
 import { IaaListingExtractor } from "@/modules/extraction/infrastructure/iaa/iaa-listing.extractor";
 import { ValidationError } from "@/common/errors/app.error";
-
-
 @Injectable()
 export class ListingExtractorService implements ListingExtractorPort {
-  private readonly extractors: Map<AuctionPlatformCode, PlatformListingExtractor>;
-
-  constructor(
-    copartExtractor: CopartListingExtractor,
-    iaaExtractor: IaaListingExtractor,
-  ) {
-    this.extractors = new Map<AuctionPlatformCode, PlatformListingExtractor>([
-      [copartExtractor.platform, copartExtractor],
-      [iaaExtractor.platform, iaaExtractor],
-    ]);
-  }
-
-  async extract(listingUrl: string): Promise<ListingSnapshot> {
-    const platform = detectPlatform(listingUrl);
-    const extractor = this.extractors.get(platform);
-
-    if (!extractor) {
-      throw new ValidationError(`Unsupported auction platform: ${platform}`);
+    private readonly extractors: Map<AuctionPlatformCode, PlatformListingExtractor>;
+    constructor(copartExtractor: CopartListingExtractor, iaaExtractor: IaaListingExtractor) {
+        this.extractors = new Map<AuctionPlatformCode, PlatformListingExtractor>([
+            [copartExtractor.platform, copartExtractor],
+            [iaaExtractor.platform, iaaExtractor],
+        ]);
     }
-
-    return extractor.extract(listingUrl);
-  }
+    async extract(listingUrl: string): Promise<ListingSnapshot> {
+        const platform = detectPlatform(listingUrl);
+        const extractor = this.extractors.get(platform);
+        if (!extractor) {
+            throw new ValidationError(`Unsupported auction platform: ${platform}`);
+        }
+        return extractor.extract(listingUrl);
+    }
 }
-

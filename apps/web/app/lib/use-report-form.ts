@@ -2,81 +2,86 @@ import { FormEvent, useCallback, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { RiskTolerance } from "@/app/types";
 import { useCreateReport } from "./use-create-report";
-
-const BUDGET_PATTERN = /^[£]?\s*([\d,]+)/;
-
-function parseBudget(raw: string): number | null {
-  const match = raw.match(BUDGET_PATTERN);
-  if (!match) return null;
-  const value = parseFloat(match[1].replace(/,/g, ""));
-  return Number.isNaN(value) ? null : value;
+function parseAmount(raw: string): number | null {
+    const cleaned = raw.replace(/[£,\s]/g, "");
+    const value = parseFloat(cleaned);
+    return Number.isNaN(value) || value <= 0 ? null : value;
 }
-
 export function useReportForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { mutateAsync, isPending } = useCreateReport();
-
-  const [listingUrl, setListingUrl] = useState(searchParams?.get("url") ?? "");
-  const [budget, setBudget] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>("cautious");
-  const [formError, setFormError] = useState("");
-
-  const submit = useCallback(
-    async (event: FormEvent) => {
-      event.preventDefault();
-      setFormError("");
-
-      const totalUserBudget = parseBudget(budget);
-      if (!totalUserBudget || totalUserBudget <= 0) {
-        setFormError("Please enter a valid budget (e.g. £4,000).");
-        return;
-      }
-
-      if (!listingUrl.trim()) {
-        setFormError("Please paste a listing URL.");
-        return;
-      }
-
-      if (!postcode.trim()) {
-        setFormError("Please enter your postcode.");
-        return;
-      }
-
-      try {
-        const report = await mutateAsync({
-          listingUrl: listingUrl.trim(),
-          totalUserBudget,
-          postcode: postcode.trim(),
-          riskTolerance,
-        });
-        router.push(`/reports/${report.id}`);
-      } catch (err) {
-        if (err instanceof Error && err.message === "UNAUTHENTICATED") {
-          const next = encodeURIComponent(`/reports/pending`);
-          router.push(`/auth?next=${next}`);
-          return;
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { mutateAsync, isPending } = useCreateReport();
+    const [listingUrl, setListingUrl] = useState(searchParams?.get("url") ?? "");
+    const [budgetMin, setBudgetMin] = useState("");
+    const [budgetMax, setBudgetMax] = useState("");
+    const [postcode, setPostcode] = useState("");
+    const [riskTolerance, setRiskTolerance] = useState<RiskTolerance>("cautious");
+    const [formError, setFormError] = useState("");
+    const min = parseAmount(budgetMin);
+    const max = parseAmount(budgetMax);
+    const isReady = listingUrl.trim().length > 0 &&
+        postcode.trim().length > 0 &&
+        min !== null &&
+        max !== null &&
+        min < max;
+    const submit = useCallback(async (event: FormEvent, confirmedListing?: any) => {
+        event.preventDefault();
+        setFormError("");
+        const min = parseAmount(budgetMin);
+        const max = parseAmount(budgetMax);
+        if (!min || min <= 0) {
+            setFormError("Please enter a minimum budget (e.g. £3,000).");
+            return;
         }
-        setFormError(
-          err instanceof Error ? err.message : "Something went wrong. Please try again.",
-        );
-      }
-    },
-    [budget, listingUrl, mutateAsync, postcode, riskTolerance, router],
-  );
-
-  return {
-    listingUrl,
-    setListingUrl,
-    budget,
-    setBudget,
-    postcode,
-    setPostcode,
-    riskTolerance,
-    setRiskTolerance,
-    formError,
-    isSubmitting: isPending,
-    submit,
-  };
+        if (!max || max <= 0) {
+            setFormError("Please enter a maximum budget (e.g. £6,000).");
+            return;
+        }
+        if (min >= max) {
+            setFormError("Your maximum budget must be higher than your minimum.");
+            return;
+        }
+        if (!listingUrl.trim()) {
+            setFormError("Please paste a listing URL.");
+            return;
+        }
+        if (!postcode.trim()) {
+            setFormError("Please enter your postcode.");
+            return;
+        }
+        try {
+            const report = await mutateAsync({
+                listingUrl: listingUrl.trim(),
+                totalUserBudget: max,
+                postcode: postcode.trim(),
+                riskTolerance,
+                listing: confirmedListing,
+            });
+            return report;
+        }
+        catch (err) {
+            if (err instanceof Error && err.message === "UNAUTHENTICATED") {
+                const next = encodeURIComponent(`/dashboard/new`);
+                router.push(`/auth?next=${next}`);
+                return;
+            }
+            setFormError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+        }
+    }, [budgetMin, budgetMax, listingUrl, mutateAsync, postcode, riskTolerance, router]);
+    return {
+        listingUrl,
+        setListingUrl,
+        budgetMin,
+        setBudgetMin,
+        budgetMax,
+        setBudgetMax,
+        postcode,
+        setPostcode,
+        riskTolerance,
+        setRiskTolerance,
+        formError,
+        isSubmitting: isPending,
+        isReady,
+        submit,
+    };
 }

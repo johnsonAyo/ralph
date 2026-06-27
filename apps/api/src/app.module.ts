@@ -9,34 +9,28 @@ import { PaymentsModule } from "@/modules/payments/payments.module";
 import { ReportsModule } from "@/modules/reports/reports.module";
 import { SupabaseModule } from "@/modules/supabase/supabase.module";
 import { AppLoggerService } from "@/common/logging/app-logger.service";
-
-
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validate: (config) => {
-        const parsed = appConfigSchema.safeParse(config);
-
-        if (!parsed.success) {
-          throw new Error(
-            `Invalid application configuration: ${parsed.error.message}`,
-          );
-        }
-
-        return parsed.data;
-      },
-    }),
-    SupabaseModule,
-    AuthModule,
-    CreditsModule,
-    ExtractionModule,
-    AiModule,
-    ReportsModule,
-    PaymentsModule,
-  ],
-  providers: [AppLoggerService],
-  exports: [AppLoggerService],
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+            validate: (config) => {
+                const parsed = appConfigSchema.safeParse(config);
+                if (!parsed.success) {
+                    throw new Error(`Invalid application configuration: ${parsed.error.message}`);
+                }
+                return parsed.data;
+            },
+        }),
+        SupabaseModule,
+        AuthModule,
+        CreditsModule,
+        ExtractionModule,
+        AiModule,
+        ReportsModule,
+        PaymentsModule,
+    ],
+    providers: [AppLoggerService],
+    exports: [AppLoggerService],
 })
-export class AppModule {}
-
+export class AppModule {
+}

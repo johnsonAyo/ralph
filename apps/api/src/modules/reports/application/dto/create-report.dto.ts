@@ -1,4 +1,1 @@
-export {
-  createReportRequestSchema,
-  type CreateReportRequest,
-} from "@ralph/shared";
+export { createReportRequestSchema, type CreateReportRequest, } from "@ralph/shared";

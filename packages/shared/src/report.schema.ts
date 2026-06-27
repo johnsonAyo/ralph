@@ -35,6 +35,7 @@ export const createReportRequestSchema = z.object({
   postcode: z.string().min(3).max(12),
   riskTolerance: z.enum(RiskTolerance).default(RiskTolerance.Cautious),
   repairPlan: z.enum(RepairPlan).default(RepairPlan.Unknown),
+  listing: listingSnapshotSchema.optional(),
 });
 
 export const reportStatusSchema = z.enum(ReportStatusCode);

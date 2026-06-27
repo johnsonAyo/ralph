@@ -2,6 +2,5 @@ export const RALPH_ANALYSIS_MODEL_FALLBACK = "gpt-4.1-mini";
 export const RALPH_ANALYSIS_RESPONSE_FORMAT = "ralph_report";
 export const RALPH_ANALYSIS_MAX_IMAGES = 8;
 export const RALPH_ANALYSIS_MAX_OUTPUT_TOKENS = 900;
-
 export const RALPH_ANALYSIS_OLLAMA_MODEL_FALLBACK = "llama3.2";
-export const RALPH_ANALYSIS_TIMEOUT_MS = 60_000;
+export const RALPH_ANALYSIS_TIMEOUT_MS = 60000;
