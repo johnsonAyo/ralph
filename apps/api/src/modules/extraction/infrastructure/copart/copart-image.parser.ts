@@ -1,11 +1,35 @@
 import { Logger } from "@nestjs/common";
 import { ExtractedImage } from "@ralph/shared";
-import { CopartFieldCode, COPART_IMAGE_RESPONSE_MARKER, } from "@/modules/extraction/domain/constants/copart.constants";
+import {
+    CopartFieldCode,
+    COPART_IMAGE_RESPONSE_MARKER,
+    COPART_IMG_SUFFIX_THUMB,
+    COPART_IMG_SUFFIX_FULL,
+    COPART_IMG_SUFFIX_HIRES,
+} from "@/modules/extraction/domain/constants/copart.constants";
 import { JsonRecord } from "@/modules/extraction/domain/types/json-record.type";
 import { isRecord, recordValue, toNumber, toStringValue, } from "@/modules/extraction/infrastructure/shared/parsing.utils";
-import { ScrapeClient } from "../scrape/scrape.client";
 
 const imageLogger = new Logger("fetchCopartLotImages");
+
+/**
+ * Copart embeds the primary photo as a thumbnail (`tims`, ..._thb.jpg) in the page's
+ * cached lot detail. The CDN serves the same photo at full/high-res by swapping the
+ * suffix, so one thumbnail URL gives us a usable hero image with no extra request.
+ * This is our guaranteed fallback when the gallery API (WAF-locked) can't be reached.
+ */
+function heroImageFromCachedDetails(cachedLotDetails?: JsonRecord): ExtractedImage[] {
+    const thumb = toStringValue(recordValue(cachedLotDetails, CopartFieldCode.ThumbnailImage));
+    if (!thumb || !thumb.includes(COPART_IMG_SUFFIX_THUMB)) {
+        return [];
+    }
+    return [{
+        sequence: 1,
+        thumbnailUrl: thumb,
+        fullUrl: thumb.replace(COPART_IMG_SUFFIX_THUMB, COPART_IMG_SUFFIX_FULL),
+        highResUrl: thumb.replace(COPART_IMG_SUFFIX_THUMB, COPART_IMG_SUFFIX_HIRES),
+    }];
+}
 export function normalizeCopartImagesResponse(json: JsonRecord): ExtractedImage[] {
     const data = recordValue<JsonRecord>(json, "data");
     const imagesList = recordValue<JsonRecord>(data, "imagesList");
@@ -41,78 +65,61 @@ export function normalizeCopartImagesResponse(json: JsonRecord): ExtractedImage[
     return images;
 }
 /**
- * Fetches Copart's high-res image JSON. Copart's image endpoint is not behind the
- * Incapsula JS challenge, so we try a fast/free native `fetch` first. But "no JS
- * challenge" is not "no IP reputation block" — on a datacenter host (e.g. Fly.io) the
- * native call can be 403'd by the same IP filtering that forced us onto ScraperAPI.
- * So if the native call fails or comes back empty, we fall back to Scrape.do's residential
- * proxies for the JSON too (no JS render needed, so it stays cheap) and log when that happens.
+ * Resolves Copart lot photos. The full gallery lives behind Copart's `lotImages` JSON
+ * endpoint, which is WAF-gated and only reachable from a clean (residential) IP with the
+ * page session — it works in local dev but reliably fails on a datacenter host (Fly), where
+ * it 403s/tarpits. So:
+ *   1. Try the gallery API natively (7s timeout). When it works → all photos.
+ *   2. Otherwise fall back to the `tims` hero thumbnail embedded in the page (always present,
+ *      no extra request), upscaled to full-res. One good photo is enough to confirm the car.
  */
-export async function fetchCopartLotImages(scrapeClient: ScrapeClient, baseUrl: string, cachedLotDetails?: JsonRecord): Promise<ExtractedImage[]> {
+export async function fetchCopartLotImages(baseUrl: string, cachedLotDetails?: JsonRecord): Promise<ExtractedImage[]> {
     const lotNumber = toStringValue(recordValue(cachedLotDetails, CopartFieldCode.LotNumber)) ??
         toStringValue(recordValue(cachedLotDetails, CopartFieldCode.LotNumberNumeric));
-    if (!lotNumber) {
-        imageLogger.warn("No lot number found in cached lot details; returning no images.");
-        return [];
-    }
-    const countryCode = toStringValue(recordValue(cachedLotDetails, "locCountry"));
 
-    // Extract base URL to construct the absolute image API URLs
-    const origin = new URL(baseUrl).origin;
+    if (lotNumber) {
+        const countryCode = toStringValue(recordValue(cachedLotDetails, "locCountry"));
+        const origin = new URL(baseUrl).origin;
+        const paths = countryCode
+            ? [
+                `${origin}/public/data/lotdetails/solr/lotImages/${lotNumber}/${countryCode}`,
+                `${origin}/public/data/lotdetails/solr/lotImages/${lotNumber}`,
+            ]
+            : [`${origin}/public/data/lotdetails/solr/lotImages/${lotNumber}`];
 
-    const paths = countryCode
-        ? [
-            `${origin}/public/data/lotdetails/solr/lotImages/${lotNumber}/${countryCode}`,
-            `${origin}/public/data/lotdetails/solr/lotImages/${lotNumber}`,
-        ]
-        : [`${origin}/public/data/lotdetails/solr/lotImages/${lotNumber}`];
-
-    let responseJson: JsonRecord | null = null;
-
-    for (const path of paths) {
-        // 1. Fast path: native fetch (free, works from residential IPs). Hard 7s timeout —
-        //    on a datacenter IP (Fly) Copart tarpits the connection instead of returning a
-        //    403, so without this the request hangs forever and the fallback never fires.
-        try {
-            const res = await fetch(path, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                    "Accept": "application/json",
-                },
-                signal: AbortSignal.timeout(7000),
-            });
-
-            if (res.ok) {
-                const text = await res.text();
-                if (text.includes(COPART_IMAGE_RESPONSE_MARKER)) {
-                    responseJson = JSON.parse(text) as JsonRecord;
-                    break;
+        for (const path of paths) {
+            // Native fetch with a hard 7s timeout — on a datacenter IP Copart tarpits the
+            // connection rather than returning a 403, so without this it would hang forever.
+            try {
+                const res = await fetch(path, {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                        "Accept": "application/json",
+                    },
+                    signal: AbortSignal.timeout(7000),
+                });
+                if (res.ok) {
+                    const text = await res.text();
+                    if (text.includes(COPART_IMAGE_RESPONSE_MARKER)) {
+                        const images = normalizeCopartImagesResponse(JSON.parse(text) as JsonRecord);
+                        if (images.length > 0) {
+                            return images;
+                        }
+                    }
                 }
-            } else {
-                imageLogger.warn(`Native image fetch returned ${res.status} for ${path}; trying Scrape.do fallback.`);
+            } catch {
+                // Expected on datacenter IPs — fall through to the embedded hero image.
             }
-        } catch (error) {
-            imageLogger.warn(`Native image fetch failed for ${path}: ${error}; trying ScraperAPI fallback.`);
-        }
-
-        // 2. Fallback: route the JSON through Scrape.do's residential proxies in case the
-        //    native call was IP-blocked (datacenter host). No render → still cheap. This is
-        //    the production-safe path.
-        try {
-            const text = await scrapeClient.fetchHtml(path, { residential: true });
-            if (text.includes(COPART_IMAGE_RESPONSE_MARKER)) {
-                responseJson = JSON.parse(text) as JsonRecord;
-                imageLogger.log(`Recovered Copart images via Scrape.do fallback for ${path}.`);
-                break;
-            }
-        } catch (error) {
-            imageLogger.warn(`Scrape.do image fallback failed for ${path}: ${error}`);
         }
     }
 
-    if (!responseJson) {
-        imageLogger.error(`Failed to fetch Copart images for lot ${lotNumber} (native + ScraperAPI both failed). Report will have no photos.`);
+    // Fallback: the embedded hero thumbnail (works everywhere, incl. Fly).
+    const hero = heroImageFromCachedDetails(cachedLotDetails);
+    if (hero.length > 0) {
+        imageLogger.warn(`Gallery API unavailable for lot ${lotNumber ?? "?"} — using embedded hero photo only.`);
+        return hero;
     }
 
-    return responseJson && isRecord(responseJson) ? normalizeCopartImagesResponse(responseJson) : [];
+    imageLogger.error(`No images found for lot ${lotNumber ?? "?"} (gallery API blocked and no embedded thumbnail).`);
+    return [];
 }

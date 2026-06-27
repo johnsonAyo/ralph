@@ -26,7 +26,7 @@ export class CopartListingExtractor implements PlatformListingExtractor {
             const cachedLotDetails = extractCachedCopartLotDetails(html);
 
             // 3. Fetch images via API
-            const directImages = await fetchCopartLotImages(this.scrapeClient, listingUrl, cachedLotDetails);
+            const directImages = await fetchCopartLotImages(listingUrl, cachedLotDetails);
 
             // 4. Extract schema.org JSON-LD data
             const jsonLd = $('script[type="application/ld+json"]')
