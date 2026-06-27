@@ -1,0 +1,55 @@
+# fly.toml — Ralph API deployment on Fly.io
+# Run `fly launch --no-deploy` from the repo root to register this app,
+# then `fly deploy` from the same directory to build & ship.
+
+app = "ralph-api"
+primary_region = "lhr"        # London — change to your preferred region
+
+[build]
+  # Fly.io will find the Dockerfile automatically in apps/api/
+  dockerfile = "apps/api/Dockerfile"
+  # Build context is the monorepo root so pnpm workspace files are available
+  build_target = "runner"
+
+[env]
+  NODE_ENV = "production"
+  PORT     = "4000"
+  # All secrets (SUPABASE_URL, OPENAI_API_KEY, etc.) are set via:
+  #   fly secrets set KEY=value
+  # Do NOT put secret values here.
+
+[[services]]
+  protocol    = "tcp"
+  internal_port = 4000
+
+  [[services.ports]]
+    port     = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port     = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type       = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+  [[services.http_checks]]
+    interval     = "15s"
+    timeout      = "5s"
+    grace_period = "30s"
+    method       = "GET"
+    path         = "/health"
+
+[http_service]
+  internal_port       = 4000
+  force_https         = true
+  auto_stop_machines  = false   # ← keeps machine always-on (no cold starts)
+  auto_start_machines = true
+  min_machines_running = 1      # ← always at least 1 machine alive
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory_mb = 512              # 512MB is enough for NestJS; bump to 1024 if Playwright needs it

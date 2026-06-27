@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { HealthController } from "@/common/health.controller";
 import { ConfigModule } from "@nestjs/config";
 import { appConfigSchema } from "@/common/config/app-config.schema";
 import { AiModule } from "@/modules/ai/ai.module";
@@ -10,6 +11,7 @@ import { ReportsModule } from "@/modules/reports/reports.module";
 import { SupabaseModule } from "@/modules/supabase/supabase.module";
 import { AppLoggerService } from "@/common/logging/app-logger.service";
 @Module({
+    controllers: [HealthController],
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
