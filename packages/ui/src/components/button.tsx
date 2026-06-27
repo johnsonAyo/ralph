@@ -29,6 +29,9 @@ const buttonVariants = cva(
         md: "min-h-[48px] rounded-2xl px-5 text-sm",
         lg: "min-h-[56px] rounded-[21px] px-[30px] text-[0.95rem]",
         icon: "size-11 rounded-2xl",
+        // No sizing — for wrapping existing bespoke-classed buttons whose own
+        // CSS controls height/padding/radius during incremental migration.
+        none: "",
       },
     },
     defaultVariants: { variant: "primary", size: "lg" },

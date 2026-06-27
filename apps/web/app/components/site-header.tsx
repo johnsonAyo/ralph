@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, LogOut, Search, User as UserIcon } from "lucide-react";
+import { Button } from "@ralph/ui";
 import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../lib/supabase";
 import { useCredits } from "../lib/use-credits";
 const HOME_ANCHORS = [
@@ -71,17 +72,17 @@ export default function SiteHeader() {
               <span className="dashboard-nav-email" title={user.email ?? user.id}>
                 {user.email ?? user.id}
               </span>
-              <button type="button" className="button dashboard-logout" onClick={handleSignOut}>
+              <Button type="button" className="dashboard-logout" onClick={handleSignOut}>
                 <LogOut size={14} aria-hidden="true"/>
                 Logout
-              </button>
+              </Button>
             </>) : (<>
               <Link className="auth-pill auth-link" href="/auth">
                 Sign in
               </Link>
-              {isHome ? (<a className="button primary" href="#check">
-                  Ask Ralph
-                </a>) : null}
+              {isHome ? (<Button asChild>
+                  <a href="#check">Ask Ralph</a>
+                </Button>) : null}
             </>)}
         </div>) : null}
     </header>);
