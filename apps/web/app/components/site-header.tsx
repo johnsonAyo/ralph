@@ -23,7 +23,7 @@ export default function SiteHeader() {
     const isOnDashboard = pathname.startsWith("/dashboard");
     const isAuthPage = pathname.startsWith("/auth");
     const { data: user } = useSession();
-    const { data: credits = 0, isLoading: loadingCredits } = useCredits();
+    const { data: credits = 0, isLoading: loadingCredits } = useCredits(user?.id);
     async function handleSignOut() {
         if (!isSupabaseConfigured()) {
             window.location.href = "/";

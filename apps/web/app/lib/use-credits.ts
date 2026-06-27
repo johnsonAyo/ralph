@@ -12,10 +12,11 @@ async function fetchCreditBalance(): Promise<number> {
     }
     return (data ?? []).reduce((sum, item) => sum + item.amount, 0);
 }
-export function useCredits() {
+export function useCredits(userId?: string) {
     return useQuery({
-        queryKey: ["credits"],
+        queryKey: ["credits", userId],
         queryFn: fetchCreditBalance,
         staleTime: 30000,
+        enabled: !!userId,
     });
 }

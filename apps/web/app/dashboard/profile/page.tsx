@@ -16,7 +16,7 @@ function getInitials(email: string): string {
 export default function ProfilePage() {
     const router = useRouter();
     const { data: user } = useSession();
-    const { data: credits = 0, isLoading: loadingCredits } = useCredits();
+    const { data: credits = 0, isLoading: loadingCredits } = useCredits(user?.id);
     const initials = user?.email ? getInitials(user.email) : "?";
     const memberSince = user?.created_at
         ? new Date(user.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })

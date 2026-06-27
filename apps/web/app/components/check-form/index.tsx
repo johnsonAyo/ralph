@@ -93,7 +93,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
   };
 
   const { data: user } = useSession();
-  const { data: credits = 0, isLoading: loadingCredits } = useCredits();
+  const { data: credits = 0, isLoading: loadingCredits } = useCredits(user?.id);
   const hasInsufficientCredits = !!user && !loadingCredits && credits <= 0;
 
   const handleSimpleSubmit = (e: React.FormEvent) => {

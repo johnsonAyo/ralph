@@ -18,7 +18,7 @@ function QuickCheckWidget() {
         router.push(`/dashboard/new?${params.toString()}`);
     }
     return (<form className="quick-check-widget" onSubmit={handleSubmit}>
-      <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart or Autotrader listing URL..." required/>
+      <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart or Autotrader listing URL..." required suppressHydrationWarning/>
       <Button type="submit" className="h-[46px] min-h-0 shrink-0 gap-1.5 rounded-[12px] px-5 text-[0.88rem] shadow-[0_6px_18px_rgba(47,98,233,0.18)]">
         Analyse
         <ArrowRight size={15} aria-hidden="true"/>
