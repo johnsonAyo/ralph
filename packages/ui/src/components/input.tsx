@@ -1,11 +1,5 @@
 import * as React from "react";
 import { cn } from "../lib/cn";
-
-/**
- * Matches the product's base `input` styling (44px tall, 14px radius, warm
- * off-white fill, 750 weight). Surface-specific CSS in globals.css still
- * out-specifies these utilities, so swapping native inputs is transparent.
- */
 const Input = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
