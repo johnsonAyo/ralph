@@ -1,46 +1,6 @@
 # ─── Stage 1: Builder ───────────────────────────────────────────────────────
 FROM node:22-slim AS builder
 
-# Install Chromium system deps (needed for playwright install to succeed)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libc6 \
-    libcairo2 \
-    libcups2 \
-    libdbus-1-3 \
-    libexpat1 \
-    libfontconfig1 \
-    libgbm1 \
-    libgcc1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libstdc++6 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libxrandr2 \
-    libxrender1 \
-    libxss1 \
-    libxtst6 \
-    lsb-release \
-    wget \
-    xdg-utils \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN npm install -g pnpm@9.15.9
 
 WORKDIR /app
@@ -65,52 +25,11 @@ RUN pnpm --filter @ralph/shared build
 # Now build the API
 RUN pnpm --filter @ralph/api build
 
-# Install Playwright Chromium browsers in the builder (all deps available here)
-# Store them in a known path so we can copy them to the runner stage
-ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
-RUN node apps/api/node_modules/playwright/cli.js install chromium
-
 # ─── Stage 2: Runner ────────────────────────────────────────────────────────
 FROM node:22-slim AS runner
 
-# Install system deps required by Playwright Chromium at runtime
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libc6 \
-    libcairo2 \
-    libcups2 \
-    libdbus-1-3 \
-    libexpat1 \
-    libfontconfig1 \
-    libgbm1 \
-    libgcc1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libstdc++6 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libxrandr2 \
-    libxrender1 \
-    libxss1 \
-    libxtst6 \
-    lsb-release \
-    wget \
-    xdg-utils \
+# ca-certificates for outbound HTTPS (Scrape.do, Supabase, OpenAI, Stripe)
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g pnpm@9.15.9
@@ -127,17 +46,12 @@ COPY apps/api/package.json ./apps/api/
 # Install production deps only
 RUN pnpm install --frozen-lockfile --prod
 
-# Copy pre-downloaded Chromium browsers from builder — no need to re-download
-COPY --from=builder /pw-browsers /pw-browsers
-
 # Copy built output from builder stage
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
 ENV NODE_ENV=production
 ENV PORT=4000
-# Tell Playwright where the browsers are
-ENV PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
 
 EXPOSE 4000
 
