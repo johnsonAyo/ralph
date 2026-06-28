@@ -397,6 +397,20 @@ main {
   letter-spacing: -0.01em;
 }
 
+.dash-see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--blue);
+  transition: opacity 150ms ease;
+}
+
+.dash-see-all:hover {
+  text-decoration: underline;
+}
+
 .dash-report-list {
   display: grid;
   gap: 16px;

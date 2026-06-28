@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useCredits } from "../../lib/use-credits";
 import { useSession, getSupabaseBrowserClient } from "../../lib/supabase";
 import Link from "next/link";
+import { Link2, PencilLine, Check } from "lucide-react";
 import { API_BASE_URL } from "../../constants";
 import {
   Button,
@@ -42,6 +43,11 @@ const RISK_OPTIONS = [
     option: landingLabels.form.riskOptions.flexible,
     checked: "has-[:checked]:border-red-500 has-[:checked]:bg-red-50",
   },
+] as const;
+
+const ENTRY_OPTIONS = [
+  { value: 'link', title: 'Paste a link', desc: 'Ralph pulls the details from the listing.', Icon: Link2 },
+  { value: 'manual', title: 'Enter manually', desc: 'Type the car’s details in yourself.', Icon: PencilLine },
 ] as const;
 
 export default function CheckForm({ hideIntro = false, variant = 'default' }: CheckFormProps) {
@@ -184,13 +190,6 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
   const manualParamsReady =
     budgetMin.trim() !== "" && budgetMax.trim() !== "" && postcode.trim().length >= 3;
 
-  const tabClass = (mode: 'link' | 'manual') =>
-    `flex-1 rounded-xl px-3 py-2.5 text-[0.8rem] font-extrabold tracking-tight transition-all duration-200 sm:text-[0.85rem] ${
-      entryMode === mode
-        ? "bg-[var(--blue)] text-white shadow-[0_6px_16px_rgba(47,98,233,0.28)]"
-        : "text-[var(--muted)] hover:bg-white/60 hover:text-[var(--ink)]"
-    }`;
-
   const sharedParams = (
     <>
       <div className="flex flex-col gap-2.5">
@@ -279,13 +278,37 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
         </div>
       )}
 
-      <div className="flex gap-1.5 rounded-2xl border border-[var(--line)] bg-[#f4f0e7] p-1.5">
-        <button type="button" onClick={() => setEntryMode('link')} className={tabClass('link')}>
-          From a link
-        </button>
-        <button type="button" onClick={() => setEntryMode('manual')} className={tabClass('manual')}>
-          Enter manually
-        </button>
+      <div className="flex flex-col gap-2">
+        <span className={LABEL_TEXT}>How do you want to check this car?</span>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+          {ENTRY_OPTIONS.map(({ value, title, desc, Icon }) => {
+            const active = entryMode === value;
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setEntryMode(value)}
+                aria-pressed={active}
+                className={`flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition duration-200 ${
+                  active
+                    ? "border-[var(--blue)] bg-[rgba(47,98,233,0.06)] shadow-[0_4px_14px_rgba(47,98,233,0.12)]"
+                    : "border-[var(--line)] bg-[#fffdf9] hover:-translate-y-0.5 hover:bg-white"
+                }`}
+              >
+                <span className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl ${active ? "bg-[var(--blue)] text-white" : "bg-[rgba(47,98,233,0.1)] text-[var(--blue)]"}`}>
+                  <Icon className="size-[18px]" aria-hidden />
+                </span>
+                <span className="flex min-w-0 flex-col gap-0.5">
+                  <span className="flex items-center gap-1.5 text-[0.92rem] font-extrabold text-[var(--ink)]">
+                    {title}
+                    {active && <Check className="size-3.5 text-[var(--blue)]" aria-hidden />}
+                  </span>
+                  <span className="text-[0.78rem] font-medium leading-snug text-[var(--muted)]">{desc}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {entryMode === 'link' ? (

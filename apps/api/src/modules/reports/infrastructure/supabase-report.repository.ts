@@ -41,6 +41,12 @@ export class SupabaseReportRepository implements ReportRepository {
         }
         return (data ?? []).map((row) => Report.fromSnapshot(this.fromRow(row)));
     }
+    async delete(id: string): Promise<void> {
+        const { error } = await this.supabase.from("reports").delete().eq("id", id);
+        if (error) {
+            throw error;
+        }
+    }
     private toRow(snapshot: ReportSnapshot): ReportRow {
         return {
             id: snapshot.id,

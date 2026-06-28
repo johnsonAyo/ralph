@@ -1,12 +1,23 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Car, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Button, Input } from "@ralph/ui";
-import { ReportSnapshot, ReportVerdictCode } from "@ralph/shared";
+import { ReportVerdictCode } from "@ralph/shared";
 import { useReports } from "../lib/use-reports";
 import { dashboardLabels } from "../labels";
-import { DashboardReportsSkeleton, DashboardStatsSkeleton, } from "../components/skeleton";
+import {
+    reportBidRange,
+    reportHeadline,
+    reportTitle,
+    reportTone,
+    relativeTime,
+} from "../lib/report-display";
+import { DashboardReportsSkeleton, DashboardStatsSkeleton } from "../components/skeleton";
+
+const RECENT_LIMIT = 3;
+
 function QuickCheckWidget() {
     const router = useRouter();
     const [url, setUrl] = useState("");
@@ -24,48 +35,6 @@ function QuickCheckWidget() {
         <ArrowRight size={15} aria-hidden="true"/>
       </Button>
     </form>);
-}
-function verdictLabel(snapshot: ReportSnapshot): string {
-    const verdict = snapshot.result?.verdict;
-    const max = snapshot.result?.hardCeiling;
-    if (verdict === ReportVerdictCode.GoodCandidate)
-        return "Good candidate";
-    if (verdict === ReportVerdictCode.ConsiderBelowCeiling) {
-        return max ? `Consider below £${max.toLocaleString("en-GB")}` : "Consider with caution";
-    }
-    if (verdict === ReportVerdictCode.HighRisk)
-        return "Avoid";
-    if (verdict === ReportVerdictCode.InsufficientConfidence)
-        return "Low confidence";
-    return snapshot.status;
-}
-function verdictClass(snapshot: ReportSnapshot): "ok" | "avoid" | "pending" {
-    const verdict = snapshot.result?.verdict;
-    if (verdict === ReportVerdictCode.GoodCandidate ||
-        verdict === ReportVerdictCode.ConsiderBelowCeiling) {
-        return "ok";
-    }
-    if (verdict === ReportVerdictCode.HighRisk)
-        return "avoid";
-    return "pending";
-}
-function bidRange(snapshot: ReportSnapshot): string {
-    const { safeBidMin, safeBidMax } = snapshot.result ?? {};
-    if (safeBidMin && safeBidMax) {
-        return `£${safeBidMin.toLocaleString("en-GB")} – £${safeBidMax.toLocaleString("en-GB")}`;
-    }
-    return "—";
-}
-function relativeTime(iso: string): string {
-    const diffMs = Date.now() - new Date(iso).getTime();
-    const diffDays = Math.floor(diffMs / 86400000);
-    if (diffDays === 0)
-        return "Today";
-    if (diffDays === 1)
-        return "Yesterday";
-    if (diffDays < 7)
-        return `${diffDays} days ago`;
-    return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) === 1 ? "" : "s"} ago`;
 }
 function EmptyState() {
     return (<div className="dash-empty">
@@ -98,8 +67,9 @@ export default function DashboardPage() {
             }
         }
     }
+    const recent = reports?.slice(0, RECENT_LIMIT) ?? [];
     return (<div className="dashboard-page">
-      
+
       <section className="dash-hero">
         <div className="dash-hero-left">
           <h1 className="dash-title">{dashboardLabels.title}</h1>
@@ -133,12 +103,15 @@ export default function DashboardPage() {
           </div>)}
       </section>
 
-      
       <section className="dash-section">
         <header className="dash-section-head">
-          <div>
-            <h2 className="dash-section-title">Recent reports</h2>
-          </div>
+          <h2 className="dash-section-title">Recent reports</h2>
+          {totalChecks > 0 && (
+            <Link className="dash-see-all" href="/dashboard/history">
+              See all {totalChecks}
+              <ArrowRight size={14} aria-hidden="true"/>
+            </Link>
+          )}
         </header>
 
         {isLoading && <DashboardReportsSkeleton />}
@@ -147,25 +120,25 @@ export default function DashboardPage() {
 
         {isError && reports && reports.length > 0 && (<p className="dash-error">Could not load reports. Please try again.</p>)}
 
-        {!isLoading && reports && reports.length > 0 && (<div className="dash-report-list">
-            {reports.map((report) => (<article key={report.id} className="dash-card">
-                <div className={`dash-card-band ${verdictClass(report)}`}>
+        {!isLoading && recent.length > 0 && (<div className="dash-report-list">
+            {recent.map((report) => (<article key={report.id} className="dash-card">
+                <div className={`dash-card-band ${reportTone(report)}`}>
                   <div className="dash-card-dot"/>
-                  <span>{verdictLabel(report)}</span>
+                  <span>{reportHeadline(report)}</span>
                 </div>
 
                 <div className="dash-card-body">
-                  <h3>{report.listing?.title ?? report.request.listingUrl ?? "Manual entry"}</h3>
+                  <h3>{reportTitle(report)}</h3>
                   <p className="dash-card-source">{report.listing?.platform ?? "—"}</p>
                   <p className="dash-card-note">
-                    {report.result?.summary ?? report.status}
+                    {report.result?.summary ?? reportHeadline(report)}
                   </p>
                 </div>
 
                 <div className="dash-card-meta">
                   <div className="dash-card-bid">
                     <span>Ralph&apos;s range</span>
-                    <strong>{bidRange(report)}</strong>
+                    <strong>{reportBidRange(report)}</strong>
                   </div>
                   <div className="dash-card-footer">
                     <span className="dash-card-when">{relativeTime(report.createdAt)}</span>

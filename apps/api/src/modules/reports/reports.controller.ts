@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseUUIDPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, UseGuards } from "@nestjs/common";
 import { CurrentUser } from "@/modules/auth/current-user.decorator";
 import { SupabaseJwtGuard } from "@/modules/auth/supabase-jwt.guard";
 import { AuthenticatedUser } from "@/modules/auth/types";
@@ -73,5 +73,18 @@ export class ReportsController {
             throw new NotFoundError("Report not found.");
         }
         return report.toSnapshot();
+    }
+    @Delete(":id")
+    @HttpCode(204)
+    async remove(
+    @CurrentUser()
+    user: AuthenticatedUser,
+    @Param("id", ParseUUIDPipe)
+    id: string) {
+        const report = await this.reports.findById(id);
+        if (!report || report.toSnapshot().userId !== user.id) {
+            throw new NotFoundError("Report not found.");
+        }
+        await this.reports.delete(id);
     }
 }
