@@ -1,4 +1,4 @@
-name: Deploy API to Fly.io
+name: Deploy API to Cloud Run
 
 on:
   push:
@@ -8,21 +8,44 @@ on:
       - 'apps/api/**'
       - 'packages/shared/**'
       - 'packages/typescript-config/**'
-      - 'fly.toml'
-      - 'apps/api/Dockerfile'
+      - 'Dockerfile'
+      - '.github/workflows/deploy-api.yml'
+
+# Service config. Env vars / secrets (OPENAI_API_KEY, SUPABASE_*, SCRAPE_DO_TOKEN,
+# STRIPE_*, WEB_ORIGIN) are set on the Cloud Run service during the first manual
+# deploy and persist across revisions, so they are NOT duplicated in GitHub here.
+env:
+  SERVICE: ralph-api
+  REGION: europe-west2
 
 jobs:
   deploy:
-    name: Deploy
+    name: Build & deploy
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to Fly.io
-        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --source . \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --region "$REGION" \
+            --allow-unauthenticated \
+            --memory 1Gi \
+            --cpu 1 \
+            --timeout 120 \
+            --min-instances 0 \
+            --max-instances 4 \
+            --quiet

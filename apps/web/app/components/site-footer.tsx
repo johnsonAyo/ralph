@@ -5,7 +5,8 @@ import CTA from "./cta";
 export default function SiteFooter() {
     const pathname = usePathname() ?? "/";
     const isOnDashboard = pathname.startsWith("/dashboard");
-    if (isOnDashboard) {
+    const isAuthPage = pathname.startsWith("/auth");
+    if (isOnDashboard || isAuthPage) {
         return null;
     }
     return (<footer className="footer">

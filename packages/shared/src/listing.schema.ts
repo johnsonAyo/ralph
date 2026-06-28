@@ -1,8 +1,22 @@
 import { z } from "zod";
 
 export enum AuctionPlatformCode {
+  // UK auction / salvage sites (supported)
   CopartUk = "copart_uk",
   IaaSynetiqUk = "iaa_synetiq_uk",
+  BcaUk = "bca_uk",
+  ManheimUk = "manheim_uk",
+  E2eUk = "e2e_uk",
+  G3Uk = "g3_uk",
+  HillsUk = "hills_uk",
+  WilsonsUk = "wilsons_uk",
+  JohnPyeUk = "john_pye_uk",
+  AstonBarclayUk = "aston_barclay_uk",
+  Raw2kUk = "raw2k_uk",
+  // US sites (recognised but not yet supported)
+  CopartUs = "copart_us",
+  IaaUs = "iaa_us",
+  // Anything else recognised as a listing page
   Other = "other",
 }
 
@@ -24,7 +38,7 @@ export const extractedImageSchema = z.object({
 
 export const listingSnapshotSchema = z.object({
   platform: auctionPlatformSchema,
-  listingUrl: z.string().url(),
+  listingUrl: z.string().url().optional(),
   lotNumber: z.string().min(1).optional(),
   title: z.string().min(1).optional(),
   year: z.number().int().optional(),

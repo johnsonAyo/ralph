@@ -9,6 +9,7 @@ import { ExtractionModule } from "@/modules/extraction/extraction.module";
 import { PaymentsModule } from "@/modules/payments/payments.module";
 import { ReportsModule } from "@/modules/reports/reports.module";
 import { SupabaseModule } from "@/modules/supabase/supabase.module";
+import { VehicleDataModule } from "@/modules/vehicle-data/vehicle-data.module";
 import { AppLoggerService } from "@/common/logging/app-logger.service";
 @Module({
     controllers: [HealthController],
@@ -30,6 +31,7 @@ import { AppLoggerService } from "@/common/logging/app-logger.service";
         AiModule,
         ReportsModule,
         PaymentsModule,
+        VehicleDataModule,
     ],
     providers: [AppLoggerService],
     exports: [AppLoggerService],

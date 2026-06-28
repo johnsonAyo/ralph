@@ -12,7 +12,7 @@ export type PricingItem = [
 export type RiskTolerance = "cautious" | "balanced" | "flexible";
 import { ListingSnapshot } from "@ralph/shared";
 export interface CreateReportInput {
-    listingUrl: string;
+    listingUrl?: string;
     totalUserBudget: number;
     postcode: string;
     riskTolerance: "cautious" | "balanced" | "flexible";

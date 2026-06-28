@@ -18,20 +18,37 @@ import {
   SelectValue,
 } from "@ralph/ui";
 import ConfirmListing from "./confirm-listing";
+import ManualEntry from "./manual-entry";
+import { CONTROL_CLASS, HINT_TEXT, LABEL_TEXT, PANEL_CLASS } from "./styles";
 
 interface CheckFormProps {
   hideIntro?: boolean;
   variant?: 'default' | 'dashboard';
 }
 
-
-const SELECT_TRIGGER_CLASS =
-  "min-h-[46px] rounded-[12px] border-[1.5px] border-input bg-[#fefdfb] px-4 text-[0.95rem] font-semibold focus:ring-[3px] focus:ring-ring/15";
+const RISK_OPTIONS = [
+  {
+    value: "cautious",
+    option: landingLabels.form.riskOptions.cautious,
+    checked: "has-[:checked]:border-green-500 has-[:checked]:bg-green-50",
+  },
+  {
+    value: "balanced",
+    option: landingLabels.form.riskOptions.balanced,
+    checked: "has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50",
+  },
+  {
+    value: "flexible",
+    option: landingLabels.form.riskOptions.flexible,
+    checked: "has-[:checked]:border-red-500 has-[:checked]:bg-red-50",
+  },
+] as const;
 
 export default function CheckForm({ hideIntro = false, variant = 'default' }: CheckFormProps) {
   const router = useRouter();
   const [simpleUrl, setSimpleUrl] = useState("");
   const [listingSource, setListingSource] = useState("auction");
+  const [entryMode, setEntryMode] = useState<'link' | 'manual'>('link');
 
   const {
     listingUrl,
@@ -50,7 +67,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
     submit,
   } = useReportForm();
 
-  
+
   const [stage, setStage] = useState<'form' | 'scraping' | 'confirm'>('form');
   const [extractedListing, setExtractedListing] = useState<any | null>(null);
   const [scrapingError, setScrapingError] = useState("");
@@ -93,7 +110,8 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
   };
 
   const { data: user } = useSession();
-  const { data: credits = 0, isLoading: loadingCredits } = useCredits(user?.id);
+  const { data: creditInfo, isLoading: loadingCredits } = useCredits(user?.id);
+  const credits = creditInfo?.balance ?? 0;
   const hasInsufficientCredits = !!user && !loadingCredits && credits <= 0;
 
   const handleSimpleSubmit = (e: React.FormEvent) => {
@@ -132,23 +150,19 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
     );
   }
 
-  // Dashboard Loader screens
-  if (isSubmitting) {
+  if (isSubmitting || stage === 'scraping') {
+    const isAnalysis = isSubmitting;
     return (
-      <div className="dashboard-form-panel" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "350px", textAlign: "center", padding: "3rem" }}>
+      <div className={`${PANEL_CLASS} min-h-[350px] items-center justify-center text-center`}>
         <div className="spinner" style={{ width: "50px", height: "50px", border: "4px solid rgba(0, 0, 0, 0.1)", borderTop: "4px solid var(--blue, #2f62e9)", borderRadius: "50%", animation: "spin 1s linear infinite", marginBottom: "1.5rem" }} />
-        <h2 style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--ink, #111)", marginBottom: "0.5rem" }}>Running AI Analysis...</h2>
-        <p style={{ color: "var(--ink-gray, #666)", fontSize: "0.95rem", maxWidth: "340px", lineHeight: "1.5" }}>Creating report and debiting credit. Analyzing the vehicle history, damage, and bid strategy.</p>
-      </div>
-    );
-  }
-
-  if (stage === 'scraping') {
-    return (
-      <div className="dashboard-form-panel" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "350px", textAlign: "center", padding: "3rem" }}>
-        <div className="spinner" style={{ width: "50px", height: "50px", border: "4px solid rgba(0, 0, 0, 0.1)", borderTop: "4px solid var(--blue, #2f62e9)", borderRadius: "50%", animation: "spin 1s linear infinite", marginBottom: "1.5rem" }} />
-        <h2 style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--ink, #111)", marginBottom: "0.5rem" }}>Retrieving car information...</h2>
-        <p style={{ color: "var(--ink-gray, #666)", fontSize: "0.95rem", maxWidth: "320px", lineHeight: "1.5" }}>Ralph is analyzing the link and extracting listing details.</p>
+        <h2 className="mb-2 text-xl font-extrabold text-[var(--ink)]">
+          {isAnalysis ? "Running AI Analysis…" : "Retrieving car information…"}
+        </h2>
+        <p className="max-w-[340px] text-[0.95rem] leading-relaxed text-[var(--muted)]">
+          {isAnalysis
+            ? "Creating report and debiting credit. Analysing the vehicle history, damage, and bid strategy."
+            : "Ralph is analysing the link and extracting listing details."}
+        </p>
       </div>
     );
   }
@@ -167,12 +181,97 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
     );
   }
 
+  const manualParamsReady =
+    budgetMin.trim() !== "" && budgetMax.trim() !== "" && postcode.trim().length >= 3;
+
+  const tabClass = (mode: 'link' | 'manual') =>
+    `flex-1 rounded-xl px-3 py-2.5 text-[0.8rem] font-extrabold tracking-tight transition-all duration-200 sm:text-[0.85rem] ${
+      entryMode === mode
+        ? "bg-[var(--blue)] text-white shadow-[0_6px_16px_rgba(47,98,233,0.28)]"
+        : "text-[var(--muted)] hover:bg-white/60 hover:text-[var(--ink)]"
+    }`;
+
+  const sharedParams = (
+    <>
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className={LABEL_TEXT}>{landingLabels.form.budgetLabel}</span>
+          {(budgetMin || budgetMax) && (
+            <span className="text-[0.88rem] font-extrabold text-[var(--blue)]">
+              £{budgetMin || "0"} – £{budgetMax || "0"}
+            </span>
+          )}
+        </div>
+        <div className="flex items-end gap-3">
+          <div className="flex flex-1 flex-col gap-1.5">
+            <span className="text-[0.8rem] font-bold text-[var(--muted)]">Minimum</span>
+            <Input
+              id="budgetMin" type="text" inputMode="numeric"
+              value={budgetMin} onChange={(e) => setBudgetMin(e.target.value)}
+              placeholder="3,000" aria-label="Minimum budget"
+              className={CONTROL_CLASS}
+            />
+          </div>
+          <span className="shrink-0 pb-3 text-lg font-bold text-[#c4bdb4]" aria-hidden="true">–</span>
+          <div className="flex flex-1 flex-col gap-1.5">
+            <span className="text-[0.8rem] font-bold text-[var(--muted)]">Maximum</span>
+            <Input
+              id="budgetMax" type="text" inputMode="numeric"
+              value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)}
+              placeholder="6,000" aria-label="Maximum budget"
+              className={CONTROL_CLASS}
+            />
+          </div>
+        </div>
+        <span className={HINT_TEXT}>{landingLabels.form.budgetHint}</span>
+      </div>
+
+      <label className="flex flex-col gap-2">
+        <span className={LABEL_TEXT}>{landingLabels.form.postcodeLabel}</span>
+        <Input
+          id="postcode"
+          value={postcode} onChange={(e) => setPostcode(e.target.value)}
+          placeholder="e.g. M12 4AB"
+          className={CONTROL_CLASS}
+        />
+        <span className={HINT_TEXT}>{landingLabels.form.postcodeHint}</span>
+      </label>
+
+      <div className="flex flex-col gap-3">
+        <span className={LABEL_TEXT}>{landingLabels.form.riskLabel}</span>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {RISK_OPTIONS.map(({ value, option, checked }) => (
+            <label
+              key={value}
+              className={`relative flex cursor-pointer select-none flex-col gap-1 rounded-2xl border-2 border-[var(--line)] bg-[#fffdf9] p-3.5 transition duration-200 hover:-translate-y-0.5 hover:bg-white has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--blue)] ${checked}`}
+            >
+              <input
+                type="radio" name="riskTolerance" value={value} className="sr-only"
+                checked={riskTolerance === value}
+                onChange={() => setRiskTolerance(value)}
+              />
+              <span className="text-[0.85rem] font-extrabold text-[var(--ink)]">{option.title}</span>
+              <span className="text-xs font-medium leading-snug text-[var(--muted)]">{option.desc}</span>
+            </label>
+          ))}
+        </div>
+        <span className={HINT_TEXT}>{landingLabels.form.riskHint}</span>
+      </div>
+    </>
+  );
+
+  const creditWarning = hasInsufficientCredits ? (
+    <p className="form-error" style={{ marginBottom: "0.25rem", textAlign: "center" }}>
+      You have 0 credits remaining. Please{" "}
+      <Link href="/#pricing" style={{ textDecoration: "underline", fontWeight: 600 }}>
+        buy credits
+      </Link>{" "}
+      to run a check.
+    </p>
+  ) : null;
+
   return (
-    <form
-      className="dashboard-form-panel"
-      onSubmit={handleStartCheck}
-      id="check-form"
-    >
+    <div className={PANEL_CLASS}>
       {!hideIntro && (
         <div className="form-intro">
           <strong>{landingLabels.form.introTitle}</strong>
@@ -180,142 +279,75 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
         </div>
       )}
 
-      {/* Listing source */}
-      <label>
-        {landingLabels.form.sourceLabel}
-        <Select value={listingSource} onValueChange={setListingSource}>
-          <SelectTrigger className={SELECT_TRIGGER_CLASS}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="marketplace">{landingLabels.form.sourceOptions.marketplace}</SelectItem>
-            <SelectItem value="auction">{landingLabels.form.sourceOptions.auction}</SelectItem>
-            <SelectItem value="dealer">{landingLabels.form.sourceOptions.dealer}</SelectItem>
-            <SelectItem value="private">{landingLabels.form.sourceOptions.private}</SelectItem>
-          </SelectContent>
-        </Select>
-        <span>{landingLabels.form.sourceHint}</span>
-      </label>
+      <div className="flex gap-1.5 rounded-2xl border border-[var(--line)] bg-[#f4f0e7] p-1.5">
+        <button type="button" onClick={() => setEntryMode('link')} className={tabClass('link')}>
+          From a link
+        </button>
+        <button type="button" onClick={() => setEntryMode('manual')} className={tabClass('manual')}>
+          Enter manually
+        </button>
+      </div>
 
-      {/* Budget range */}
-      <div className="budget-range-field">
-        <div className="budget-range-header">
-          <span className="budget-range-label">{landingLabels.form.budgetLabel}</span>
-          {(budgetMin || budgetMax) && (
-            <span className="budget-range-preview">
-              £{budgetMin || "0"} – £{budgetMax || "0"}
-            </span>
+      {entryMode === 'link' ? (
+        <form className="flex flex-col gap-7" onSubmit={handleStartCheck} id="check-form">
+          <label className="flex flex-col gap-2">
+            <span className={LABEL_TEXT}>{landingLabels.form.sourceLabel}</span>
+            <Select value={listingSource} onValueChange={setListingSource}>
+              <SelectTrigger className={CONTROL_CLASS}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="marketplace">{landingLabels.form.sourceOptions.marketplace}</SelectItem>
+                <SelectItem value="auction">{landingLabels.form.sourceOptions.auction}</SelectItem>
+                <SelectItem value="dealer">{landingLabels.form.sourceOptions.dealer}</SelectItem>
+                <SelectItem value="private">{landingLabels.form.sourceOptions.private}</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className={HINT_TEXT}>{landingLabels.form.sourceHint}</span>
+          </label>
+
+          <label className="flex flex-col gap-2">
+            <span className={LABEL_TEXT}>{landingLabels.form.listingUrlLabel}</span>
+            <Input
+              id="listingUrl" type="url"
+              value={listingUrl} onChange={(e) => setListingUrl(e.target.value)}
+              placeholder="https://www.copart.co.uk/lot/..." required
+              className={CONTROL_CLASS}
+            />
+            <span className={HINT_TEXT}>{landingLabels.form.listingUrlHint}</span>
+          </label>
+
+          {sharedParams}
+
+          {scrapingError && <p className="form-error">{scrapingError}</p>}
+          {formError && <p className="form-error">{formError}</p>}
+          {creditWarning}
+
+          {hasInsufficientCredits ? (
+            <div className="button-tooltip-container" data-tooltip="You don't have enough credits to run a check. Please purchase more credits.">
+              <Button type="submit" className="w-full" disabled>
+                Fetch listing details
+              </Button>
+            </div>
+          ) : (
+            <Button type="submit" className="w-full" disabled={!isReady || isSubmitting}>
+              Fetch listing details
+            </Button>
           )}
-        </div>
-        <div className="budget-range-row">
-          <div className="budget-range-col">
-            <p className="budget-range-sublabel">Minimum</p>
-            <Input
-              id="budgetMin"
-              type="text"
-              inputMode="numeric"
-              value={budgetMin}
-              onChange={(e) => setBudgetMin(e.target.value)}
-              placeholder="3,000"
-              required
-              aria-label="Minimum budget"
-            />
-          </div>
-          <span className="budget-range-sep" aria-hidden="true">–</span>
-          <div className="budget-range-col">
-            <p className="budget-range-sublabel">Maximum</p>
-            <Input
-              id="budgetMax"
-              type="text"
-              inputMode="numeric"
-              value={budgetMax}
-              onChange={(e) => setBudgetMax(e.target.value)}
-              placeholder="6,000"
-              required
-              aria-label="Maximum budget"
-            />
-          </div>
-        </div>
-        <span className="budget-range-hint">{landingLabels.form.budgetHint}</span>
-      </div>
-
-      {/* Listing URL */}
-      <label>
-        {landingLabels.form.listingUrlLabel}
-        <Input
-          id="listingUrl"
-          type="url"
-          value={listingUrl}
-          onChange={(e) => setListingUrl(e.target.value)}
-          placeholder="https://www.copart.co.uk/lot/..."
-          required
-        />
-        <span>{landingLabels.form.listingUrlHint}</span>
-      </label>
-
-      {/* Postcode */}
-      <label>
-        {landingLabels.form.postcodeLabel}
-        <Input
-          id="postcode"
-          value={postcode}
-          onChange={(e) => setPostcode(e.target.value)}
-          placeholder="e.g. M12 4AB"
-          required
-        />
-        <span>{landingLabels.form.postcodeHint}</span>
-      </label>
-
-      {/* Risk tolerance */}
-      <div className="risk-selector-container">
-        <span className="field-label">{landingLabels.form.riskLabel}</span>
-        <div className="risk-cards-grid">
-          <label className="risk-card risk-card-low">
-            <input type="radio" name="riskTolerance" value="cautious"
-              checked={riskTolerance === "cautious"} onChange={() => setRiskTolerance("cautious")} />
-            <span className="risk-title">{landingLabels.form.riskOptions.cautious.title}</span>
-            <span className="risk-desc">{landingLabels.form.riskOptions.cautious.desc}</span>
-          </label>
-          <label className="risk-card risk-card-balanced">
-            <input type="radio" name="riskTolerance" value="balanced"
-              checked={riskTolerance === "balanced"} onChange={() => setRiskTolerance("balanced")} />
-            <span className="risk-title">{landingLabels.form.riskOptions.balanced.title}</span>
-            <span className="risk-desc">{landingLabels.form.riskOptions.balanced.desc}</span>
-          </label>
-          <label className="risk-card risk-card-high">
-            <input type="radio" name="riskTolerance" value="flexible"
-              checked={riskTolerance === "flexible"} onChange={() => setRiskTolerance("flexible")} />
-            <span className="risk-title">{landingLabels.form.riskOptions.flexible.title}</span>
-            <span className="risk-desc">{landingLabels.form.riskOptions.flexible.desc}</span>
-          </label>
-        </div>
-        <span className="field-hint">{landingLabels.form.riskHint}</span>
-      </div>
-
-      {scrapingError && <p className="form-error">{scrapingError}</p>}
-      {formError && <p className="form-error">{formError}</p>}
-
-      {hasInsufficientCredits && (
-        <p className="form-error" style={{ marginBottom: "1.5rem", textAlign: "center" }}>
-          You have 0 credits remaining. Please{" "}
-          <Link href="/#pricing" style={{ textDecoration: "underline", fontWeight: 600 }}>
-            buy credits
-          </Link>{" "}
-          to run a check.
-        </p>
-      )}
-
-      {hasInsufficientCredits ? (
-        <div className="button-tooltip-container" data-tooltip="You don't have enough credits to run a check. Please purchase more credits.">
-          <Button type="submit" disabled={!isReady || isSubmitting || hasInsufficientCredits} className="w-full cursor-not-allowed">
-            Ask Ralph About This Car
-          </Button>
-        </div>
+        </form>
       ) : (
-        <Button type="submit" disabled={!isReady || isSubmitting}>
-          Ask Ralph About This Car
-        </Button>
+        <div className="flex flex-col gap-7">
+          {sharedParams}
+          {creditWarning}
+          <ManualEntry
+            paramsReady={manualParamsReady && !hasInsufficientCredits}
+            submitting={isSubmitting}
+            error={formError}
+            userId={user?.id}
+            onAnalyse={(event, listing) => submit(event, listing)}
+          />
+        </div>
       )}
-    </form>
+    </div>
   );
 }

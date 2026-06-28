@@ -30,7 +30,7 @@ export enum ReportVerdictCode {
 }
 
 export const createReportRequestSchema = z.object({
-  listingUrl: z.string().url(),
+  listingUrl: z.string().url().optional(),
   totalUserBudget: z.number().positive(),
   postcode: z.string().min(3).max(12),
   riskTolerance: z.enum(RiskTolerance).default(RiskTolerance.Cautious),

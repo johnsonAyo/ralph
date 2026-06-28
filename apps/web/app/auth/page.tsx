@@ -2,7 +2,6 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   BookmarkCheck,
   History,
   Mail,
@@ -157,7 +156,7 @@ export default function AuthPage() {
   const sent = message === "Sign-in link sent. Check your email to continue.";
 
   return (
-    <main className="grid min-h-[calc(100vh-90px)] lg:grid-cols-[1.05fr_1fr]">
+    <main className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
       {/* Brand panel */}
       <aside
         className="relative hidden flex-col justify-between overflow-hidden p-12 xl:p-16 lg:flex"
@@ -200,8 +199,12 @@ export default function AuthPage() {
       </aside>
 
       {/* Form */}
-      <section className="flex items-center justify-center bg-[#fbfaf6] px-6 py-12 sm:px-10">
-        <div className="flex w-full max-w-md flex-col gap-8">
+      <section className="flex items-center justify-center bg-[#fbfaf6] px-5 py-10 sm:px-10 sm:py-12">
+        <div className="flex w-full max-w-md flex-col gap-7 sm:gap-8">
+          {/* Brand mark — the panel carries it on desktop, so show here only on mobile */}
+          <div className="lg:hidden">
+            <BrandMark />
+          </div>
           <div className="flex flex-col gap-2">
             <h1 className="m-0 text-[clamp(1.5rem,3vw,2rem)] font-[900] leading-[1.05] tracking-[-0.045em] text-foreground">
               Sign in to Ask Ralph
@@ -274,14 +277,6 @@ export default function AuthPage() {
               );
             })}
           </ul>
-
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-[0.82rem] font-[800] text-[#625c52] transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Back to Ralph
-          </Link>
         </div>
       </section>
     </main>

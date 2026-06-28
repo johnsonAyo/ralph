@@ -23,7 +23,9 @@ export default function SiteHeader() {
     const isOnDashboard = pathname.startsWith("/dashboard");
     const isAuthPage = pathname.startsWith("/auth");
     const { data: user } = useSession();
-    const { data: credits = 0, isLoading: loadingCredits } = useCredits(user?.id);
+    const { data: creditInfo, isLoading: loadingCredits } = useCredits(user?.id);
+    const credits = creditInfo?.balance ?? 0;
+    const creditTotal = creditInfo?.total ?? 0;
     async function handleSignOut() {
         if (!isSupabaseConfigured()) {
             window.location.href = "/";
@@ -37,7 +39,7 @@ export default function SiteHeader() {
         await supabase.auth.signOut();
         window.location.href = "/";
     }
-    if (!isSupabaseConfigured() || isOnDashboard) {
+    if (!isSupabaseConfigured() || isOnDashboard || isAuthPage) {
         return null;
     }
     return (<header className={`nav ${isOnDashboard ? "dashboard-nav" : ""}`}>
@@ -67,7 +69,7 @@ export default function SiteHeader() {
       {!isAuthPage ? (<div className="nav-actions">
           {user ? (<>
               <span className="dashboard-nav-credits" style={{ opacity: 0.8, fontSize: "0.85rem", fontWeight: 500 }}>
-                {loadingCredits ? "..." : `${credits} check${credits === 1 ? "" : "s"} left`}
+                {loadingCredits ? "..." : `${credits} / ${creditTotal} checks left`}
               </span>
               <span className="dashboard-nav-email" title={user.email ?? user.id}>
                 {user.email ?? user.id}

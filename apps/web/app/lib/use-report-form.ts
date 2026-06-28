@@ -41,7 +41,8 @@ export function useReportForm() {
             setFormError("Your maximum budget must be higher than your minimum.");
             return;
         }
-        if (!listingUrl.trim()) {
+        // Manual entry supplies `confirmedListing` directly and may have no URL.
+        if (!confirmedListing && !listingUrl.trim()) {
             setFormError("Please paste a listing URL.");
             return;
         }
@@ -51,7 +52,7 @@ export function useReportForm() {
         }
         try {
             const report = await mutateAsync({
-                listingUrl: listingUrl.trim(),
+                listingUrl: listingUrl.trim() || undefined,
                 totalUserBudget: max,
                 postcode: postcode.trim(),
                 riskTolerance,

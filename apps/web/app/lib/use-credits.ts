@@ -1,21 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
 import { getSupabaseBrowserClient } from "./supabase";
-async function fetchCreditBalance(): Promise<number> {
+
+export interface CreditSummary {
+    balance: number;
+    total: number;
+}
+
+const EMPTY: CreditSummary = { balance: 0, total: 0 };
+
+async function fetchCreditSummary(): Promise<CreditSummary> {
     const supabase = getSupabaseBrowserClient();
     if (!supabase)
-        return 0;
+        return EMPTY;
     const { data, error } = await supabase
         .from("credits_ledger")
         .select("amount");
     if (error) {
         throw error;
     }
-    return (data ?? []).reduce((sum, item) => sum + item.amount, 0);
+    const rows = data ?? [];
+    return rows.reduce<CreditSummary>(
+        (acc, item) => ({
+            balance: acc.balance + item.amount,
+            total: acc.total + (item.amount > 0 ? item.amount : 0),
+        }),
+        { ...EMPTY },
+    );
 }
+
 export function useCredits(userId?: string) {
     return useQuery({
         queryKey: ["credits", userId],
-        queryFn: fetchCreditBalance,
+        queryFn: fetchCreditSummary,
         staleTime: 30000,
         enabled: !!userId,
     });

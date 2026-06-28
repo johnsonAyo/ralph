@@ -34,7 +34,7 @@ import { RalphAnalyserPort } from "./domain/ralph-analyser.port";
             },
         },
     ],
-    exports: [RALPH_ANALYSER],
+    exports: [RALPH_ANALYSER, OPENAI_CLIENT],
 })
 export class AiModule {
 }

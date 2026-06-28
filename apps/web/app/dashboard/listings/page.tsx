@@ -1,10 +1,8 @@
 "use client";
 
 import { ExternalLink, MapPin, Globe } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { SUPPORTED_SITES } from "./constants";
-
-type RegionFilter = "All" | "UK" | "US";
 
 function SiteCard({ site }: { site: typeof SUPPORTED_SITES[0] }) {
   const [logoError, setLogoError] = useState(false);
@@ -90,52 +88,23 @@ function SiteCard({ site }: { site: typeof SUPPORTED_SITES[0] }) {
 }
 
 export default function ListingsPage() {
-  const [filter, setFilter] = useState<RegionFilter>("All");
-
-  const filteredSites = useMemo(() => {
-    if (filter === "All") return SUPPORTED_SITES;
-    return SUPPORTED_SITES.filter(site => site.region === filter);
-  }, [filter]);
-
   return (
     <div className="dashboard-page pb-12">
       <section className="dash-section mx-auto w-full max-w-[1400px]">
-        <header className="dash-section-head flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 border-b border-[var(--line)] pb-8">
+        <header className="flex flex-col items-start gap-6 mb-10 border-b border-[var(--line)] pb-8">
           <div className="max-w-3xl">
             <h1 className="dash-section-title text-4xl font-extrabold tracking-tight mb-3">Car Listings</h1>
             <p className="dash-sub text-[1.1rem] leading-relaxed m-0 opacity-70 font-medium">
-              Browse our comprehensive directory of supported platforms to find your next car. Once you find a vehicle, copy its link and paste it into Ralph for deep analysis.
+              Browse our directory of supported UK platforms to find your next car. Once you find a vehicle, copy its link and paste it into Ralph for deep analysis.
             </p>
-          </div>
-
-          <div className="flex items-center bg-[var(--surface-dim)] p-1.5 rounded-2xl border border-[var(--line)] shadow-inner shrink-0">
-            {(["All", "UK", "US"] as const).map((region) => (
-              <button
-                key={region}
-                onClick={() => setFilter(region)}
-                className={`relative px-8 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ease-out ${
-                  filter === region
-                    ? "text-[rgb(47,98,233)] shadow-[0_2px_10px_rgba(0,0,0,0.05)] bg-[var(--bg)] border border-[var(--line)]"
-                    : "opacity-60 hover:opacity-100 hover:bg-[var(--line)] border border-transparent"
-                }`}
-              >
-                {region === "All" ? "All Regions" : region}
-              </button>
-            ))}
           </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
-          {filteredSites.map((site) => (
+          {SUPPORTED_SITES.map((site) => (
             <SiteCard key={site.name} site={site} />
           ))}
         </div>
-        
-        {filteredSites.length === 0 && (
-          <div className="py-24 text-center opacity-60 bg-[var(--surface-dim)] rounded-3xl border-2 border-dashed border-[var(--line)]">
-            <p className="text-xl font-semibold">No listings found for the selected region.</p>
-          </div>
-        )}
       </section>
     </div>
   );

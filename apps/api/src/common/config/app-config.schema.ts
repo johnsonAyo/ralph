@@ -13,5 +13,15 @@ export const appConfigSchema = z
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
     SCRAPE_DO_TOKEN: z.string().min(1).optional(),
     WEB_URL: z.string().url().optional(),
+    // Vehicle data sources (Phase 1). All optional so the app boots without them;
+    // the lookup endpoint reports "no sources configured" until they're set.
+    DVLA_VES_API_KEY: z.string().min(1).optional(),
+    DVLA_VES_URL: z.string().url().optional(),
+    DVSA_MOT_CLIENT_ID: z.string().min(1).optional(),
+    DVSA_MOT_CLIENT_SECRET: z.string().min(1).optional(),
+    DVSA_MOT_API_KEY: z.string().min(1).optional(),
+    DVSA_MOT_TOKEN_URL: z.string().url().optional(),
+    DVSA_MOT_SCOPE: z.string().min(1).optional(),
+    DVSA_MOT_URL: z.string().url().optional(),
 })
     .passthrough();

@@ -64,10 +64,12 @@ export class ReportsController {
     }
     @Get(":id")
     async findOne(
+    @CurrentUser()
+    user: AuthenticatedUser,
     @Param("id", ParseUUIDPipe)
     id: string) {
         const report = await this.reports.findById(id);
-        if (!report) {
+        if (!report || report.toSnapshot().userId !== user.id) {
             throw new NotFoundError("Report not found.");
         }
         return report.toSnapshot();

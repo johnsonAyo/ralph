@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
+import { ValidationError } from "@/common/errors/app.error";
 import { CreditCheckerPort } from "@/modules/credits/domain/credit-checker.port";
 import { RalphAnalyserPort } from "@/modules/ai/domain/ralph-analyser.port";
 import { ListingExtractorPort } from "@/modules/extraction/domain/listing-extractor.port";
@@ -23,6 +24,9 @@ export class CreateReportUseCase {
         request: CreateReportRequest;
     }): Promise<ReportSnapshot> {
         const now = new Date().toISOString();
+        if (!input.request.listing && !input.request.listingUrl) {
+            throw new ValidationError("Provide a listing URL or manual listing details.");
+        }
         const report = Report.create({
             id: randomUUID(),
             userId: input.userId,
@@ -55,7 +59,7 @@ export class CreateReportUseCase {
         try {
             report.markExtracting(now);
             await this.reports.save(report);
-            const listing = await this.extractor.extract(input.request.listingUrl);
+            const listing = await this.extractor.extract(input.request.listingUrl as string);
             report.attachListing(listing, now);
             report.needsUserConfirmation(now);
             await this.reports.save(report);

@@ -18,7 +18,7 @@ function QuickCheckWidget() {
         router.push(`/dashboard/new?${params.toString()}`);
     }
     return (<form className="quick-check-widget" onSubmit={handleSubmit}>
-      <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart or Autotrader listing URL..." required suppressHydrationWarning/>
+      <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart, IAA or other UK listing URL…" required suppressHydrationWarning/>
       <Button type="submit" className="h-[46px] min-h-0 shrink-0 gap-1.5 rounded-[12px] px-5 text-[0.88rem] shadow-[0_6px_18px_rgba(47,98,233,0.18)]">
         Analyse
         <ArrowRight size={15} aria-hidden="true"/>
@@ -155,7 +155,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="dash-card-body">
-                  <h3>{report.listing?.title ?? report.request.listingUrl}</h3>
+                  <h3>{report.listing?.title ?? report.request.listingUrl ?? "Manual entry"}</h3>
                   <p className="dash-card-source">{report.listing?.platform ?? "—"}</p>
                   <p className="dash-card-note">
                     {report.result?.summary ?? report.status}
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="dash-card-footer">
                     <span className="dash-card-when">{relativeTime(report.createdAt)}</span>
-                    <a className="dash-card-link" href={`/reports/${report.id}`}>
+                    <a className="dash-card-link" href={`/dashboard/reports/${report.id}`}>
                       Open report
                       <ArrowRight size={13} aria-hidden="true"/>
                     </a>
