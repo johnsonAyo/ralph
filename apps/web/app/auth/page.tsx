@@ -245,7 +245,7 @@ export default function AuthPage() {
                 Email address
               </label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#9a9286]" aria-hidden />
+                <Mail className="pointer-events-none absolute left-3.5 top-0 bottom-0 my-auto size-4 text-[#9a9286]" aria-hidden />
                 <Input
                   id="auth-email"
                   type="email"

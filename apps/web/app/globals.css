@@ -3863,3 +3863,16 @@ select {
   cursor: not-allowed;
 }
 
+/* Landing gutters: the 18vw side padding is far too wide on phones/tablets.
+   Tighten to match the sign-in page (~20px) below desktop. */
+@media (max-width: 768px) {
+  .nav,
+  .hero,
+  .footer,
+  .decision-section,
+  .faqs-section,
+  .faqs-bridge {
+    padding-inline: clamp(20px, 6vw, 36px);
+  }
+}
+
