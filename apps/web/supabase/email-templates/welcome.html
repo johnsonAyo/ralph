@@ -1,7 +1,8 @@
 <!--
-  Ralph — Magic link / sign-in email.
-  Paste into Supabase → Authentication → Email Templates → "Magic Link".
-  Variable used: {{ .ConfirmationURL }}
+  Ralph — Welcome / "you're subscribed" email.
+  NOTE: this is NOT a Supabase auth template — it's a lifecycle email you send
+  from your own transactional sender (e.g. Resend / Postmark / a Supabase Edge
+  Function) after a user signs up. Replace the button URL with your real link.
 -->
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -11,12 +12,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="color-scheme" content="light only" />
   <meta name="supported-color-schemes" content="light only" />
-  <title>Sign in to Ask Ralph</title>
+  <title>Welcome to Ask Ralph</title>
 </head>
 <body style="margin:0; padding:0; background-color:#fbfaf6; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
-  <!-- preheader (hidden) -->
   <div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all;">
-    Your secure sign-in link for Ask Ralph — expires in 1 hour.
+    You’re in — run your first car check with Ask Ralph.
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fbfaf6;">
@@ -24,7 +24,6 @@
       <td align="center" style="padding:32px 16px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px; width:100%;">
 
-          <!-- Logo -->
           <tr>
             <td align="left" style="padding:4px 4px 24px 4px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -36,29 +35,27 @@
             </td>
           </tr>
 
-          <!-- Card -->
           <tr>
             <td style="background-color:#ffffff; border:1px solid #e6ded0; border-radius:20px; padding:36px 32px;">
               <h1 style="margin:0 0 12px 0; font-family:Arial,Helvetica,sans-serif; font-size:24px; line-height:1.2; font-weight:800; color:#111111; letter-spacing:-0.02em;">
-                Sign in to Ask Ralph
+                Welcome to Ask Ralph
               </h1>
-              <p style="margin:0 0 28px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.55; color:#625c52;">
-                Tap the button below to sign in securely. No password needed — this link signs you straight in.
+              <p style="margin:0 0 24px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.55; color:#625c52;">
+                Your account is ready. Paste any UK car listing or enter the details, and Ralph tells you if it’s a good buy, a fair price, and what to watch for — before you commit.
               </p>
 
-              <!-- Button -->
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td align="center">
                     <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ .ConfirmationURL }}" style="height:52px;v-text-anchor:middle;width:100%;" arcsize="50%" strokecolor="#2f62e9" fillcolor="#2f62e9">
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://ralph-web.vercel.app/dashboard/new" style="height:52px;v-text-anchor:middle;width:100%;" arcsize="50%" strokecolor="#2f62e9" fillcolor="#2f62e9">
                     <w:anchorlock/>
-                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">Sign in to Ask Ralph</center>
+                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">Run your first check</center>
                     </v:roundrect>
                     <![endif]-->
                     <!--[if !mso]><!-- -->
-                    <a href="{{ .ConfirmationURL }}" target="_blank" style="display:block; background-color:#2f62e9; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:700; line-height:52px; text-align:center; text-decoration:none; border-radius:26px;">
-                      Sign in to Ask Ralph
+                    <a href="https://ralph-web.vercel.app/dashboard/new" target="_blank" style="display:block; background-color:#2f62e9; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:700; line-height:52px; text-align:center; text-decoration:none; border-radius:26px;">
+                      Run your first check
                     </a>
                     <!--<![endif]-->
                   </td>
@@ -67,18 +64,16 @@
 
               <div style="margin:28px 0 0 0; padding-top:20px; border-top:1px solid #f0ece3;">
                 <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12.5px; line-height:1.5; color:#9a9286;">
-                  This link expires in 1 hour and can only be used once. If you didn’t request it, you can safely ignore this email.
+                  Ralph is independent — paid by you, not the seller. Every check is unbiased.
                 </p>
               </div>
             </td>
           </tr>
 
-          <!-- Footer -->
           <tr>
             <td align="center" style="padding:24px 16px;">
               <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:1.5; color:#9a9286;">
-                Ask Ralph — an independent car-buying check.<br/>
-                Paid by you, not the seller.
+                Ask Ralph — check the car before you buy.
               </p>
             </td>
           </tr>
