@@ -43,7 +43,7 @@ export class GenericListingExtractor implements PlatformListingExtractor {
 
     constructor(
         private readonly scrapeClient: ScrapeClient,
-        @Inject(OPENAI_CLIENT) private readonly openai: OpenAI,
+        @Inject(OPENAI_CLIENT) private readonly openai: OpenAI | null,
         private readonly config: ConfigService,
     ) { }
 
@@ -64,6 +64,9 @@ export class GenericListingExtractor implements PlatformListingExtractor {
     }
 
     private async runExtraction(listingUrl: string, pageText: string, imageCandidates: string[]) {
+        if (!this.openai) {
+            throw new AppError("OpenAI listing extraction is not configured. Set OPENAI_API_KEY in apps/api/.env.", 500, "OPENAI_NOT_CONFIGURED");
+        }
         const model = this.config.get<string>("OPENAI_EXTRACTION_MODEL")
             ?? this.config.get<string>("OPENAI_MODEL")
             ?? EXTRACTION_MODEL_FALLBACK;

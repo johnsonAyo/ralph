@@ -11,9 +11,9 @@ import { RalphAnalyserPort } from "./domain/ralph-analyser.port";
         {
             provide: OPENAI_CLIENT,
             inject: [ConfigService],
-            useFactory: (config: ConfigService): OpenAI => {
-                const apiKey = config.getOrThrow<string>("OPENAI_API_KEY");
-                return new OpenAI({ apiKey });
+            useFactory: (config: ConfigService): OpenAI | null => {
+                const apiKey = config.get<string>("OPENAI_API_KEY");
+                return apiKey ? new OpenAI({ apiKey }) : null;
             },
         },
         OpenAiRalphAnalyserService,

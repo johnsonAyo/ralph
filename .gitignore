@@ -3,6 +3,7 @@ node_modules/
 out/
 dist/
 .turbo/
+.pnpm-store/
 .env*
 !.env.example
 npm-debug.log*

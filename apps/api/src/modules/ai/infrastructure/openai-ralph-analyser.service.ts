@@ -12,8 +12,11 @@ import { RalphAnalysisContext } from "../domain/ralph-analysis-context";
 export class OpenAiRalphAnalyserService implements RalphAnalyserPort {
     constructor(
     @Inject(OPENAI_CLIENT)
-    private readonly openai: OpenAI, private readonly config: ConfigService) { }
+    private readonly openai: OpenAI | null, private readonly config: ConfigService) { }
     async analyse(input: RalphAnalysisContext): Promise<ReportResult> {
+        if (!this.openai) {
+            throw new AppError("OpenAI analysis is not configured. Set OPENAI_API_KEY in apps/api/.env.", 500, "OPENAI_NOT_CONFIGURED");
+        }
         const model = this.config.get<string>("OPENAI_MODEL") ?? RALPH_ANALYSIS_MODEL_FALLBACK;
         const ctx = buildSharedAnalysisContext(input);
         try {

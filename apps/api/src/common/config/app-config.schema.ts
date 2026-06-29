@@ -7,6 +7,7 @@ export const appConfigSchema = z
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1).optional(),
     OPENAI_MODEL: z.string().min(1).optional(),
+    OPENAI_EXTRACTION_MODEL: z.string().min(1).optional(),
     OLLAMA_URL: z.string().url().optional(),
     OLLAMA_MODEL: z.string().min(1).optional(),
     STRIPE_SECRET_KEY: z.string().min(1).optional(),

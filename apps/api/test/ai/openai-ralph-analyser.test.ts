@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ConfigService } from "@nestjs/config";
 import { AuctionPlatformCode, ExtractionConfidence, ReportVerdictCode, } from "@ralph/shared";
+import { AppError } from "@/common/errors/app.error";
 import { OpenAiRalphAnalyserService } from "@/modules/ai/infrastructure/openai-ralph-analyser.service";
 import { buildSharedAnalysisContext } from "@/modules/ai/infrastructure/ralph-analysis.prompt";
 const listing = {
@@ -98,4 +99,14 @@ test("OpenAiRalphAnalyserService parses the OpenAI JSON response into the shared
     assert.equal(createdRequests[0].model, "gpt-4.1-mini");
     assert.equal(createdRequests[0].text.format.name, "ralph_report");
     assert.equal(createdRequests[0].max_output_tokens, 900);
+});
+
+test("OpenAiRalphAnalyserService reports a clear configuration error when no OpenAI client is available", async () => {
+    const service = new OpenAiRalphAnalyserService(null, { get: () => undefined } as unknown as ConfigService);
+
+    await assert.rejects(() => service.analyse({ request, listing } as any), (err: unknown) => {
+        assert.ok(err instanceof AppError);
+        assert.equal((err as AppError).code, "OPENAI_NOT_CONFIGURED");
+        return true;
+    });
 });

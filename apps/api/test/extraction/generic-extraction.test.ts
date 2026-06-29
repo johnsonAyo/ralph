@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { ConfigService } from "@nestjs/config";
 import { AuctionPlatformCode } from "@ralph/shared";
-import { ValidationError } from "@/common/errors/app.error";
+import { AppError, ValidationError } from "@/common/errors/app.error";
 import { detectPlatform } from "@/modules/extraction/application/detect-platform";
 import { reduceListingPage } from "@/modules/extraction/infrastructure/generic/html-reducer";
 import { buildGenericListingSnapshot } from "@/modules/extraction/infrastructure/generic/generic-snapshot.mapper";
 import { GenericExtraction } from "@/modules/extraction/infrastructure/generic/generic-extraction.schema";
+import { GenericListingExtractor } from "@/modules/extraction/infrastructure/generic/generic-listing.extractor";
 
 test("detectPlatform maps known UK hosts and falls back to Other", () => {
     assert.equal(detectPlatform("https://www.copart.co.uk/lot/123/x"), AuctionPlatformCode.CopartUk);
@@ -91,4 +93,21 @@ test("buildGenericListingSnapshot maps fields and rejects hallucinated images", 
     assert.equal(snapshot.images.length, 1, "hallucinated image dropped");
     assert.equal(snapshot.images[0].fullUrl, "https://cdn.example.com/items/2.jpg");
     assert.equal(snapshot.images[0].sequence, 1);
+});
+
+test("GenericListingExtractor reports a clear configuration error when no OpenAI client is available", async () => {
+    const scrapeClient = {
+        fetchHtml: async () => "<html><body><p>2006 BMW 3 Series</p></body></html>",
+    };
+    const extractor = new GenericListingExtractor(
+        scrapeClient as any,
+        null,
+        { get: () => undefined } as unknown as ConfigService,
+    );
+
+    await assert.rejects(() => extractor.extract("https://auctions.iaai.co.uk/auction/items/details/x/50019823"), (err: unknown) => {
+        assert.ok(err instanceof AppError);
+        assert.equal((err as AppError).code, "OPENAI_NOT_CONFIGURED");
+        return true;
+    });
 });

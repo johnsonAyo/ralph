@@ -9,50 +9,7 @@ import { useCheckout } from "./lib/use-checkout";
 import { HomeShellSkeleton } from "./components/skeleton";
 import CTA from "./components/cta";
 import PublicRegCheck from "./components/public-reg-check";
-function VideoPlaceholder() {
-    return (<div style={{
-            width: '100%',
-            height: '90vh',
-            backgroundColor: '#111',
-            borderRadius: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
-      <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(45deg, rgba(59,130,246,0.2), rgba(16,185,129,0.2))'
-        }}/>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', zIndex: 1 }}>
-        <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '2px solid rgba(255,255,255,0.2)',
-            cursor: 'pointer'
-        }}>
-          <div style={{
-            width: 0,
-            height: 0,
-            borderTop: '15px solid transparent',
-            borderBottom: '15px solid transparent',
-            borderLeft: '24px solid #fff',
-            marginLeft: '8px'
-        }}/>
-        </div>
-        <p style={{ fontSize: '1.2rem', fontWeight: 600, opacity: 0.8 }}>Video Placeholder</p>
-      </div>
-    </div>);
-}
+import RalphCinema from "./components/ralph-cinema";
 const whyIconMap = {
     FileSearch,
     Receipt,
@@ -88,7 +45,7 @@ export default function Home() {
       </section>
 
       <section className="check-section" id="check">
-        <VideoPlaceholder />
+        <RalphCinema />
 
         <div className="ai-explainer">
           <h3>{landingLabels.aiExplainer.title}</h3>
