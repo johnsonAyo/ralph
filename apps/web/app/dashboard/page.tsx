@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Car, TrendingDown, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Car, TrendingDown, AlertTriangle, CheckCircle2, ExternalLink } from "lucide-react";
 import { Button, Input } from "@ralph/ui";
 import { ReportVerdictCode } from "@ralph/shared";
 import { useReports } from "../lib/use-reports";
+import { SUPPORTED_SITES } from "./listings/constants";
 import { dashboardLabels } from "../labels";
 import {
     reportBidRange,
@@ -35,6 +36,28 @@ function QuickCheckWidget() {
         <ArrowRight size={15} aria-hidden="true"/>
       </Button>
     </form>);
+}
+function SitePreview({ site }: { site: typeof SUPPORTED_SITES[0] }) {
+    const [logoError, setLogoError] = useState(false);
+    const domain = new URL(site.url).hostname.replace(/^www\./, "");
+    const fallback = `https://icon.horse/icon/${domain}`;
+    return (<a href={site.url} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(47,98,233,0.25)]" style={{ textDecoration: "none", color: "inherit" }}>
+      <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl border border-[var(--line)] bg-white p-1.5">
+        {!logoError ? (<img src={site.logo} alt="" className="size-full object-contain" onError={(e) => {
+                if (e.currentTarget.src === site.logo) {
+                    e.currentTarget.src = fallback;
+                }
+                else {
+                    setLogoError(true);
+                }
+            }}/>) : (<span className="grid size-full place-items-center rounded-lg bg-[var(--blue)] text-sm font-bold text-white">{site.name.charAt(0)}</span>)}
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate text-[0.95rem] font-extrabold text-[var(--ink)] transition-colors group-hover:text-[var(--blue)]">{site.name}</span>
+        <span className="truncate text-[0.78rem] font-medium text-[var(--muted)]">{domain}</span>
+      </span>
+      <ExternalLink size={15} className="ml-auto shrink-0 text-[var(--muted)] transition-colors group-hover:text-[var(--blue)]" aria-hidden="true"/>
+    </a>);
 }
 function EmptyState() {
     return (<div className="dash-empty">
@@ -150,6 +173,21 @@ export default function DashboardPage() {
                 </div>
               </article>))}
           </div>)}
+      </section>
+
+      <section className="dash-section">
+        <header className="dash-section-head">
+          <h2 className="dash-section-title">Where to find a car</h2>
+          <Link className="dash-see-all" href="/dashboard/listings">
+            Browse all
+            <ArrowRight size={14} aria-hidden="true"/>
+          </Link>
+        </header>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {SUPPORTED_SITES.slice(0, 3).map((site) => (
+            <SitePreview key={site.name} site={site}/>
+          ))}
+        </div>
       </section>
     </div>);
 }

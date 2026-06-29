@@ -1,0 +1,93 @@
+<!--
+  Ralph — Confirm signup email.
+  Paste into Supabase → Authentication → Email Templates → "Confirm signup".
+  Variable used: {{ .ConfirmationURL }}
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="color-scheme" content="light only" />
+  <meta name="supported-color-schemes" content="light only" />
+  <title>Confirm your email — Ask Ralph</title>
+</head>
+<body style="margin:0; padding:0; background-color:#fbfaf6; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all;">
+    Confirm your email to finish setting up Ask Ralph.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fbfaf6;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px; width:100%;">
+
+          <tr>
+            <td align="left" style="padding:4px 4px 24px 4px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="width:40px; height:40px; background-color:#111111; border-radius:12px; text-align:center; vertical-align:middle; font-family:Arial,Helvetica,sans-serif; font-size:20px; font-weight:800; color:#ffffff;">R</td>
+                  <td style="padding-left:10px; font-family:Arial,Helvetica,sans-serif; font-size:15px; font-weight:800; color:#111111; line-height:1.05; letter-spacing:-0.02em;">Ask<br/>Ralph</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background-color:#ffffff; border:1px solid #e6ded0; border-radius:20px; padding:36px 32px;">
+              <h1 style="margin:0 0 12px 0; font-family:Arial,Helvetica,sans-serif; font-size:24px; line-height:1.2; font-weight:800; color:#111111; letter-spacing:-0.02em;">
+                Confirm your email
+              </h1>
+              <p style="margin:0 0 28px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.55; color:#625c52;">
+                You’re one step from your Ask Ralph account. Confirm your email to start checking cars before you buy.
+              </p>
+
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ .ConfirmationURL }}" style="height:52px;v-text-anchor:middle;width:100%;" arcsize="50%" strokecolor="#2f62e9" fillcolor="#2f62e9">
+                    <w:anchorlock/>
+                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">Confirm email</center>
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-- -->
+                    <a href="{{ .ConfirmationURL }}" target="_blank" style="display:block; background-color:#2f62e9; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:700; line-height:52px; text-align:center; text-decoration:none; border-radius:26px;">
+                      Confirm email
+                    </a>
+                    <!--<![endif]-->
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:28px 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.5; color:#9a9286;">
+                Or paste this link into your browser:
+              </p>
+              <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.5; word-break:break-all;">
+                <a href="{{ .ConfirmationURL }}" target="_blank" style="color:#2f62e9; text-decoration:underline;">{{ .ConfirmationURL }}</a>
+              </p>
+
+              <div style="margin:28px 0 0 0; padding-top:20px; border-top:1px solid #f0ece3;">
+                <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12.5px; line-height:1.5; color:#9a9286;">
+                  If you didn’t create an Ask Ralph account, you can safely ignore this email.
+                </p>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:24px 16px;">
+              <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:1.5; color:#9a9286;">
+                Ask Ralph — an independent car-buying check.<br/>
+                Paid by you, not the seller.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
