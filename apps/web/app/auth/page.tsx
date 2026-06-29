@@ -91,6 +91,23 @@ function SampleReportCard() {
   );
 }
 
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z" />
+      <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.02-3.7H.96v2.34A9 9 0 0 0 9 18z" />
+      <path fill="#FBBC05" d="M3.98 10.72a5.4 5.4 0 0 1 0-3.44V4.94H.96a9 9 0 0 0 0 8.12l3.02-2.34z" />
+      <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.94l3.02 2.34C4.68 5.16 6.66 3.58 9 3.58z" />
+    </svg>
+  );
+}
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M11.18 8.46c-.02-1.6 1.31-2.37 1.37-2.41-.75-1.1-1.91-1.25-2.32-1.26-.99-.1-1.93.58-2.43.58-.5 0-1.27-.57-2.09-.55-1.08.02-2.07.63-2.62 1.59-1.12 1.94-.29 4.81.8 6.39.53.77 1.17 1.64 2 1.6.8-.03 1.1-.52 2.07-.52.96 0 1.24.52 2.08.5.86-.01 1.4-.78 1.93-1.56.61-.9.86-1.76.87-1.8-.02-.01-1.67-.64-1.69-2.55zM9.6 3.24c.44-.53.74-1.27.66-2.01-.64.03-1.4.43-1.86.96-.41.47-.77 1.22-.67 1.94.71.05 1.43-.36 1.87-.89z" />
+    </svg>
+  );
+}
 export default function AuthPage() {
   const configured = isSupabaseConfigured();
   const [email, setEmail] = useState("");
@@ -126,6 +143,21 @@ export default function AuthPage() {
     }
     finally {
       setSubmitting(false);
+    }
+  }
+  async function handleOAuth(provider: "google" | "apple") {
+    setMessage("");
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      setMessage("Sign-in isn't configured on this deployment.");
+      return;
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${getSiteUrl()}/auth?next=${encodeURIComponent(getNextPath())}` },
+    });
+    if (error) {
+      setMessage(error.message);
     }
   }
   if (!configured) {
@@ -252,6 +284,33 @@ export default function AuthPage() {
               <span>{message}</span>
             </div>
           ) : null}
+
+          <div className="flex items-center gap-3">
+            <Separator className="flex-1 bg-[#e6ded0]" />
+            <span className="text-[0.68rem] font-[900] uppercase tracking-[0.08em] text-[#9a9286]">
+              or
+            </span>
+            <Separator className="flex-1 bg-[#e6ded0]" />
+          </div>
+
+          <div className="flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={() => handleOAuth("google")}
+              className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-[14px] border border-[#e6ded0] bg-white text-[0.95rem] font-[800] text-foreground transition-colors hover:bg-[#faf8f3]"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOAuth("apple")}
+              className="inline-flex h-[52px] w-full items-center justify-center gap-3 rounded-[14px] border border-[#e6ded0] bg-white text-[0.95rem] font-[800] text-foreground transition-colors hover:bg-[#faf8f3]"
+            >
+              <AppleIcon />
+              Continue with Apple
+            </button>
+          </div>
 
           <div className="flex items-center gap-3">
             <Separator className="flex-1 bg-[#e6ded0]" />
