@@ -6,7 +6,7 @@ export default function CTA({
   variant = "primary",
 }: CTAProps) {
   return (
-    <Button asChild variant={variant === "secondary" ? "secondary" : "primary"}>
+    <Button asChild variant={variant === "secondary" ? "secondary" : "primary"} size="md">
       <a href="#check">{children}</a>
     </Button>
   );

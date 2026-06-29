@@ -6,8 +6,6 @@ import { Button } from "@ralph/ui";
 import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../lib/supabase";
 import { useCredits } from "../lib/use-credits";
 const HOME_ANCHORS = [
-    { href: "#check", label: "Check" },
-    { href: "#answers", label: "Report" },
     { href: "#why", label: "Why" },
     { href: "#pricing", label: "Pricing" },
     { href: "#faqs", label: "FAQs" },
@@ -82,7 +80,7 @@ export default function SiteHeader() {
               <Link className="auth-pill auth-link" href="/auth">
                 Sign in
               </Link>
-              {isHome ? (<Button asChild>
+              {isHome ? (<Button asChild size="md" className="min-h-[44px] rounded-[14px]">
                   <a href="#check">Ask Ralph</a>
                 </Button>) : null}
             </>)}
