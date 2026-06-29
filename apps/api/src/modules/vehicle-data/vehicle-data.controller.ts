@@ -1,5 +1,4 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
-import { SupabaseJwtGuard } from "@/modules/auth/supabase-jwt.guard";
+import { Body, Controller, Post } from "@nestjs/common";
 import { ZodValidationPipe } from "@/common/pipes/zod-validation.pipe";
 import {
   VehicleLookupRequest,
@@ -7,7 +6,8 @@ import {
 } from "@ralph/shared";
 import { LookupVehicleUseCase } from "./application/lookup-vehicle.use-case";
 
-@UseGuards(SupabaseJwtGuard)
+// Public: the free reg lookup (DVLA + MOT) is the no-login funnel. It reads
+// public open-data only — no DB write, no credit spend — so it needs no guard.
 @Controller("vehicle")
 export class VehicleDataController {
   constructor(private readonly lookup: LookupVehicleUseCase) {}

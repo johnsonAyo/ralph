@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { Camera, ChevronRight, FileSearch, Receipt, ShieldCheck, Target, Users, } from "lucide-react";
 import { Button } from "@ralph/ui";
 import { getStripeLookupKey } from "./lib/site-url";
@@ -9,6 +8,7 @@ import { useSession } from "./lib/supabase";
 import { useCheckout } from "./lib/use-checkout";
 import { HomeShellSkeleton } from "./components/skeleton";
 import CTA from "./components/cta";
+import PublicRegCheck from "./components/public-reg-check";
 function VideoPlaceholder() {
     return (<div style={{
             width: '100%',
@@ -101,18 +101,7 @@ export default function Home() {
         </div>
 
         <div className="form-section">
-          <div className="card cta-card" style={{ textAlign: "center", padding: "32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-            <h3 style={{ margin: 0 }}>Start a new Ralph check</h3>
-            <p style={{ margin: 0, maxWidth: "44ch", color: "var(--ink-dim, #5a6478)" }}>
-              The full report form has moved to your dashboard. Sign in and open it from the sidebar.
-            </p>
-            <Button asChild>
-              <Link href="/dashboard/new">
-                Open the new report form
-                <ChevronRight size={16} aria-hidden="true"/>
-              </Link>
-            </Button>
-          </div>
+          <PublicRegCheck />
         </div>
       </section>
 
