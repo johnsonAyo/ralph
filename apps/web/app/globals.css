@@ -3864,14 +3864,20 @@ select {
 }
 
 /* Landing gutters: the 18vw side padding is far too wide on phones/tablets.
-   Tighten to match the sign-in page (~20px) below desktop. */
+   Tighten every landing section to match the sign-in page (~20px) below desktop. */
 @media (max-width: 768px) {
   .nav,
   .hero,
   .footer,
+  .faqs-bridge,
+  .answers-section,
+  .budget-section,
+  .why-section,
+  .pricing-section,
+  .about-section,
   .decision-section,
   .faqs-section,
-  .faqs-bridge {
+  [class$="-section"] {
     padding-inline: clamp(20px, 6vw, 36px);
   }
 }
