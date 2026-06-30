@@ -127,6 +127,10 @@ function MileageChart({ data, C }: { data: MilePoint[]; C: Palette }) {
 }
 
 type Finding = { title: string; meaning: string; evidence: string; chart?: MilePoint[] };
+type GridTone = "good" | "note" | "flag";
+type GridCell = { label: string; value: string; tone: GridTone };
+
+const GRID_DOT: Record<GridTone, string> = { good: "#34d399", note: "#e6b873", flag: "#e06a6a" };
 
 type Workflow = {
   id: "link" | "reg" | "manual";
@@ -140,6 +144,7 @@ type Workflow = {
   rich?: {
     verdict: string;
     summary: string;
+    grid: GridCell[];
     findings: Finding[];
     clear: string;
     money: { meaning: string; rows: [string, string][] };
@@ -149,6 +154,7 @@ type Workflow = {
     kind: string;
     verdict: string;
     note: string;
+    decision?: { left: string; leftLabel: string; mid: string; midLabel: string; risk: string };
     caveat?: string;
     insights: { title: string; meaning: string }[];
     source: string;
@@ -174,6 +180,17 @@ const WORKFLOWS: Workflow[] = [
     rich: {
       verdict: "Worth it on the right terms",
       summary: "Audi Q3 S Line · a few things here change what it's worth and what you'd take on. The call's yours — here's what to weigh.",
+      grid: [
+        { label: "Finance", value: "Owed", tone: "flag" },
+        { label: "Write-off", value: "Cat N", tone: "flag" },
+        { label: "Stolen", value: "Clear", tone: "good" },
+        { label: "Mileage", value: "Doesn't add up", tone: "flag" },
+        { label: "MOT", value: "Valid", tone: "good" },
+        { label: "Tax", value: "SORN", tone: "note" },
+        { label: "Damage", value: "Repaired", tone: "note" },
+        { label: "Value", value: "~£19,600", tone: "good" },
+        { label: "Budget fit", value: "On terms", tone: "note" },
+      ],
       findings: [
         {
           title: "There's finance still owed on it",
@@ -224,8 +241,9 @@ const WORKFLOWS: Workflow[] = [
     steps: ["Reading the photos", "Assessing the damage", "Estimating repair cost", "What it's really worth"],
     report: {
       kind: "Listing analysis",
-      verdict: "Only worth it under £1,850",
+      verdict: "Negotiate — or walk",
       note: "The asking price doesn't leave room for the repair this damage really needs.",
+      decision: { left: "£1,850", leftLabel: "Max sensible bid", mid: "£1,900", midLabel: "Walk away above", risk: "Front-left damage" },
       caveat: "No reg on this listing, so Ralph couldn't verify the MOT — ask the seller for it.",
       insights: [
         { title: "The damage is likely more than cosmetic", meaning: "The wheel sits at an angle in the photos — budget for suspension, not just a bumper." },
@@ -560,6 +578,18 @@ export default function RalphCinema() {
                 <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.5, margin: 0 }}>{w.rich.summary}</p>
               </div>
 
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, animation: "ralphFade .5s both", animationDelay: ".08s" }}>
+                {w.rich.grid.map((g) => (
+                  <div key={g.label} style={{ padding: "9px 10px", borderRadius: 11, border: `1px solid ${C.innerBorder}`, background: C.innerCard }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                      <span style={{ width: 7, height: 7, borderRadius: 99, background: GRID_DOT[g.tone], flexShrink: 0 }} />
+                      <span style={{ color: C.faint, fontSize: 9, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase" }}>{g.label}</span>
+                    </div>
+                    <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginTop: 4 }}>{g.value}</div>
+                  </div>
+                ))}
+              </div>
+
               <div style={{ color: C.faint, fontSize: 11, fontWeight: 800, letterSpacing: 1, marginTop: 2 }}>WORTH WEIGHING UP</div>
 
               {w.rich.findings.map((f) => (
@@ -613,6 +643,23 @@ export default function RalphCinema() {
                 <div style={{ color: C.text, fontWeight: 800, fontSize: 19, margin: "4px 0 6px" }}>{w.report.verdict}</div>
                 <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.5, margin: 0 }}>{w.report.note}</p>
               </div>
+
+              {w.report.decision && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, animation: "ralphFade .5s both", animationDelay: ".08s" }}>
+                  <div style={{ padding: "13px 14px", borderRadius: 13, border: `1px solid ${C.accentChipBorder}`, background: C.accentChipBg }}>
+                    <div style={{ color: C.text, fontWeight: 800, fontSize: 18 }}>{w.report.decision.left}</div>
+                    <div style={{ color: C.accent, fontSize: 10, fontWeight: 800, letterSpacing: 0.5, marginTop: 3, textTransform: "uppercase" }}>{w.report.decision.leftLabel}</div>
+                  </div>
+                  <div style={{ padding: "13px 14px", borderRadius: 13, border: `1px solid ${C.innerBorder}`, background: C.innerCard }}>
+                    <div style={{ color: C.text, fontWeight: 800, fontSize: 18 }}>{w.report.decision.mid}</div>
+                    <div style={{ color: C.faint, fontSize: 10, fontWeight: 800, letterSpacing: 0.5, marginTop: 3, textTransform: "uppercase" }}>{w.report.decision.midLabel}</div>
+                  </div>
+                  <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 8, padding: "10px 13px", borderRadius: 12, border: `1px solid ${C.innerBorder}`, background: C.innerCard }}>
+                    <AlertTriangle size={14} color={FLAG} aria-hidden />
+                    <span style={{ color: C.muted, fontSize: 12.5 }}><span style={{ color: C.faint, fontWeight: 700 }}>Main risk: </span>{w.report.decision.risk}</span>
+                  </div>
+                </div>
+              )}
 
               <div style={{ color: C.faint, fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>WHAT THIS MEANS FOR YOU</div>
               {w.report.insights.map((it) => (
