@@ -41,6 +41,23 @@
   box-sizing: border-box;
 }
 
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.theme-toggle:hover {
+  background: var(--soft);
+}
+
 /* Preflight is off, so force solid borders on controls (UA default is outset = dark bottom edge). */
 button,
 input,

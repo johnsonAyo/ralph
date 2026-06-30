@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Search, User as UserIcon } from "lucide-react";
+import { LayoutDashboard, LogOut, Moon, Search, Sun, User as UserIcon } from "lucide-react";
 import { Button } from "@ralph/ui";
 import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../lib/supabase";
 import { useCredits } from "../lib/use-credits";
+import { useTheme } from "../lib/use-theme";
 const HOME_ANCHORS = [
     { href: "#why", label: "Why" },
     { href: "#pricing", label: "Pricing" },
@@ -24,6 +25,7 @@ export default function SiteHeader() {
     const { data: creditInfo, isLoading: loadingCredits } = useCredits(user?.id);
     const credits = creditInfo?.balance ?? 0;
     const creditTotal = creditInfo?.total ?? 0;
+    const { theme, toggle: toggleTheme } = useTheme();
     async function handleSignOut() {
         if (!isSupabaseConfigured()) {
             window.location.href = "/";
@@ -65,6 +67,15 @@ export default function SiteHeader() {
         </nav>)}
 
       {!isAuthPage ? (<div className="nav-actions">
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Light report preview" : "Dark report preview"}
+            title={theme === "dark" ? "Light report" : "Dark report"}
+          >
+            {theme === "dark" ? <Sun size={16} aria-hidden="true"/> : <Moon size={16} aria-hidden="true"/>}
+          </button>
           {user ? (<>
               <span className="dashboard-nav-credits" style={{ opacity: 0.8, fontSize: "0.85rem", fontWeight: 500 }}>
                 {loadingCredits ? "..." : `${credits} / ${creditTotal} checks left`}
