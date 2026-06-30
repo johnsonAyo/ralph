@@ -1,5 +1,6 @@
 "use client";
-
+import "../../dashboard.css";
+import "../report.css";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";

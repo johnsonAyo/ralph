@@ -1,5 +1,5 @@
 "use client";
-
+import "./check-form.css";
 import { useReportForm } from "../../lib/use-report-form";
 import { landingLabels } from "../../labels";
 import { useRouter } from "next/navigation";

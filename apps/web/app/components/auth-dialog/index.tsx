@@ -1,5 +1,5 @@
 "use client";
-
+import "./auth-dialog.css";
 import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useAuthDialog } from "../../lib/use-auth-dialog";

@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 import { isDevAuthBypassEnabled } from "./app/lib/dev-auth";
 const publicPaths = ["/", "/dashboard", "/opengraph-image"];
-const staticPathPrefixes = ["/_next", "/favicon.ico", "/images", "/fonts"];
+const staticPathPrefixes = ["/_next", "/favicon.ico", "/images", "/fonts", "/dev"];
 function isPublicPath(pathname: string): boolean {
     return (publicPaths.includes(pathname) ||
         staticPathPrefixes.some((prefix) => pathname.startsWith(prefix)));

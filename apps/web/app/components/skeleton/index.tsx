@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
+import "./skeleton.css";
 type SkeletonVariant = "text" | "block" | "circle" | "pill";
 interface SkeletonProps {
     variant?: SkeletonVariant;

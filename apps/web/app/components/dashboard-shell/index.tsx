@@ -1,4 +1,5 @@
 "use client";
+import "./dashboard-shell.css";
 import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -6,6 +7,7 @@ import { LayoutDashboard, PlusCircle, Search, User as UserIcon, Coins, PanelLeft
 import { Button } from "@ralph/ui";
 import { useSession } from "../../lib/supabase";
 import { useCredits } from "../../lib/use-credits";
+import { getUserDisplayName, getUserInitials } from "../../lib/user-display";
 const SIDEBAR_STORAGE_KEY = "ralph:sidebar-collapsed";
 const DASHBOARD_LINKS = [
     { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
@@ -17,17 +19,15 @@ const DASHBOARD_LINKS = [
 interface DashboardShellProps {
     children: ReactNode;
 }
-function getInitials(email: string): string {
-    const parts = email.split("@")[0].split(/[._-]/);
-    return parts.slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("");
-}
+
 export default function DashboardShell({ children }: DashboardShellProps) {
     const pathname = usePathname() ?? "/dashboard";
     const { data: user } = useSession();
     const { data: creditInfo, isLoading: loadingCredits } = useCredits(user?.id);
     const credits = creditInfo?.balance ?? 0;
     const creditTotal = creditInfo?.total ?? 0;
-    const initials = user?.email ? getInitials(user.email) : "?";
+    const initials = getUserInitials(user);
+    const displayName = getUserDisplayName(user);
     const activeLink = DASHBOARD_LINKS.find((l) => l.href === pathname);
     const pageTitle = activeLink?.label ?? (pathname.includes("/reports/") ? "Report" : "Dashboard");
     const [collapsed, setCollapsed] = useState(false);
@@ -91,10 +91,10 @@ export default function DashboardShell({ children }: DashboardShellProps) {
               </div>
             </div>)}
 
-          {user && (<Link href="/dashboard/profile" className="dashboard-user-widget" title={collapsed ? (user.email ?? user.id) : undefined}>
+          {user && (<Link href="/dashboard/profile" className="dashboard-user-widget" title={collapsed ? displayName : undefined}>
               <div className="dashboard-user-avatar" aria-hidden="true">{initials}</div>
-              <span className="dashboard-user-email dashboard-collapse-hide" title={user.email ?? user.id}>
-                {user.email ?? user.id}
+              <span className="dashboard-user-email dashboard-collapse-hide" title={displayName}>
+                {displayName}
               </span>
             </Link>)}
         </div>

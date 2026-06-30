@@ -1,5 +1,5 @@
 "use client";
-
+import "./auth-form.css";
 import { FormEvent, useState } from "react";
 import { Mail } from "lucide-react";
 import { Button, Input } from "@ralph/ui";

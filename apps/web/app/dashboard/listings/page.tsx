@@ -1,5 +1,5 @@
 "use client";
-
+import "../dashboard.css";
 import { ExternalLink, MapPin, Globe } from "lucide-react";
 import { useState } from "react";
 import { SUPPORTED_SITES } from "./constants";

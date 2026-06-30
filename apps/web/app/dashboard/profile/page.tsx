@@ -1,4 +1,6 @@
 "use client";
+import "./profile.css";
+import "../dashboard.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogOut, Mail, Coins, CalendarDays, FileText, ShieldCheck, BadgeCheck } from "lucide-react";
@@ -6,15 +8,10 @@ import { getSupabaseBrowserClient, isSupabaseConfigured, useSession } from "../.
 import { Button } from "@ralph/ui";
 import { ReportStatusCode } from "@ralph/shared";
 import { useCredits } from "../../lib/use-credits";
+import { getUserDisplayName, getUserInitials } from "../../lib/user-display";
 import { useReports } from "../../lib/use-reports";
 import { ProfileBlockSkeleton, ProfileHeaderSkeleton } from "../../components/skeleton";
-function getInitials(email: string): string {
-    const parts = email.split("@")[0].split(/[._-]/);
-    return parts
-        .slice(0, 2)
-        .map((p) => p[0]?.toUpperCase() ?? "")
-        .join("");
-}
+
 export default function ProfilePage() {
     const router = useRouter();
     const { data: user } = useSession();
@@ -24,7 +21,8 @@ export default function ProfilePage() {
     const { data: reports = [], isLoading: loadingReports } = useReports();
     const checksRun = reports.length;
     const completedChecks = reports.filter((r) => r.status === ReportStatusCode.Completed).length;
-    const initials = user?.email ? getInitials(user.email) : "?";
+    const initials = getUserInitials(user);
+    const displayName = getUserDisplayName(user);
     const memberSince = user?.created_at
         ? new Date(user.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })
         : "—";
@@ -51,7 +49,7 @@ export default function ProfilePage() {
       {user ? (<section className="profile-identity-card">
           <div className="profile-avatar" aria-hidden="true">{initials}</div>
           <div className="profile-identity-body">
-            <p className="profile-identity-email">{user.email}</p>
+            <p className="profile-identity-email">{displayName}</p>
             <div className="profile-identity-meta">
               <span className="profile-meta-pill">
                 <CalendarDays size={12} aria-hidden="true"/>

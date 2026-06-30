@@ -1,5 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
+import "./site-footer/site-footer.css";
 import { landingLabels } from "../labels";
 import CTA from "./cta";
 export default function SiteFooter() {

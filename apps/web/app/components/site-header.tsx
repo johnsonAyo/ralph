@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import "./site-header/site-header.css";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, LogOut, Moon, Search, Sun, User as UserIcon } from "lucide-react";
 import { Button } from "@ralph/ui";
@@ -7,6 +8,7 @@ import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../
 import { useCredits } from "../lib/use-credits";
 import { useTheme } from "../lib/use-theme";
 import { openAuth } from "../lib/use-auth-dialog";
+import { getUserDisplayName } from "../lib/user-display";
 const HOME_ANCHORS = [
     { href: "#why", label: "Why" },
     { href: "#pricing", label: "Pricing" },
@@ -81,8 +83,8 @@ export default function SiteHeader() {
               <span className="dashboard-nav-credits" style={{ opacity: 0.8, fontSize: "0.85rem", fontWeight: 500 }}>
                 {loadingCredits ? "..." : `${credits} / ${creditTotal} checks left`}
               </span>
-              <span className="dashboard-nav-email" title={user.email ?? user.id}>
-                {user.email ?? user.id}
+              <span className="dashboard-nav-email" title={getUserDisplayName(user)}>
+                {getUserDisplayName(user)}
               </span>
               <Button type="button" className="dashboard-logout" onClick={handleSignOut}>
                 <LogOut size={14} aria-hidden="true"/>

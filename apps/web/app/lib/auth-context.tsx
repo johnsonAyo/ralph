@@ -7,6 +7,10 @@ const PUBLIC_ONLY_PATHS = new Set(["/", "/auth"]);
 function isPublicOnly(pathname: string): boolean {
     return PUBLIC_ONLY_PATHS.has(pathname);
 }
+// /dev/* are internal design-review pages — no session needed, no redirect either way.
+function isDevPreview(pathname: string): boolean {
+    return pathname.startsWith("/dev/");
+}
 function getNextTarget(): string {
     if (typeof window === "undefined") {
         return "/dashboard";
@@ -36,6 +40,9 @@ export default function AuthGate({ children }: {
             return;
         }
         if (!pathname) {
+            return;
+        }
+        if (isDevPreview(pathname)) {
             return;
         }
         if (user && isPublicOnly(pathname)) {

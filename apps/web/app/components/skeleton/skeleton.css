@@ -1,0 +1,55 @@
+@keyframes skeleton-sweep {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--soft);
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+.skeleton--text {
+  border-radius: 6px;
+  height: 0.85rem;
+  align-self: center;
+}
+.skeleton--block {
+  border-radius: 14px;
+}
+.skeleton--circle {
+  border-radius: 50%;
+}
+.skeleton--pill {
+  border-radius: 999px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+    background-image: none;
+  }
+}
+.dash-card--skeleton {
+  height: 120px;
+  background: linear-gradient(90deg, var(--surface) 25%, var(--line) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}

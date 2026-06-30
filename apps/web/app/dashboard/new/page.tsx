@@ -1,4 +1,5 @@
 "use client";
+import "../dashboard.css";
 import CheckForm from "../../components/check-form";
 
 export default function NewCheckPage() {

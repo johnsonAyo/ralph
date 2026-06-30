@@ -1,4 +1,5 @@
 "use client";
+import "./dashboard.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

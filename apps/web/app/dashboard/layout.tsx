@@ -1,4 +1,5 @@
 "use client";
+import "./dashboard.css";
 import { ReactNode, useEffect, useState } from "react";
 import DashboardShell from "../components/dashboard-shell";
 import { useSession } from "../lib/supabase";

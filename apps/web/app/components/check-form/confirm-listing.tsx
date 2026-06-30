@@ -1,5 +1,5 @@
 "use client";
-
+import "./confirm-listing.css";
 import { FormEvent, useState } from "react";
 import {
   ArrowLeft,

@@ -1,5 +1,5 @@
 "use client";
-
+import "../check-form/check-form.css";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Check, Gauge, Loader2, ShieldQuestion } from "lucide-react";

@@ -1,4 +1,6 @@
 "use client";
+import "./page.css";
+import "./components/check-form/check-form.css";
 import { Camera, FileSearch, Receipt, ShieldCheck, Target, Users, } from "lucide-react";
 import { Button } from "@ralph/ui";
 import { getStripeLookupKey } from "./lib/site-url";

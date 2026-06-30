@@ -1,0 +1,19 @@
+.footer {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  background: #102f75;
+  color: var(--surface);
+  text-align: center;
+  padding: clamp(44px, 6vw, 72px) clamp(40px, 18vw, 260px);
+}
+.footer h2 {
+  max-width: 820px;
+}
+.footer p {
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: var(--font-body);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}

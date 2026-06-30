@@ -1,5 +1,5 @@
 "use client";
-
+import "../dashboard.css";
 import Link from "next/link";
 import { ArrowRight, Loader2, Trash2 } from "lucide-react";
 import { useReports } from "../../lib/use-reports";
@@ -14,7 +14,7 @@ import {
 import { DashboardReportsSkeleton } from "../../components/skeleton";
 
 export default function HistoryPage() {
-  const { data: reports, isLoading, isError } = useReports();
+  const { data: reports, isLoading } = useReports();
   const del = useDeleteReport();
 
   const handleDelete = (id: string) => {
@@ -37,38 +37,50 @@ export default function HistoryPage() {
 
         {isLoading && <DashboardReportsSkeleton />}
 
-        {!isLoading && !isError && !reports?.length && (
-          <div className="rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-10 text-center">
-            <p className="m-0 font-extrabold text-[var(--ink)]">No checks yet</p>
-            <p className="mt-1 text-[0.92rem] text-[var(--muted)]">Run your first check to see it here.</p>
-            <Link href="/dashboard/new" className="mt-4 inline-flex items-center gap-1.5 text-[0.9rem] font-extrabold text-[var(--blue)] hover:underline">
-              Run a new check <ArrowRight size={14} aria-hidden="true" />
+        {!isLoading && (!reports || reports.length === 0) && (
+          <div className="dashboard-empty-state">
+            <div className="dashboard-empty-icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3 className="dashboard-empty-title">No checks yet</h3>
+            <p className="dashboard-empty-text">
+              When you run a check you can see the reports here.
+            </p>
+            <Link
+              href="/dashboard/new"
+              className="dashboard-empty-cta"
+            >
+              Run a new check <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         )}
 
-        {isError && <p className="dash-error">Could not load your history. Please try again.</p>}
-
         {!isLoading && reports && reports.length > 0 && (
-          <ul className="m-0 flex list-none flex-col gap-3 p-0">
+          <ul className="dashboard-history-list">
             {reports.map((report) => (
               <li
                 key={report.id}
-                className="flex items-center gap-4 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-4"
+                className="dashboard-history-item"
               >
-                <span className={`h-10 w-1.5 shrink-0 rounded-full ${report.id && reportTone(report) === "ok" ? "bg-green-500" : reportTone(report) === "avoid" ? "bg-red-500" : "bg-[var(--line)]"}`} aria-hidden="true" />
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate text-[0.95rem] font-extrabold text-[var(--ink)]">{reportTitle(report)}</span>
-                  <span className="text-[0.78rem] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                <span className={`dashboard-history-tone-bar ${reportTone(report)}`} aria-hidden="true" />
+                <div className="dashboard-history-info">
+                  <span className="dashboard-history-title">{reportTitle(report)}</span>
+                  <span className="dashboard-history-meta">
                     {reportHeadline(report)} · {report.listing?.platform ?? "—"} · {relativeTime(report.createdAt)}
                   </span>
                 </div>
-                <span className="hidden shrink-0 text-[0.85rem] font-bold tabular-nums text-[var(--ink)] sm:block">
+                <span className="dashboard-history-price">
                   {reportBidRange(report)}
                 </span>
                 <Link
                   href={`/dashboard/reports/${report.id}`}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-[10px] px-3 py-2 text-[0.82rem] font-extrabold text-[var(--blue)] transition-colors hover:bg-[rgba(47,98,233,0.08)]"
+                  className="dashboard-history-open-btn"
                 >
                   Open
                   <ArrowRight size={14} aria-hidden="true" />
@@ -78,7 +90,7 @@ export default function HistoryPage() {
                   onClick={() => handleDelete(report.id)}
                   disabled={del.isPending}
                   aria-label="Delete report"
-                  className="grid size-9 shrink-0 place-items-center rounded-[10px] text-[var(--muted)] transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                  className="dashboard-history-delete-btn"
                 >
                   {del.isPending && del.variables === report.id ? (
                     <Loader2 className="size-4 animate-spin" aria-hidden="true" />
