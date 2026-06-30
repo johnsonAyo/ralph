@@ -10,7 +10,9 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/ui/package.json ./packages/ui/
 COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
 
 # Install all dependencies (including devDeps needed to build)
 RUN pnpm install --frozen-lockfile
@@ -41,7 +43,9 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/ui/package.json ./packages/ui/
 COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
 
 # Install production deps only
 RUN pnpm install --frozen-lockfile --prod
