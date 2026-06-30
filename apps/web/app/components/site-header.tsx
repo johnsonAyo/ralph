@@ -6,6 +6,7 @@ import { Button } from "@ralph/ui";
 import { getSupabaseBrowserClient, isSupabaseConfigured, useSession, } from "../lib/supabase";
 import { useCredits } from "../lib/use-credits";
 import { useTheme } from "../lib/use-theme";
+import { openAuth } from "../lib/use-auth-dialog";
 const HOME_ANCHORS = [
     { href: "#why", label: "Why" },
     { href: "#pricing", label: "Pricing" },
@@ -88,11 +89,11 @@ export default function SiteHeader() {
                 Logout
               </Button>
             </>) : (<>
-              <Link className="auth-pill auth-link" href="/auth">
+              <button type="button" className="auth-pill auth-link" onClick={() => openAuth("drawer")}>
                 Sign in
-              </Link>
-              {isHome ? (<Button asChild size="md" className="min-h-[44px] rounded-[14px]">
-                  <a href="#check">Ask Ralph</a>
+              </button>
+              {isHome ? (<Button type="button" size="md" className="min-h-[44px] rounded-[14px]" onClick={() => openAuth("modal")}>
+                  Ask Ralph
                 </Button>) : null}
             </>)}
         </div>) : null}

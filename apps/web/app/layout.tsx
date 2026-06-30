@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "./providers";
 import SiteHeader from "./components/site-header";
 import SiteFooter from "./components/site-footer";
+import AuthDialog from "./components/auth-dialog";
 export const metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
     title: "Ask Ralph | Check if a car is a good buy",
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             {children}
           </div>
           <SiteFooter />
+          <AuthDialog />
         </Providers>
       </body>
     </html>);
