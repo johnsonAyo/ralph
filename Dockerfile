@@ -1,7 +1,8 @@
 # ─── Stage 1: Builder ───────────────────────────────────────────────────────
 FROM node:22-slim AS builder
 
-RUN npm install -g pnpm@9.15.9
+# Enable corepack to automatically use the pnpm version defined in package.json
+RUN corepack enable pnpm
 
 WORKDIR /app
 
@@ -34,7 +35,7 @@ FROM node:22-slim AS runner
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm@9.15.9
+RUN corepack enable pnpm
 
 WORKDIR /app
 
