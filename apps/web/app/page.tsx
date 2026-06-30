@@ -1,9 +1,9 @@
 "use client";
-import { Camera, ChevronRight, FileSearch, Receipt, ShieldCheck, Target, Users, } from "lucide-react";
+import { Camera, FileSearch, Receipt, ShieldCheck, Target, Users, } from "lucide-react";
 import { Button } from "@ralph/ui";
 import { getStripeLookupKey } from "./lib/site-url";
 import { landingLabels } from "./labels";
-import { pricing, aiInputs, reportAnswers, aboutIntro, aboutSections, faqs, whyUseCards, } from "./constants";
+import { pricing, aiInputs, reportAnswers, faqs, whyUseCards, } from "./constants";
 import { useSession } from "./lib/supabase";
 import { useCheckout } from "./lib/use-checkout";
 import { HomeShellSkeleton } from "./components/skeleton";
@@ -147,37 +147,6 @@ export default function Home() {
             </article>))}
         </div>
       </section>
-
-      <section className="about-section" id="about">
-        <div className="section-heading">
-          <h2>{landingLabels.about.title}</h2>
-        </div>
-        <p className="about-intro">{aboutIntro}</p>
-        <div className="about-mobile-toc" aria-label="">
-          {aboutSections.map((section) => (<a key={section.id} href={`#${section.id}`}>
-              {section.heading}
-            </a>))}
-        </div>
-        <div className="about-layout">
-          <nav className="about-toc" aria-label="e">
-
-            {aboutSections.map((section) => (<a key={section.id} href={`#${section.id}`}>
-                <ChevronRight aria-hidden="true"/>
-                <span>{section.heading}</span>
-              </a>))}
-          </nav>
-          <div className="about-content">
-            {aboutSections.map((section) => (<article key={section.id} id={section.id} className="about-article">
-                <h3>{section.heading}</h3>
-                <p>{section.body}</p>
-              </article>))}
-          </div>
-        </div>
-      </section>
-
-      <div className="faqs-bridge">
-        <h2>{landingLabels.pricing.title}</h2>
-      </div>
 
       <section className="faqs-section" id="faqs">
         <div className="section-heading">

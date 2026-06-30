@@ -1,10 +1,10 @@
 export const landingLabels = {
     hero: {
-        eyebrow: "The decision layer, not another history check",
-        title: "Know the most you should pay — before you buy.",
-        copy: "Paste a listing, enter a reg, or type the details. Unlike a history check, Ralph reads the price, photos, mileage and history against your budget — then tells you whether the car makes sense for your money.",
+        eyebrow: "Ralph guides your decision before you buy",
+        title: "Found a car online? Ask Ralph before you buy.",
+        copy: "Paste a listing or start with the information you have. Ralph checks the price, mileage, damage, history, photos and your budget.",
         cta: "Ask Ralph About This Car",
-        subtext: "A history check tells you the record. Ralph tells you whether to buy. One sample check is on us.",
+        subtext: "An intelligence layer that guides your decision before you buy. One sample check is on us.",
     },
     aiExplainer: {
         title: "How Ralph turns a listing into a budget-fit report.",

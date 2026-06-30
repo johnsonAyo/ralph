@@ -410,9 +410,11 @@ export default function RalphCinema() {
       style={{
         position: "relative",
         width: "100%",
+        maxWidth: 600,
+        margin: "0 auto",
         display: "flex",
         justifyContent: "center",
-        padding: "clamp(20px,4vw,48px) 0",
+        padding: "clamp(20px,4vw,40px) clamp(16px,3vw,26px)",
         background: C.backdrop,
         borderRadius: 28,
         overflow: "hidden",
@@ -424,7 +426,7 @@ export default function RalphCinema() {
 
       <div
         style={{
-          width: "min(560px,92%)",
+          width: "min(560px,100%)",
           height: "clamp(560px,76vh,632px)",
           display: "flex",
           flexDirection: "column",
