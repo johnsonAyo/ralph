@@ -4,7 +4,11 @@ import Stripe from "stripe";
 import { STRIPE_CLIENT } from "@/common/tokens";
 import { PaymentsController } from "./payments.controller";
 import { StripeWebhookService } from "./stripe-webhook.service";
+import { SupabaseModule } from "@/modules/supabase/supabase.module";
+import { EmailModule } from "@/modules/email/email.module";
+
 @Module({
+    imports: [SupabaseModule, EmailModule],
     controllers: [PaymentsController],
     providers: [
         {

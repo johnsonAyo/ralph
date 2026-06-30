@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 import { isDevAuthBypassEnabled } from "./app/lib/dev-auth";
-const publicPaths = ["/", "/auth", "/dashboard", "/opengraph-image"];
+const publicPaths = ["/", "/dashboard", "/opengraph-image"];
 const staticPathPrefixes = ["/_next", "/favicon.ico", "/images", "/fonts"];
 function isPublicPath(pathname: string): boolean {
     return (publicPaths.includes(pathname) ||
@@ -37,16 +37,14 @@ export async function proxy(request: NextRequest) {
         },
     });
     const { data: { user }, } = await supabase.auth.getUser();
-    if (user &&
-        (request.nextUrl.pathname === "/" ||
-            request.nextUrl.pathname === "/auth")) {
+    if (user && request.nextUrl.pathname === "/") {
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     if (isPublicPath(request.nextUrl.pathname)) {
         return response;
     }
     if (!user) {
-        const authUrl = new URL("/auth", request.url);
+        const authUrl = new URL("/?login=true", request.url);
         authUrl.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
         return NextResponse.redirect(authUrl);
     }

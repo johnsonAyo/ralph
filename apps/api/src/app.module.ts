@@ -10,6 +10,8 @@ import { PaymentsModule } from "@/modules/payments/payments.module";
 import { ReportsModule } from "@/modules/reports/reports.module";
 import { SupabaseModule } from "@/modules/supabase/supabase.module";
 import { VehicleDataModule } from "@/modules/vehicle-data/vehicle-data.module";
+import { EmailModule } from "@/modules/email/email.module";
+import { WebhooksModule } from "@/modules/webhooks/webhooks.module";
 import { AppLoggerService } from "@/common/logging/app-logger.service";
 @Module({
     controllers: [HealthController],
@@ -32,6 +34,8 @@ import { AppLoggerService } from "@/common/logging/app-logger.service";
         ReportsModule,
         PaymentsModule,
         VehicleDataModule,
+        EmailModule,
+        WebhooksModule,
     ],
     providers: [AppLoggerService],
     exports: [AppLoggerService],

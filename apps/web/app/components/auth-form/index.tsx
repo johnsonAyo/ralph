@@ -42,7 +42,7 @@ export default function AuthForm() {
       }
       const result = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${getSiteUrl()}/auth?next=/` },
+        options: { emailRedirectTo: `${getSiteUrl()}/dashboard` },
       });
       if (result.error) throw result.error;
       setMessage(SENT);
@@ -62,7 +62,7 @@ export default function AuthForm() {
     }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${getSiteUrl()}/auth?next=/` },
+      options: { redirectTo: `${getSiteUrl()}/dashboard` },
     });
     if (error) setMessage(error.message);
   }

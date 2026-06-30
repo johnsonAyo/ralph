@@ -24,5 +24,7 @@ export const appConfigSchema = z
     DVSA_MOT_TOKEN_URL: z.string().url().optional(),
     DVSA_MOT_SCOPE: z.string().min(1).optional(),
     DVSA_MOT_URL: z.string().url().optional(),
+    RESEND_API_KEY: z.string().min(1).optional(),
+    SUPABASE_WEBHOOK_SECRET: z.string().min(1).optional(),
 })
     .passthrough();
