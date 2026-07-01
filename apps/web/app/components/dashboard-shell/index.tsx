@@ -3,7 +3,7 @@ import "./dashboard-shell.css";
 import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, PlusCircle, Search, User as UserIcon, Coins, PanelLeftClose, PanelLeftOpen, Clock } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Search, User as UserIcon, Coins, PanelLeftClose, PanelLeftOpen, Clock, CarFront } from "lucide-react";
 import { Button } from "@ralph/ui";
 import { useSession } from "../../lib/supabase";
 import { useCredits } from "../../lib/use-credits";
@@ -12,6 +12,7 @@ const SIDEBAR_STORAGE_KEY = "ralph:sidebar-collapsed";
 const DASHBOARD_LINKS = [
     { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
     { href: "/dashboard/new", label: "New check", Icon: PlusCircle },
+    { href: "/dashboard/verdict", label: "Reg check", Icon: CarFront },
     { href: "/dashboard/history", label: "History", Icon: Clock },
     { href: "/dashboard/listings", label: "Listings", Icon: Search },
     { href: "/dashboard/profile", label: "Profile", Icon: UserIcon },

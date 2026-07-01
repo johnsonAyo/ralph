@@ -57,10 +57,12 @@ export const reportResultSchema = z.object({
 export const reportSnapshotSchema = z.object({
   id: z.string().uuid(),
   userId: z.string(),
+  type: z.enum(["auction", "reg_check"]).default("auction").catch("auction"),
   status: reportStatusSchema,
-  request: createReportRequestSchema,
+  request: z.any(),
   listing: listingSnapshotSchema.optional(),
-  result: reportResultSchema.optional(),
+  profile: z.any().optional(),
+  result: z.any().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

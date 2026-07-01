@@ -10,8 +10,29 @@ export class Report {
         return new Report({
             id: input.id,
             userId: input.userId,
+            type: "auction",
             request: input.request,
             status: ReportStatusCode.Queued,
+            createdAt: input.now,
+            updatedAt: input.now,
+        });
+    }
+    static createRegCheck(input: {
+        id: string;
+        userId: string;
+        request: any;
+        profile: any;
+        result: any;
+        now: string;
+    }): Report {
+        return new Report({
+            id: input.id,
+            userId: input.userId,
+            type: "reg_check",
+            request: input.request,
+            profile: input.profile,
+            result: input.result,
+            status: ReportStatusCode.Completed,
             createdAt: input.now,
             updatedAt: input.now,
         });

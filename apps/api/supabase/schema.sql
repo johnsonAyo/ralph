@@ -1,13 +1,22 @@
 create table if not exists public.reports (
   id uuid primary key,
   user_id uuid not null,
+  type text not null default 'auction',
   status text not null,
   request jsonb not null,
   listing jsonb,
+  profile jsonb,
   result jsonb,
   created_at timestamptz not null,
   updated_at timestamptz not null
 );
+
+-- Backfill for existing installs: `create table if not exists` above does NOT add
+-- new columns to a table that already exists, so add them explicitly (idempotent).
+alter table public.reports add column if not exists type text not null default 'auction';
+alter table public.reports add column if not exists listing jsonb;
+alter table public.reports add column if not exists profile jsonb;
+alter table public.reports add column if not exists result jsonb;
 
 create index if not exists reports_user_id_idx on public.reports (user_id);
 create index if not exists reports_status_idx on public.reports (status);

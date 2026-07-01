@@ -7,7 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev start:dev",
     "dev:web": "turbo run dev --filter=@ralph/web",
     "dev:api": "turbo run start:dev --filter=@ralph/api",
     "build": "turbo run build",

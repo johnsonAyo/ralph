@@ -51,9 +51,11 @@ export class SupabaseReportRepository implements ReportRepository {
         return {
             id: snapshot.id,
             user_id: snapshot.userId,
+            type: snapshot.type,
             status: snapshot.status,
             request: snapshot.request,
             listing: snapshot.listing ?? null,
+            profile: snapshot.profile ?? null,
             result: snapshot.result ?? null,
             created_at: snapshot.createdAt,
             updated_at: snapshot.updatedAt,
@@ -63,9 +65,11 @@ export class SupabaseReportRepository implements ReportRepository {
         return reportSnapshotSchema.parse({
             id: row.id,
             userId: row.user_id,
+            type: row.type,
             status: row.status,
             request: row.request,
             listing: row.listing ?? undefined,
+            profile: row.profile ?? undefined,
             result: row.result ?? undefined,
             createdAt: row.created_at,
             updatedAt: row.updated_at,

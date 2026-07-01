@@ -19,6 +19,9 @@ function hostnameLabel(url?: string): string | undefined {
 }
 
 export function reportTitle(snapshot: ReportSnapshot): string {
+  if (snapshot.type === "reg_check") {
+    return snapshot.request.registration;
+  }
   return (
     snapshot.listing?.title ??
     hostnameLabel(snapshot.request.listingUrl) ??
@@ -56,6 +59,10 @@ export function reportTone(snapshot: ReportSnapshot): "ok" | "avoid" | "pending"
 }
 
 export function reportBidRange(snapshot: ReportSnapshot): string {
+  if (snapshot.type === "reg_check") {
+    const amount = snapshot.request.askingPrice || snapshot.request.totalBudget;
+    return amount ? `£${amount.toLocaleString("en-GB")}` : "—";
+  }
   const { safeBidMin, safeBidMax } = snapshot.result ?? {};
   if (safeBidMin && safeBidMax) {
     return `£${safeBidMin.toLocaleString("en-GB")} – £${safeBidMax.toLocaleString("en-GB")}`;

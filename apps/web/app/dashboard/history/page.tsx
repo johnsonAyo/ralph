@@ -79,7 +79,7 @@ export default function HistoryPage() {
                   {reportBidRange(report)}
                 </span>
                 <Link
-                  href={`/dashboard/reports/${report.id}`}
+                  href={report.type === "reg_check" ? `/dashboard/verdict?id=${report.id}` : `/dashboard/reports/${report.id}`}
                   className="dashboard-history-open-btn"
                 >
                   Open

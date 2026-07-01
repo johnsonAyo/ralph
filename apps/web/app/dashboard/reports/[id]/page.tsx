@@ -247,7 +247,7 @@ export default function ReportPage() {
               Why this verdict
             </h2>
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-              {result.keyRisks.map((risk, i) => (
+              {result.keyRisks.map((risk: string, i: number) => (
                 <li key={i} className="flex items-start gap-2.5 text-[0.92rem] leading-[1.45] text-foreground">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden />
                   {risk}
@@ -295,7 +295,7 @@ export default function ReportPage() {
         {result.assumptions.length > 0 ? (
           <Disclosure title="What Ralph assumed">
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-              {result.assumptions.map((a, i) => (
+              {result.assumptions.map((a: string, i: number) => (
                 <li key={i} className="flex items-start gap-2.5 text-[0.9rem] leading-[1.45] text-[#625c52]">
                   <Lightbulb className="mt-0.5 size-4 shrink-0 text-[var(--muted)]" aria-hidden />
                   {a}

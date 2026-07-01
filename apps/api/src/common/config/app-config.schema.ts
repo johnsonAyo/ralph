@@ -10,6 +10,9 @@ export const appConfigSchema = z
     OPENAI_EXTRACTION_MODEL: z.string().min(1).optional(),
     OLLAMA_URL: z.string().url().optional(),
     OLLAMA_MODEL: z.string().min(1).optional(),
+    // Set for Ollama Cloud (https://ollama.com) — sent as a Bearer auth header.
+    // Leave blank for a local Ollama instance.
+    OLLAMA_API_KEY: z.string().min(1).optional(),
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
     SCRAPE_DO_TOKEN: z.string().min(1).optional(),

@@ -11,3 +11,5 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 apps/api/cloudrun.env.yaml
+upload.zip
+*.zip

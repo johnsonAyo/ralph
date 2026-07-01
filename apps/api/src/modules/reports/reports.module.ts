@@ -20,6 +20,7 @@ import { ReportsController } from "./reports.controller";
             useExisting: SupabaseReportRepository,
         },
     ],
+    exports: [REPORT_REPOSITORY],
 })
 export class ReportsModule {
 }
