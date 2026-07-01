@@ -52,7 +52,7 @@ export class OpenAiVehicleVerdictService implements VehicleVerdictAnalyserPort {
         max_output_tokens: VEHICLE_VERDICT_MAX_OUTPUT_TOKENS,
         metadata: {
           analysis_type: VEHICLE_VERDICT_RESPONSE_FORMAT,
-          registration: input.profile.registration ?? "unknown",
+          registration: input.profile?.registration ?? "unknown",
         },
       });
       if (!response.output_text) {

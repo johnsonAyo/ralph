@@ -20,17 +20,20 @@ export class Report {
     static createRegCheck(input: {
         id: string;
         userId: string;
+        type?: "auction" | "reg_check";
         request: any;
-        profile: any;
+        profile?: any;
+        listing?: any;
         result: any;
         now: string;
     }): Report {
         return new Report({
             id: input.id,
             userId: input.userId,
-            type: "reg_check",
+            type: input.type ?? "reg_check",
             request: input.request,
             profile: input.profile,
+            listing: input.listing,
             result: input.result,
             status: ReportStatusCode.Completed,
             createdAt: input.now,

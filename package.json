@@ -7,9 +7,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "turbo run dev start:dev",
-    "dev:web": "turbo run dev --filter=@ralph/web",
-    "dev:api": "turbo run start:dev --filter=@ralph/api",
+    "dev": "node scripts/predev-port.js && turbo run dev start:dev",
+    "dev:web": "node scripts/predev-port.js 3000 && turbo run dev --filter=@ralph/web",
+    "dev:api": "node scripts/predev-port.js 4000 && turbo run start:dev --filter=@ralph/api",
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@ralph/web",
     "build:api": "turbo run build --filter=@ralph/api",

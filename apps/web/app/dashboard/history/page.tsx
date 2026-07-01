@@ -53,10 +53,10 @@ export default function HistoryPage() {
               When you run a check you can see the reports here.
             </p>
             <Link
-              href="/dashboard/new"
+              href="/dashboard/verdict"
               className="dashboard-empty-cta"
             >
-              Run a new check <ArrowRight size={16} aria-hidden="true" />
+              Ask Ralph <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         )}
@@ -79,7 +79,7 @@ export default function HistoryPage() {
                   {reportBidRange(report)}
                 </span>
                 <Link
-                  href={report.type === "reg_check" ? `/dashboard/verdict?id=${report.id}` : `/dashboard/reports/${report.id}`}
+                  href={`/dashboard/verdict?id=${report.id}`}
                   className="dashboard-history-open-btn"
                 >
                   Open

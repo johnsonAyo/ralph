@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { AiModule } from "@/modules/ai/ai.module";
+import { ExtractionModule } from "@/modules/extraction/extraction.module";
 import { VEHICLE_DATA_PROVIDERS } from "./domain/vehicle-data-provider.interface";
 import { DvlaVesProvider } from "./infrastructure/dvla-ves.provider";
 import { DvsaMotProvider } from "./infrastructure/dvsa-mot.provider";
@@ -10,7 +11,7 @@ import { VehicleDataController } from "./vehicle-data.controller";
 import { ReportsModule } from "@/modules/reports/reports.module";
 
 @Module({
-  imports: [AuthModule, AiModule, ReportsModule],
+  imports: [AuthModule, AiModule, ReportsModule, ExtractionModule],
   controllers: [VehicleDataController],
   providers: [
     DvlaVesProvider,

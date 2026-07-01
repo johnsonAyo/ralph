@@ -212,21 +212,22 @@
 .dashboard-topbar-cta:hover {
   background: var(--blue-dark);
 }
-.dashboard-topbar-avatar {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: var(--soft);
-  color: var(--blue);
-  font-size: 0.85rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  transition: transform 150ms ease;
+.dashboard-topbar-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: color 150ms ease;
+  border: none;
+  background: transparent;
+  padding: 0;
+  outline: none;
 }
-.dashboard-topbar-avatar:hover {
-  transform: scale(1.05);
+.dashboard-topbar-user:hover {
+  color: var(--blue);
 }
 .dashboard-main {
   padding-top: clamp(32px, 4vw, 48px);
@@ -238,11 +239,77 @@
   align-content: start;
   min-width: 0;
 }
+.mobile-backdrop {
+  display: none;
+}
+.mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  margin-left: -8px;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 8px;
+}
+.mobile-menu-btn:hover {
+  background: var(--soft);
+}
+.mobile-menu-close {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.mobile-menu-close:hover {
+  background: var(--soft);
+  color: var(--ink);
+}
+
 @media (max-width: 900px) {
   .dashboard-layout {
     grid-template-columns: 1fr;
   }
-  .dashboard-sidebar {
+  .desktop-only {
     display: none;
+  }
+  .mobile-menu-btn {
+    display: grid;
+    place-items: center;
+  }
+  .mobile-menu-close {
+    display: grid;
+    place-items: center;
+  }
+  
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: clamp(200px, 60vw, 260px);
+    background: var(--surface);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-right: none;
+  }
+  
+  .dashboard-layout[data-mobile-menu="true"] .dashboard-sidebar {
+    transform: translateX(0);
+    box-shadow: 12px 0 40px rgba(0,0,0,0.1);
+  }
+  
+  .dashboard-layout[data-mobile-menu="true"] .mobile-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s ease;
   }
 }

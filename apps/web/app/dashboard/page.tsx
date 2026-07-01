@@ -30,9 +30,9 @@ function QuickCheckWidget() {
         const params = new URLSearchParams({ url: url.trim() });
         router.push(`/dashboard/new?${params.toString()}`);
     }
-    return (<form className="quick-check-widget" onSubmit={handleSubmit}>
-      <Input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart, IAA or other UK listing URL…" required suppressHydrationWarning/>
-      <Button type="submit" className="h-[46px] min-h-0 shrink-0 gap-1.5 rounded-[12px] px-5 text-[0.88rem] shadow-[0_6px_18px_rgba(47,98,233,0.18)]">
+    return (<form className="mt-5 flex w-full max-w-[640px] flex-col gap-2.5 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
+      <Input type="url" className="h-[48px] sm:h-[46px] flex-1 rounded-[12px] shadow-sm text-ellipsis" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart, IAA or other UK listing URL…" required suppressHydrationWarning/>
+      <Button type="submit" className="h-[48px] sm:h-[46px] w-full sm:w-auto min-h-0 shrink-0 gap-1.5 rounded-[12px] px-5 text-[0.88rem] shadow-[0_6px_18px_rgba(47,98,233,0.18)] justify-center">
         Analyse
         <ArrowRight size={15} aria-hidden="true"/>
       </Button>

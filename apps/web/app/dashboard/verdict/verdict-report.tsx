@@ -63,8 +63,12 @@ export function VerdictReport({ report, onReset }: VerdictReportProps) {
   const confidenceTone =
     result.confidence === ExtractionConfidence.High ? "success" : result.confidence === ExtractionConfidence.Medium ? "warning" : "neutral";
 
-  const title = [profile.identity.yearOfManufacture, profile.identity.make, profile.identity.model].filter(Boolean).join(" ") || "Vehicle";
-  const registration = profile.registration || request.registration;
+  const title =
+    [profile?.identity.yearOfManufacture, profile?.identity.make, profile?.identity.model].filter(Boolean).join(" ") ||
+    [request.manual?.year, request.manual?.make, request.manual?.model].filter(Boolean).join(" ") ||
+    report.listing?.title ||
+    "Vehicle";
+  const registration = profile?.registration || request.registration;
 
   const budgetFitTone = 
     result.budgetFit.rating === BudgetFitCode.Comfortable ? "text-green-600 bg-green-50" :
@@ -135,6 +139,22 @@ export function VerdictReport({ report, onReset }: VerdictReportProps) {
           value={`${money(result.runningCost.nearTermRepairLow)} - ${money(result.runningCost.nearTermRepairHigh)}`} 
         />
       </div>
+
+      {/* Price guidance — only when there's a price on the table */}
+      {result.priceGuidance && (
+        <section className="flex flex-col gap-3 rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-7">
+          <h2 className="m-0 text-[1.15rem] font-[900] text-foreground">{result.priceGuidance.framing}</h2>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {result.priceGuidance.maxSensible != null && (
+              <Stat icon={Tag} label="Max sensible" value={money(result.priceGuidance.maxSensible)} />
+            )}
+            {result.priceGuidance.walkAwayAbove != null && (
+              <Stat icon={AlertCircle} label="Walk away above" value={money(result.priceGuidance.walkAwayAbove)} />
+            )}
+          </div>
+          <p className="m-0 text-[0.9rem] leading-relaxed text-[var(--muted)]">{result.priceGuidance.note}</p>
+        </section>
+      )}
 
       {/* Findings */}
       {result.findings.length > 0 && (

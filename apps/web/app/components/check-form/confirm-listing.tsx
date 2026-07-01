@@ -27,6 +27,7 @@ interface ListingImage {
 
 interface ConfirmListingProps {
   listing: any;
+  registration?: string;
   submitting: boolean;
   error?: string | null;
   onBack: () => void;
@@ -112,6 +113,7 @@ function Spec({
 
 export default function ConfirmListing({
   listing,
+  registration,
   submitting,
   error,
   onBack,
@@ -199,6 +201,16 @@ export default function ConfirmListing({
           </Badge>
         ) : null}
       </div>
+
+      {registration && (
+        <div className="rounded-[14px] border border-[var(--blue)] bg-[rgba(47,98,233,0.06)] px-4 py-3">
+          <p className="m-0 text-[0.88rem] font-[650] leading-snug text-[var(--ink)]">
+            Registration provided: <span className="font-[900] tracking-wider text-[var(--blue)] uppercase">{registration}</span>
+            <br />
+            <span className="font-[500] text-[var(--muted)]">DVLA records will be used as the source of truth for the vehicle&rsquo;s factory spec.</span>
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <h2 className="m-0 font-serif text-[clamp(1.4rem,2.4vw,1.9rem)] font-[900] leading-[1.05] tracking-[-0.04em] text-foreground">

@@ -1,4 +1,11 @@
-import { ReportSnapshot, ReportStatusCode, ReportVerdictCode } from "@ralph/shared";
+import { ReportSnapshot, ReportStatusCode, ReportVerdictCode, VehicleVerdictCode } from "@ralph/shared";
+
+const REG_VERDICT_LABEL: Record<string, string> = {
+  [VehicleVerdictCode.SoundBuy]: "Sound buy",
+  [VehicleVerdictCode.ConsiderWithCaution]: "Consider with caution",
+  [VehicleVerdictCode.BudgetStretch]: "A stretch for the budget",
+  [VehicleVerdictCode.InsufficientData]: "Not enough to say",
+};
 
 const STATUS_LABEL: Record<string, string> = {
   [ReportStatusCode.Queued]: "Queued",
@@ -30,6 +37,9 @@ export function reportTitle(snapshot: ReportSnapshot): string {
 }
 
 export function reportHeadline(snapshot: ReportSnapshot): string {
+  if (snapshot.type === "reg_check") {
+    return REG_VERDICT_LABEL[snapshot.result?.verdict] ?? STATUS_LABEL[snapshot.status] ?? snapshot.status;
+  }
   if (snapshot.status === ReportStatusCode.Completed && snapshot.result) {
     const { verdict, hardCeiling } = snapshot.result;
     if (verdict === ReportVerdictCode.GoodCandidate) return "Good candidate";
@@ -46,6 +56,13 @@ export function reportHeadline(snapshot: ReportSnapshot): string {
 
 export function reportTone(snapshot: ReportSnapshot): "ok" | "avoid" | "pending" {
   const verdict = snapshot.result?.verdict;
+  if (snapshot.type === "reg_check") {
+    if (verdict === VehicleVerdictCode.SoundBuy || verdict === VehicleVerdictCode.ConsiderWithCaution) {
+      return "ok";
+    }
+    if (verdict === VehicleVerdictCode.BudgetStretch) return "avoid";
+    return "pending";
+  }
   if (
     verdict === ReportVerdictCode.GoodCandidate ||
     verdict === ReportVerdictCode.ConsiderBelowCeiling
