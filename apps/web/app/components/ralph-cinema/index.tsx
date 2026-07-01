@@ -436,7 +436,7 @@ export default function RalphCinema() {
         }
         @media (max-width: 768px) {
           .ralph-cine-mockup {
-            height: 80dvh;
+            height: 65dvh;
             min-height: 400px;
           }
         }
