@@ -422,21 +422,27 @@ export default function RalphCinema() {
     >
       <style>{`@keyframes ralphBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
         @keyframes ralphFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-        .ralph-cine-body::-webkit-scrollbar{width:0;height:0}`}</style>
+        .ralph-cine-body::-webkit-scrollbar{width:0;height:0}
+        .ralph-cine-mockup {
+          width: min(560px, 100%);
+          height: clamp(560px, 76vh, 632px);
+          display: flex;
+          flex-direction: column;
+          border-radius: 22px;
+          border: 1px solid ${C.border};
+          background: ${C.windowBg};
+          box-shadow: ${theme === "dark" ? "0 40px 120px rgba(0,0,0,0.55)" : "0 40px 90px rgba(20,40,35,0.18)"};
+          overflow: hidden;
+        }
+        @media (max-width: 768px) {
+          .ralph-cine-mockup {
+            height: 80dvh;
+            min-height: 400px;
+          }
+        }
+      `}</style>
 
-      <div
-        style={{
-          width: "min(560px,100%)",
-          height: "clamp(560px,76vh,632px)",
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: 22,
-          border: `1px solid ${C.border}`,
-          background: C.windowBg,
-          boxShadow: theme === "dark" ? "0 40px 120px rgba(0,0,0,0.55)" : "0 40px 90px rgba(20,40,35,0.18)",
-          overflow: "hidden",
-        }}
-      >
+      <div className="ralph-cine-mockup">
         {/* Title bar */}
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 18px", borderBottom: `1px solid ${C.innerBorder}` }}>
           <div style={{ display: "flex", gap: 7 }}>
