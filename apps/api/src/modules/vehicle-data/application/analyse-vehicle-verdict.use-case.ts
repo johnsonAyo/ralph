@@ -4,6 +4,7 @@ import {
   AnalysisSource,
   ListingSnapshot,
   VehicleProfile,
+  VehicleSourceType,
   VehicleVerdictReport,
   VehicleVerdictRequest,
 } from "@ralph/shared";
@@ -84,8 +85,12 @@ export class AnalyseVehicleVerdictUseCase {
     const reportEntity = Report.createRegCheck({
       id: reportId,
       userId,
-      // A listing-backed check is an "auction"-type report; otherwise reg_check.
-      type: request.listingUrl ? "auction" : "reg_check",
+      // An auction-sourced or listing-backed check is an "auction"-type report;
+      // otherwise reg_check.
+      type:
+        request.sourceType === VehicleSourceType.Auction || request.listingUrl
+          ? "auction"
+          : "reg_check",
       request,
       profile,
       listing,

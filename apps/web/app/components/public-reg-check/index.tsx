@@ -245,11 +245,11 @@ export default function PublicRegCheck() {
         {/* No reg? Signpost the other two ways in */}
         <p className="m-0 text-[0.85rem] text-[var(--muted)]">
           No registration number?{" "}
-          <Link href="/dashboard/new" className="font-bold text-[var(--blue)] underline-offset-2 hover:underline">
+          <Link href="/dashboard/verdict" className="font-bold text-[var(--blue)] underline-offset-2 hover:underline">
             Paste a listing link
           </Link>{" "}
           or{" "}
-          <Link href="/dashboard/new" className="font-bold text-[var(--blue)] underline-offset-2 hover:underline">
+          <Link href="/dashboard/verdict?source=off_market" className="font-bold text-[var(--blue)] underline-offset-2 hover:underline">
             enter the details yourself
           </Link>
           .
@@ -325,7 +325,7 @@ export default function PublicRegCheck() {
               listing against the data, and gives you Ralph's buy / don't-buy verdict with a sensible price.
             </p>
             <Button asChild size="lg" className="mt-4">
-              <Link href="/dashboard/new">
+              <Link href={`/dashboard/verdict?reg=${encodeURIComponent(reg.replace(/\s+/g, "").toUpperCase())}`}>
                 Run a Deep Check <ArrowRight className="size-4" aria-hidden />
               </Link>
             </Button>

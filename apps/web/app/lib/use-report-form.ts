@@ -62,7 +62,7 @@ export function useReportForm() {
         }
         catch (err) {
             if (err instanceof Error && err.message === "UNAUTHENTICATED") {
-                const next = encodeURIComponent(`/dashboard/new`);
+                const next = encodeURIComponent(`/dashboard/verdict`);
                 router.push(`/auth?next=${next}`);
                 return;
             }

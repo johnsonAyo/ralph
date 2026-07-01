@@ -28,7 +28,7 @@ function QuickCheckWidget() {
         if (!url.trim())
             return;
         const params = new URLSearchParams({ url: url.trim() });
-        router.push(`/dashboard/new?${params.toString()}`);
+        router.push(`/dashboard/verdict?${params.toString()}`);
     }
     return (<form className="mt-5 flex w-full max-w-[640px] flex-col gap-2.5 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
       <Input type="url" className="h-[48px] sm:h-[46px] flex-1 rounded-[12px] shadow-sm text-ellipsis" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Paste a Copart, IAA or other UK listing URL…" required suppressHydrationWarning/>

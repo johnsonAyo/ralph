@@ -2,45 +2,62 @@
 import "../dashboard.css";
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { Hash, PencilLine } from "lucide-react";
+import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type {
   ListingSnapshot,
   VehicleVerdictRequest,
   VehicleVerdictReport,
 } from "@ralph/shared";
-import { AnalysisSource } from "@ralph/shared";
-import { VerdictSmartForm } from "./verdict-smart-form";
-import { ManualForm, type ManualDraft } from "./verdict-manual-form";
+import { AnalysisSource, VehicleSourceType } from "@ralph/shared";
+import { SourceStep } from "./verdict-source-step";
+import { RegStep } from "./verdict-reg-step";
+import { DetailsStep } from "./verdict-details-step";
+import { type ManualDraft } from "./verdict-manual-form";
 import { ManualConfirm } from "./verdict-manual-confirm";
+import { type LinkSubmitData } from "./verdict-link-form";
 import { VerdictReport } from "./verdict-report";
 import ConfirmListing from "../../components/check-form/confirm-listing";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import { useReport } from "../../lib/use-report";
 import { API_BASE_URL } from "../../constants";
 
-const TABS: { id: Tab; label: string; Icon: typeof Hash }[] = [
-  { id: "smart", label: "Auto Search", Icon: Hash },
-  { id: "manual", label: "Fill it in manually", Icon: PencilLine },
-];
+type Step = "source" | "reg" | "details" | "confirm-listing" | "confirm-manual";
 
-type Tab = "smart" | "manual";
-type Stage = "input" | "confirm-listing" | "confirm-manual";
+const STEP_LABELS = ["Source", "Registration", "Details"] as const;
+function stepIndex(step: Step): number {
+  if (step === "source") return 0;
+  if (step === "reg") return 1;
+  return 2; // details + both confirm stages
+}
+
+function parseSource(value: string | null): VehicleSourceType | undefined {
+  if (!value) return undefined;
+  return (Object.values(VehicleSourceType) as string[]).includes(value)
+    ? (value as VehicleSourceType)
+    : undefined;
+}
 
 function VerdictPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const savedId = searchParams.get("id") ?? undefined;
+  const prefillReg = searchParams.get("reg") ?? undefined;
+  const prefillUrl = searchParams.get("url") ?? undefined;
+  const prefillSource = parseSource(searchParams.get("source"));
 
-  const [tab, setTab] = useState<Tab>("smart");
-  const [stage, setStage] = useState<Stage>("input");
+  // If a source is deep-linked we skip straight to the reg question.
+  const [step, setStep] = useState<Step>(prefillSource ? "reg" : "source");
+  const [sourceType, setSourceType] = useState<VehicleSourceType | null>(prefillSource ?? null);
+  const [registration, setRegistration] = useState<string | undefined>(prefillReg);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [report, setReport] = useState<VehicleVerdictReport | null>(null);
 
-  // Listing confirm flow carries the fetched listing + the budget entered with it.
+  // Listing confirm flow carries the fetched listing + the money entered with it.
   const [fetchedListing, setFetchedListing] = useState<ListingSnapshot | null>(null);
-  const [listingBudget, setListingBudget] = useState<{ totalBudget: number; askingPrice?: number; registration?: string } | null>(null);
+  const [pending, setPending] = useState<{ totalBudget: number; askingPrice?: number } | null>(null);
   // Manual confirm flow.
   const [manualDraft, setManualDraft] = useState<ManualDraft | null>(null);
 
@@ -94,64 +111,83 @@ function VerdictPageInner() {
     }
   }
 
-  // --- Hybrid: Reg and/or Listing ---
-  const handleHybridSubmit = async (data: { registration?: string; listingUrl?: string; totalBudget: number; askingPrice?: number }) => {
-    setIsLoading(true);
+  // --- Step 1: source ---
+  const handleSelectSource = (source: VehicleSourceType) => {
+    setSourceType(source);
     setError("");
-    
+    setStep("reg");
+  };
+
+  // --- Step 2: registration ---
+  const handleRegContinue = (reg?: string) => {
+    setRegistration(reg);
+    setError("");
+    setStep("details");
+  };
+
+  // --- Step 3a: link path (or reg-only when no link) ---
+  const handleSubmitLink = async (data: LinkSubmitData) => {
+    if (!sourceType) return;
+    setError("");
     if (data.listingUrl) {
+      setIsLoading(true);
       try {
         const listing = await authedPost<ListingSnapshot>("/vehicle/preview-listing", { listingUrl: data.listingUrl });
         setFetchedListing(listing);
-        setListingBudget({ 
-          totalBudget: data.totalBudget, 
-          askingPrice: data.askingPrice,
-          registration: data.registration
-        });
-        setStage("confirm-listing");
+        setPending({ totalBudget: data.totalBudget, askingPrice: data.askingPrice });
+        setStep("confirm-listing");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Couldn't fetch that listing. Check the link or try manual entry.");
+        setError(err instanceof Error ? err.message : "Couldn't fetch that listing. Check the link or enter details manually.");
       } finally {
         setIsLoading(false);
       }
-    } else if (data.registration) {
-      analyse({ 
-        registration: data.registration, 
-        totalBudget: data.totalBudget, 
-        askingPrice: data.askingPrice 
-      });
     } else {
-      setError("Please provide a registration or listing URL.");
-      setIsLoading(false);
+      // No link but we have a reg — analyse the reg + budget alone.
+      analyse({
+        sourceType,
+        registration,
+        totalBudget: data.totalBudget,
+        askingPrice: data.askingPrice,
+      });
     }
   };
 
   const handleConfirmListing = (_e: React.FormEvent, edited: ListingSnapshot) => {
-    if (!listingBudget) return;
-    analyse({ 
-      registration: listingBudget.registration,
-      listing: edited, 
-      totalBudget: listingBudget.totalBudget, 
-      askingPrice: listingBudget.askingPrice 
+    if (!sourceType || !pending) return;
+    analyse({
+      sourceType,
+      registration,
+      listing: edited,
+      totalBudget: pending.totalBudget,
+      askingPrice: pending.askingPrice,
     });
   };
 
-  // --- Manual: fill → confirm/edit → analyse ---
+  // --- Step 3b: manual path: fill → confirm → analyse ---
   const handleReviewManual = (draft: ManualDraft) => {
     setManualDraft(draft);
-    setStage("confirm-manual");
+    setError("");
+    setStep("confirm-manual");
   };
   const handleConfirmManual = () => {
-    if (!manualDraft) return;
-    analyse({ manual: manualDraft.manual, totalBudget: manualDraft.totalBudget, askingPrice: manualDraft.askingPrice });
+    if (!sourceType || !manualDraft) return;
+    analyse({
+      sourceType,
+      registration,
+      manual: manualDraft.manual,
+      totalBudget: manualDraft.totalBudget,
+      askingPrice: manualDraft.askingPrice,
+    });
   };
 
   const handleReset = () => {
     setReport(null);
     setError("");
-    setStage("input");
+    setStep(prefillSource ? "reg" : "source");
+    setSourceType(prefillSource ?? null);
+    setRegistration(prefillReg);
     setFetchedListing(null);
-    setListingBudget(null);
+    setPending(null);
     setManualDraft(null);
     if (savedId) {
       router.push("/dashboard/verdict");
@@ -159,14 +195,6 @@ function VerdictPageInner() {
       window.history.replaceState(null, "", "/dashboard/verdict");
     }
   };
-
-  function switchTab(next: Tab) {
-    setTab(next);
-    setStage("input");
-    setError("");
-    setFetchedListing(null);
-    setManualDraft(null);
-  }
 
   // ---- Reopened saved report ----
   if (savedId) {
@@ -210,55 +238,88 @@ function VerdictPageInner() {
     );
   }
 
+  const current = stepIndex(step);
+
   return (
     <div className="dashboard-page">
-      <div className="mx-auto w-full max-w-3xl">
-        {/* Input method tabs */}
-        <div className="mb-5 flex gap-2">
-          {TABS.map(({ id, label, Icon }) => {
-            const active = tab === id;
+      <div className="mx-auto w-full max-w-2xl">
+        {/* Progress stepper */}
+        <ol className="mb-6 flex items-center gap-2">
+          {STEP_LABELS.map((label, i) => {
+            const done = i < current;
+            const active = i === current;
             return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => switchTab(id)}
-                className={`flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-[0.9rem] font-[750] transition-colors ${
-                  active
-                    ? "border-[var(--blue)] bg-[rgba(47,98,233,0.08)] text-[var(--blue)]"
-                    : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--ink)]"
-                }`}
-              >
-                <Icon className="size-4" aria-hidden />
-                {label}
-              </button>
+              <li key={label} className="flex flex-1 items-center gap-2 last:flex-none">
+                <span
+                  className={`grid size-6 shrink-0 place-items-center rounded-full text-[0.72rem] font-[900] transition ${
+                    done
+                      ? "bg-[var(--blue)] text-white"
+                      : active
+                        ? "border-2 border-[var(--blue)] text-[var(--blue)]"
+                        : "border border-[var(--line)] text-[var(--muted)]"
+                  }`}
+                >
+                  {done ? <Check className="size-3.5" aria-hidden /> : i + 1}
+                </span>
+                <span
+                  className={`text-[0.8rem] font-[800] ${
+                    active ? "text-foreground" : "text-[var(--muted)]"
+                  }`}
+                >
+                  {label}
+                </span>
+                {i < STEP_LABELS.length - 1 && (
+                  <span className={`h-px flex-1 ${done ? "bg-[var(--blue)]" : "bg-[var(--line)]"}`} />
+                )}
+              </li>
             );
           })}
-        </div>
+        </ol>
 
-        {tab === "smart" && stage === "input" && (
-          <VerdictSmartForm onSubmit={handleHybridSubmit} isLoading={isLoading} error={error} />
+        {step === "source" && (
+          <SourceStep selected={sourceType ?? undefined} onSelect={handleSelectSource} />
         )}
 
-        {tab === "smart" && stage === "confirm-listing" && fetchedListing && (
+        {step === "reg" && sourceType && (
+          <RegStep
+            sourceType={sourceType}
+            initialReg={registration}
+            onBack={() => setStep("source")}
+            onContinue={handleRegContinue}
+          />
+        )}
+
+        {step === "details" && sourceType && (
+          <DetailsStep
+            sourceType={sourceType}
+            hasReg={Boolean(registration)}
+            initialUrl={prefillUrl}
+            manualInitial={manualDraft ?? undefined}
+            isLoading={isLoading}
+            error={error}
+            onSubmitLink={handleSubmitLink}
+            onReviewManual={handleReviewManual}
+            onBack={() => setStep("reg")}
+          />
+        )}
+
+        {step === "confirm-listing" && fetchedListing && (
           <ConfirmListing
             listing={fetchedListing}
-            registration={listingBudget?.registration}
+            registration={registration}
             submitting={isLoading}
             error={error || null}
-            onBack={() => setStage("input")}
+            onBack={() => setStep("details")}
             onConfirm={handleConfirmListing}
           />
         )}
 
-        {tab === "manual" && stage === "input" && (
-          <ManualForm initial={manualDraft ?? undefined} onReview={handleReviewManual} isLoading={isLoading} error={error} />
-        )}
-        {tab === "manual" && stage === "confirm-manual" && manualDraft && (
+        {step === "confirm-manual" && manualDraft && (
           <ManualConfirm
             draft={manualDraft}
             submitting={isLoading}
             error={error || null}
-            onEdit={() => setStage("input")}
+            onEdit={() => setStep("details")}
             onConfirm={handleConfirmManual}
           />
         )}

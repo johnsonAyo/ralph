@@ -132,7 +132,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
           </div>
           <div className="dashboard-topbar-right">
             <Button asChild size="none" className="dashboard-topbar-cta">
-              <Link href="/dashboard/new">
+              <Link href="/dashboard/verdict">
                 <PlusCircle size={15} aria-hidden="true"/>
                 New check
               </Link>

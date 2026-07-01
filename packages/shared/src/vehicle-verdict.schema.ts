@@ -35,6 +35,16 @@ export enum AnalysisSource {
   Manual = "manual",
 }
 
+// WHERE the car is being sold — the buyer picks this first. It drives how Ralph
+// frames price guidance (a fixed dealer price vs a negotiable private ask vs a
+// live auction bid are judged differently) and which fields the form collects.
+export enum VehicleSourceType {
+  Dealership = "dealership",
+  Auction = "auction",
+  Private = "private",
+  OffMarket = "off_market",
+}
+
 // Free-text details a buyer can type in when there's no reg / no listing URL.
 export const manualDetailsSchema = z.object({
   make: z.string().optional(),
@@ -48,6 +58,9 @@ export const manualDetailsSchema = z.object({
 
 export const vehicleVerdictRequestSchema = z
   .object({
+    // Where the car is being sold — picked first in the UI. Optional in the
+    // schema for backward-compat with older saved reports; the form always sets it.
+    sourceType: z.enum(VehicleSourceType).optional(),
     // At least one source must be present (enforced below).
     registration: z.string().min(2).max(10).optional(),
     listingUrl: z.string().url().optional(),

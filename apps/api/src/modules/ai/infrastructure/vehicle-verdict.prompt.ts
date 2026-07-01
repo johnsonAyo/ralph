@@ -15,7 +15,8 @@ const VEHICLE_VERDICT_INSTRUCTIONS = [
   "If an askingPrice or a listing price is present, judge value against it. If not, estimate a typical UK market price range for this make/model/year/mileage from your own knowledge and clearly state in valueEstimate.basis that it is an estimate.",
   "Budget fit: compare the likely all-in cost (price + near-term repairs implied by the evidence) against the buyer's totalBudget. Set budgetFit.rating to comfortable, tight, over, or unknown.",
   "Near-term running cost: estimate a repair allowance for the next 12 months from the evidence, as a range. It is an allowance, not a quote.",
-  "priceGuidance: fill it WHENEVER an askingPrice OR a listing price is present — maxSensible = the most it's sensibly worth paying (estimate from what you know if data is thin, and say so), walkAwayAbove = the point to walk away, framing adapted to the source: an auction listing => 'max sensible bid'; a marketplace/private listing => 'worth offering up to'; a dealer's fixed price => price-fit context. Set priceGuidance to null ONLY when there is neither an asking price nor a listing (a pure reg-only or manual-only budget-fit case with no price at all).",
+  "The buyer tells you WHERE the car is via `source`: 'dealership' (a fixed forecourt/dealer price — you can advise whether it's a fair price and good budget fit, but not haggle a bid), 'auction' (a live salvage/auction lot — advise a maximum sensible bid and a walk-away point), 'private' (a private seller or marketplace ad — the price is negotiable, so advise what's worth offering), 'off_market' (not listed anywhere — no price context unless they give one). Let `source` drive the tone and the priceGuidance framing.",
+  "priceGuidance: fill it WHENEVER an askingPrice OR a listing price is present — maxSensible = the most it's sensibly worth paying (estimate from what you know if data is thin, and say so), walkAwayAbove = the point to walk away, framing adapted to `source`: auction => 'max sensible bid'; private => 'worth offering up to'; dealership => price-fit context ('fair for what you get' / 'a stretch' / 'overpriced'). Set priceGuidance to null ONLY when there is neither an asking price nor a listing (a pure reg-only or manual-only budget-fit case with no price at all).",
   "Pick verdict from: sound_buy (fits the budget and nothing major stands out), consider_with_caution (workable but with real things to check), budget_stretch (likely over or at the edge of the budget once costs are added), insufficient_data (too little to say).",
   "Keep it concise, calm, and plain. The buying decision rests with the buyer.",
   // Hard output contract — required because Ollama Cloud does NOT enforce the
@@ -37,6 +38,8 @@ export function buildVehicleVerdictContext(
 
   const data = JSON.stringify(
     {
+      // Where the car is being sold — drives price-guidance framing (see instructions).
+      source: request.sourceType ?? null,
       buyer: {
         totalBudget: request.totalBudget,
         askingPrice: request.askingPrice ?? null,

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { Button, Input } from "@ralph/ui";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ImagePlus, Loader2, X, ArrowLeft } from "lucide-react";
 import type { ManualDetails } from "@ralph/shared";
 import { uploadListingPhotos } from "../../lib/upload-listing-photos";
 import { useSession } from "../../lib/supabase";
@@ -18,9 +18,12 @@ interface ManualFormProps {
   onReview: (data: ManualDraft) => void;
   isLoading: boolean;
   error?: string;
+  // Label for the price field — adapts to the source (dealer price / bid / ask).
+  priceLabel?: string;
+  onBack?: () => void;
 }
 
-export function ManualForm({ initial, onReview, isLoading, error }: ManualFormProps) {
+export function ManualForm({ initial, onReview, isLoading, error, priceLabel = "Asking Price (£) (Optional)", onBack }: ManualFormProps) {
   const [make, setMake] = useState(initial?.manual.make ?? "");
   const [model, setModel] = useState(initial?.manual.model ?? "");
   const [year, setYear] = useState(initial?.manual.year?.toString() ?? "");
@@ -175,7 +178,7 @@ export function ManualForm({ initial, onReview, isLoading, error }: ManualFormPr
             <span className={HINT_TEXT}>The most you can spend, including initial repairs.</span>
           </label>
           <label className="flex flex-col gap-2">
-            <span className={LABEL_TEXT}>Asking Price (£) (Optional)</span>
+            <span className={LABEL_TEXT}>{priceLabel}</span>
             <Input type="text" inputMode="numeric" value={askingPrice} onChange={(e) => setAskingPrice(e.target.value)} placeholder="e.g. 4,500" className={CONTROL_CLASS} disabled={isLoading} />
           </label>
         </div>
@@ -197,6 +200,16 @@ export function ManualForm({ initial, onReview, isLoading, error }: ManualFormPr
           "Review details"
         )}
       </Button>
+
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 self-start text-[0.85rem] font-bold text-[var(--muted)] transition hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden /> Back
+        </button>
+      )}
     </form>
   );
 }

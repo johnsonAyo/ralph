@@ -17,7 +17,7 @@ export default function CTA({
 
   function handleClick() {
     if (user) {
-      router.push("/dashboard/new");
+      router.push("/dashboard/verdict");
     } else {
       openAuth("modal");
     }

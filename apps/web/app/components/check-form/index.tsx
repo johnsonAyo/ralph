@@ -123,7 +123,7 @@ export default function CheckForm({ hideIntro = false, variant = 'default' }: Ch
   const handleSimpleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams({ url: simpleUrl.trim() });
-    router.push(`/dashboard/new?${params.toString()}`);
+    router.push(`/dashboard/verdict?${params.toString()}`);
   };
 
   if (variant === 'default') {
