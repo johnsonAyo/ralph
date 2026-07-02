@@ -31,7 +31,7 @@ export function RegStep({ sourceType, initialReg, onBack, onContinue }: RegStepP
           {meta.label}
         </span>
         <h2 className="m-0 text-[1.25rem] font-[900] text-foreground">
-          Do you have the registration?
+          Do you have the car&rsquo;s registration number?
         </h2>
         <p className="m-0 text-[0.92rem] text-[var(--muted)]">
           If you do, Ralph pulls the car&rsquo;s DVLA record and full MOT history for free. No plate?

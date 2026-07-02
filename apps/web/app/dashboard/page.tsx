@@ -166,7 +166,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="dash-card-footer">
                     <span className="dash-card-when">{relativeTime(report.createdAt)}</span>
-                    <a className="dash-card-link" href={`/dashboard/reports/${report.id}`}>
+                    <a className="dash-card-link" href={`/dashboard/verdict?id=${report.id}`}>
                       Open report
                       <ArrowRight size={13} aria-hidden="true"/>
                     </a>

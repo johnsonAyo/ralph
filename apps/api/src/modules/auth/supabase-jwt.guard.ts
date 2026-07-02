@@ -14,6 +14,15 @@ export class SupabaseJwtGuard implements CanActivate {
             headers: Record<string, string | undefined>;
             user?: AuthenticatedUser;
         }>();
+        // TEMP DEV-ONLY BYPASS — remove after local testing. Guarded by NODE_ENV
+        // so it can never authenticate in production even if the flag leaks.
+        if (process.env.NODE_ENV !== "production" && process.env.DISABLE_AUTH_FOR_DEV === "true") {
+            request.user = {
+                id: "00000000-0000-4000-8000-000000000001",
+                email: "dev@local.test",
+            };
+            return true;
+        }
         const authHeader = request.headers.authorization;
         const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
         if (!token) {

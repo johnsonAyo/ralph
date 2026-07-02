@@ -12,10 +12,12 @@ export function SourceStep({ selected, onSelect }: SourceStepProps) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h2 className="m-0 text-[1.25rem] font-[900] text-foreground">Where&rsquo;s the car?</h2>
+        <h2 className="m-0 text-[1.25rem] font-[900] text-foreground">
+          Where are you buying the car from?
+        </h2>
         <p className="m-0 text-[0.92rem] text-[var(--muted)]">
-          This tells Ralph how to judge the price, a fixed dealer price, a live auction bid and a
-          private ask are all weighed differently.
+          This helps Ralph judge the price fairly. A fixed dealer price, a live auction bid and a
+          private seller&rsquo;s asking price all get weighed differently.
         </p>
       </div>
 

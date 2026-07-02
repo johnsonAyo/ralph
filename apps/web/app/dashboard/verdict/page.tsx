@@ -1,5 +1,6 @@
 "use client";
 import "../dashboard.css";
+import "./verdict-report.css";
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
@@ -9,7 +10,13 @@ import type {
   VehicleVerdictRequest,
   VehicleVerdictReport,
 } from "@ralph/shared";
-import { AnalysisSource, VehicleSourceType } from "@ralph/shared";
+import { 
+  AnalysisSource, 
+  VehicleSourceType,
+  VehicleVerdictCode,
+  BudgetFitCode,
+  FindingTone,
+} from "@ralph/shared";
 import { SourceStep } from "./verdict-source-step";
 import { RegStep } from "./verdict-reg-step";
 import { DetailsStep } from "./verdict-details-step";
@@ -17,6 +24,7 @@ import { type ManualDraft } from "./verdict-manual-form";
 import { ManualConfirm } from "./verdict-manual-confirm";
 import { type LinkSubmitData } from "./verdict-link-form";
 import { VerdictReport } from "./verdict-report";
+import { VerdictReportOld } from "./verdict-report-old";
 import ConfirmListing from "../../components/check-form/confirm-listing";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import { useReport } from "../../lib/use-report";
@@ -99,10 +107,38 @@ function VerdictPageInner() {
     setIsLoading(true);
     setError("");
     try {
-      const result = await authedPost<VehicleVerdictReport>("/vehicle/verdict", request);
-      setReport(result);
-      if (result?.id) {
-        window.history.replaceState(null, "", `/dashboard/verdict?id=${result.id}`);
+      // TEMP DEV BYPASS: Return mock report to avoid rate limits during styling
+      const mockReport: VehicleVerdictReport = {
+        id: "mock-123",
+        sources: [AnalysisSource.Manual],
+        request,
+        result: {
+          verdict: VehicleVerdictCode.ConsiderWithCaution,
+          confidence: "medium" as any,
+          headline: "Consider below £1,850",
+          summary: "Ralph thinks this is possible if bidding stays controlled because the front-left damage may need more than cosmetic work.",
+          budgetFit: { rating: BudgetFitCode.Tight, note: "Tight but possible if bidding remains controlled." },
+          valueEstimate: { typicalPriceLow: 1600, typicalPriceHigh: 1850, basis: "Based on typical auction results for this condition." },
+          runningCost: { nearTermRepairLow: 700, nearTermRepairHigh: 1200, note: "Allowance for bumper, headlight, paint, and suspension check." },
+          priceGuidance: {
+            maxSensible: 1850,
+            walkAwayAbove: 1900,
+            framing: "Ralph's target range",
+            note: "If bidding moves fast, use Ralph's range before increasing your bid."
+          },
+          findings: [
+            { tone: FindingTone.Watch, title: "Front-left damage", evidence: "May need more than cosmetic work." }
+          ],
+          whatToCheck: ["Suspension alignment", "Wheel area"],
+          couldNotVerify: ["Final delivery quote"],
+          nextStep: "Confirm the auction delivery quote before increasing the bid."
+        },
+        generatedAt: new Date().toISOString()
+      };
+      
+      setReport(mockReport);
+      if (mockReport.id) {
+        window.history.replaceState(null, "", `/dashboard/verdict?id=${mockReport.id}`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
@@ -220,8 +256,17 @@ function VerdictPageInner() {
     }
     return (
       <div className="dashboard-page">
-        <div className="mx-auto w-full max-w-3xl">
-          <VerdictReport report={savedReport} onReset={handleReset} />
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="flex flex-col gap-12 xl:flex-row xl:gap-8">
+            <div className="flex-1 min-w-0">
+              <h2 className="mb-4 text-xl font-bold border-b pb-2">Old Design</h2>
+              <VerdictReportOld report={savedReport} onReset={handleReset} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="mb-4 text-xl font-bold border-b pb-2">New Design</h2>
+              <VerdictReport report={savedReport} onReset={handleReset} />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -231,8 +276,17 @@ function VerdictPageInner() {
   if (report) {
     return (
       <div className="dashboard-page">
-        <div className="mx-auto w-full max-w-3xl">
-          <VerdictReport report={report} onReset={handleReset} />
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="flex flex-col gap-12 xl:flex-row xl:gap-8">
+            <div className="flex-1 min-w-0">
+              <h2 className="mb-4 text-xl font-bold border-b pb-2">Old Design</h2>
+              <VerdictReportOld report={report} onReset={handleReset} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="mb-4 text-xl font-bold border-b pb-2">New Design</h2>
+              <VerdictReport report={report} onReset={handleReset} />
+            </div>
+          </div>
         </div>
       </div>
     );

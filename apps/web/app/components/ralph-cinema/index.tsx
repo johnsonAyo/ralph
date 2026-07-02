@@ -4,12 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Check, Hash, ImageIcon, Link2, PencilLine, ShieldCheck, TrendingDown, UploadCloud } from "lucide-react";
 import { useTheme } from "../../lib/use-theme";
 
-// Dark/light, glassy "Ralph turns an input into a report" hero rendering — HTML,
-// not a video, in the spirit of mytabulon.com's hero. Ralph is NOT a chat, and
-// NOT a data dump: every finding leads with what it MEANS for the buyer, with
-// the raw data as evidence underneath. The reg path shows the full rich report
-// (interpretation-led, with a mileage chart) and auto-scrolls through it.
-
 type Palette = {
   text: string;
   muted: string;
