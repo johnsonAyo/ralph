@@ -114,11 +114,15 @@ h3 {
 }
 .button:focus-visible,
 .check-panel button:focus-visible,
-input:focus-visible,
-select:focus-visible,
 a:focus-visible {
   outline: 3px solid rgba(47, 98, 233, 0.32);
   outline-offset: 4px;
+}
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(47, 98, 233, 0.14);
 }
 .setup-missing {
   min-height: 100vh;

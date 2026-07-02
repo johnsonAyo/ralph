@@ -192,7 +192,6 @@ export function ManualForm({ initial, onReview, isLoading, error, priceLabel = "
     <form className={PANEL_CLASS} onSubmit={handleSubmit}>
       {/* ─── The car ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-5">
-        <SectionHeader icon={Car} title="The car" sub="Just the basics to start — only the make is required." />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5">
           <label className="col-span-2 flex flex-col gap-2 sm:col-span-1">
             <FieldLabel required>Make</FieldLabel>

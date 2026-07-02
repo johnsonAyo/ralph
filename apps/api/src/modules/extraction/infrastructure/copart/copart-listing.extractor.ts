@@ -89,7 +89,7 @@ export class CopartListingExtractor implements PlatformListingExtractor {
             // Combine all image sources (since we don't intercept XHRs, we just use directImages)
             const images = uniqueImages([...directImages]);
 
-            return buildCopartListingSnapshot({
+            const snapshot = buildCopartListingSnapshot({
                 listingUrl,
                 cachedLotDetails,
                 vehicle: nodeByType("Vehicle") as JsonRecord | undefined,
@@ -97,6 +97,8 @@ export class CopartListingExtractor implements PlatformListingExtractor {
                 lines,
                 images,
             });
+            snapshot.rawHtml = html;
+            return snapshot;
         } catch (error) {
             this.logger.error(`Copart extraction failed for ${listingUrl}: ${error}`);
             throw error;

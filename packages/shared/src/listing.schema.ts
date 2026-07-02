@@ -61,6 +61,7 @@ export const listingSnapshotSchema = z.object({
   images: z.array(extractedImageSchema).default([]),
   extractionConfidence: z.enum(ExtractionConfidence).default(ExtractionConfidence.Low),
   missingFields: z.array(z.string()).default([]),
+  rawHtml: z.string().optional(),
 });
 
 export type AuctionPlatform = z.infer<typeof auctionPlatformSchema>;

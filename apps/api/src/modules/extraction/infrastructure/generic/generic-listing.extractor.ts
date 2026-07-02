@@ -57,7 +57,9 @@ export class GenericListingExtractor implements PlatformListingExtractor {
 
             const extraction = await this.runExtraction(listingUrl, text, imageCandidates);
 
-            return buildGenericListingSnapshot({ platform, listingUrl, extraction, imageCandidates });
+            const snapshot = buildGenericListingSnapshot({ platform, listingUrl, extraction, imageCandidates });
+            snapshot.rawHtml = html;
+            return snapshot;
         } catch (error) {
             this.logger.error(`Generic extraction failed for ${listingUrl}: ${error}`);
             throw error;

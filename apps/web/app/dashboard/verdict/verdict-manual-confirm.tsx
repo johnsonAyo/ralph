@@ -36,6 +36,9 @@ export function ManualConfirm({ draft, submitting, error, onEdit, onConfirm }: M
     ["Year", manual.year?.toString() || "—"],
     ["Mileage", manual.mileage != null ? `${manual.mileage.toLocaleString("en-GB")} mi` : "—"],
     ["Fuel", manual.fuelType || "—"],
+    ["Gearbox", manual.transmission || "—"],
+    ["Owners", manual.previousOwners != null ? manual.previousOwners.toString() : "—"],
+    ["Service history", manual.serviceHistory || "—"],
     ["Your budget", money(draft.totalBudget)],
     ["Asking price", money(draft.askingPrice)],
   ];
@@ -48,11 +51,8 @@ export function ManualConfirm({ draft, submitting, error, onEdit, onConfirm }: M
 
   return (
     <section className="flex flex-col gap-5 rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-7">
-      <div className="flex flex-col gap-1">
-        <h2 className="m-0 text-[1.2rem] font-[900] text-foreground">Does this look right?</h2>
-        <p className="m-0 text-[0.9rem] text-[var(--muted)]">
-          You typed these in, so double-check them — Ralph&rsquo;s read is only as good as the details. Edit anything that&rsquo;s off before analysing.
-        </p>
+      <div className="flex flex-col gap-1 items-center text-center">
+        <h2 className="m-0 text-[1.5rem] sm:text-[1.8rem] font-[900] text-foreground">Confirm details</h2>
       </div>
 
       {images.length > 0 && (
@@ -116,10 +116,18 @@ export function ManualConfirm({ draft, submitting, error, onEdit, onConfirm }: M
         </div>
       )}
 
+      {manual.knownFaults && (
+        <div className="rounded-[14px] border border-[var(--line)] bg-[#fbfaf6] px-4 py-3 text-[0.9rem]">
+          <strong className="block text-[0.66rem] font-[900] uppercase tracking-[0.05em] text-[#9a9286] mb-1">Known Faults / Damage</strong>
+          <span className="text-[var(--ink)] font-semibold">{manual.knownFaults}</span>
+        </div>
+      )}
+
       {manual.notes && (
-        <p className="m-0 rounded-[14px] border border-[var(--line)] bg-[#fbfaf6] px-4 py-3 text-[0.9rem] italic text-[var(--muted)]">
-          &ldquo;{manual.notes}&rdquo;
-        </p>
+        <div className="rounded-[14px] border border-[var(--line)] bg-[#fbfaf6] px-4 py-3 text-[0.9rem]">
+          <strong className="block text-[0.66rem] font-[900] uppercase tracking-[0.05em] text-[#9a9286] mb-1">Additional Notes</strong>
+          <p className="m-0 italic text-[var(--muted)]">&ldquo;{manual.notes}&rdquo;</p>
+        </div>
       )}
 
       <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">

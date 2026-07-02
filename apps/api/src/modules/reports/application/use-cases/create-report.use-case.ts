@@ -27,9 +27,11 @@ export class CreateReportUseCase {
         if (!input.request.listing && !input.request.listingUrl) {
             throw new ValidationError("Provide a listing URL or manual listing details.");
         }
+        const requestId = randomUUID();
         const report = Report.create({
             id: randomUUID(),
             userId: input.userId,
+            requestId,
             request: input.request,
             now,
         });

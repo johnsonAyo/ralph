@@ -81,10 +81,12 @@ export class AnalyseVehicleVerdictUseCase {
     const result = await this.analyser.analyse({ request, profile, listing });
 
     const reportId = randomUUID();
+    const requestId = randomUUID();
     const now = new Date().toISOString();
     const reportEntity = Report.createRegCheck({
       id: reportId,
       userId,
+      requestId,
       // An auction-sourced or listing-backed check is an "auction"-type report;
       // otherwise reg_check.
       type:

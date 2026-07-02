@@ -13,9 +13,6 @@ import type {
 import { 
   AnalysisSource, 
   VehicleSourceType,
-  VehicleVerdictCode,
-  BudgetFitCode,
-  FindingTone,
 } from "@ralph/shared";
 import { SourceStep } from "./verdict-source-step";
 import { RegStep } from "./verdict-reg-step";
@@ -105,47 +102,8 @@ function VerdictPageInner() {
     setIsLoading(true);
     setError("");
     try {
-      // TEMP DEV BYPASS: Return mock report to avoid rate limits during styling
-      const mockReport: VehicleVerdictReport = {
-        id: "mock-123",
-        sources: [AnalysisSource.Manual],
-        // TEMP: sample photos so the report carousel is visible during styling.
-        request: {
-          ...request,
-          manual: {
-            ...(request.manual ?? {}),
-            images: [
-              { fullUrl: "https://picsum.photos/seed/ralphcar1/1200/900" },
-              { fullUrl: "https://picsum.photos/seed/ralphcar2/1200/900" },
-              { fullUrl: "https://picsum.photos/seed/ralphcar3/1200/900" },
-            ],
-          },
-        },
-        result: {
-          verdict: VehicleVerdictCode.ConsiderWithCaution,
-          confidence: "medium" as any,
-          headline: "Consider below £1,850",
-          summary: "Ralph thinks this is possible if bidding stays controlled because the front-left damage may need more than cosmetic work.",
-          budgetFit: { rating: BudgetFitCode.Tight, note: "Tight but possible if bidding remains controlled." },
-          valueEstimate: { typicalPriceLow: 1600, typicalPriceHigh: 1850, basis: "Based on typical auction results for this condition." },
-          runningCost: { nearTermRepairLow: 700, nearTermRepairHigh: 1200, note: "Allowance for bumper, headlight, paint, and suspension check." },
-          priceGuidance: {
-            maxSensible: 1850,
-            walkAwayAbove: 1900,
-            framing: "Ralph's target range",
-            note: "If bidding moves fast, use Ralph's range before increasing your bid."
-          },
-          findings: [
-            { tone: FindingTone.Watch, title: "Front-left damage", evidence: "May need more than cosmetic work." }
-          ],
-          whatToCheck: ["Suspension alignment", "Wheel area"],
-          couldNotVerify: ["Final delivery quote"],
-          nextStep: "Confirm the auction delivery quote before increasing the bid."
-        },
-        generatedAt: new Date().toISOString()
-      };
-      
-      setReport(mockReport);
+      const realReport = await authedPost<VehicleVerdictReport>("/vehicle/verdict", request);
+      setReport(realReport);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
