@@ -1,6 +1,4 @@
 "use client";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@ralph/ui";
 import type { VehicleSourceType } from "@ralph/shared";
 import { SOURCE_META, SOURCE_ORDER } from "./verdict-source-meta";
 

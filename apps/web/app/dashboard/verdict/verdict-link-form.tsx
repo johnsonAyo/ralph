@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Button, Input } from "@ralph/ui";
 import { ArrowLeft, PencilLine, Loader2, Lock } from "lucide-react";
 import { VehicleSourceType } from "@ralph/shared";
-import { SOURCE_META } from "./verdict-source-meta";
 import { LABEL_TEXT, HINT_TEXT, CONTROL_CLASS, PANEL_CLASS } from "../../components/check-form/styles";
 
 export interface LinkSubmitData {
@@ -32,7 +31,6 @@ export function LinkForm({
   isLoading,
   error,
 }: LinkFormProps) {
-  const meta = SOURCE_META[sourceType];
   const [listingUrl, setListingUrl] = useState(initialUrl ?? "");
   const [totalBudget, setTotalBudget] = useState("");
 

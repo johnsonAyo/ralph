@@ -3,8 +3,6 @@ import { useState } from "react";
 import { Button, Input } from "@ralph/ui";
 import { ArrowRight, Check } from "lucide-react";
 import type { VehicleSourceType } from "@ralph/shared";
-import { SOURCE_META } from "./verdict-source-meta";
-import { LABEL_TEXT, HINT_TEXT } from "../../components/check-form/styles";
 
 interface RegStepProps {
   sourceType: VehicleSourceType;
@@ -15,13 +13,12 @@ interface RegStepProps {
 
 type Choice = "yes" | "no" | null;
 
-export function RegStep({ sourceType, initialReg, onContinue }: RegStepProps) {
+export function RegStep({ sourceType: _sourceType, initialReg, onContinue }: RegStepProps) {
   const [choice, setChoice] = useState<Choice>(initialReg ? "yes" : null);
   const [reg, setReg] = useState(initialReg ?? "");
 
   const cleanReg = reg.replace(/\s+/g, "").toUpperCase();
   const regReady = cleanReg.length >= 2;
-  const meta = SOURCE_META[sourceType];
 
   return (
     <section className="flex flex-col gap-5">
