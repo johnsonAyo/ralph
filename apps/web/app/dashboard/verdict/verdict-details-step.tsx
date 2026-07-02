@@ -33,48 +33,46 @@ export function DetailsStep({
 }: DetailsStepProps) {
   const meta = SOURCE_META[sourceType];
   const offMarket = sourceType === VehicleSourceType.OffMarket;
-  const [mode, setMode] = useState<Mode>(offMarket ? "manual" : "link");
+  const [mode, setMode] = useState<Mode>("manual");
   const effectiveMode: Mode = offMarket ? "manual" : mode;
 
   return (
     <section className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
-        <span className="text-[0.72rem] font-[900] uppercase tracking-[0.08em] text-[var(--blue)]">
-          {meta.label}
-        </span>
-        <h2 className="m-0 text-[1.25rem] font-[900] text-foreground">
+      <div className="flex flex-col gap-2 items-center text-center mb-6">
+
+        <h2 className="m-0 text-[1.5rem] sm:text-[1.8rem] font-[900] text-foreground">
           {offMarket ? "Tell Ralph about the car" : "Add the car's details"}
         </h2>
-        <p className="m-0 text-[0.92rem] text-[var(--muted)]">
+        <p className="m-0 text-[1rem] sm:text-[1.1rem] text-[var(--muted)] max-w-2xl mx-auto">
           {offMarket
             ? "No listing to pull from, so fill in what you know. Photos help Ralph spot damage."
-            : "Paste the advert and we'll pull it in, or type the details yourself."}
+            : "Paste a link to the advert to pull in the details automatically, or enter them manually."}
         </p>
       </div>
 
       {!offMarket && (
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setMode("link")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-[12px] border px-3.5 py-2.5 text-[0.88rem] font-[800] transition ${
-              effectiveMode === "link"
-                ? "border-[var(--blue)] bg-[rgba(47,98,233,0.08)] text-[var(--blue)]"
-                : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-foreground"
-            }`}
-          >
-            <Link2 className="size-4" aria-hidden /> Paste a link
-          </button>
+        <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto w-full mb-2">
           <button
             type="button"
             onClick={() => setMode("manual")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-[12px] border px-3.5 py-2.5 text-[0.88rem] font-[800] transition ${
+            className={`flex flex-1 items-center justify-center gap-3 rounded-[20px] border px-6 py-4 text-[1.05rem] font-[800] transition ${
               effectiveMode === "manual"
                 ? "border-[var(--blue)] bg-[rgba(47,98,233,0.08)] text-[var(--blue)]"
-                : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-foreground"
+                : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-foreground hover:border-[var(--blue)]"
             }`}
           >
-            <PencilLine className="size-4" aria-hidden /> Enter manually
+            <PencilLine className="size-5" aria-hidden /> Enter manually
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("link")}
+            className={`flex flex-1 items-center justify-center gap-3 rounded-[20px] border px-6 py-4 text-[1.05rem] font-[800] transition ${
+              effectiveMode === "link"
+                ? "border-[var(--blue)] bg-[rgba(47,98,233,0.08)] text-[var(--blue)]"
+                : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-foreground hover:border-[var(--blue)]"
+            }`}
+          >
+            <Link2 className="size-5" aria-hidden /> Paste a link
           </button>
         </div>
       )}

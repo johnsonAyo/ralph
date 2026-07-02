@@ -26,8 +26,8 @@ export const SOURCE_META: Record<VehicleSourceType, SourceMeta> = {
   },
   [VehicleSourceType.Auction]: {
     type: VehicleSourceType.Auction,
-    label: "Salvage / Auction",
-    blurb: "A salvage yard or car auction",
+    label: "Auction website",
+    blurb: "A car auction",
     examples: "Copart, IAA, BCA, salvage lots",
     priceLabel: "Current bid (£)",
     priceHint: "Where the bidding is now. Ralph advises a max sensible bid and a walk-away point.",

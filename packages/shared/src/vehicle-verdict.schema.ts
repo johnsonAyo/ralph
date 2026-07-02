@@ -46,12 +46,22 @@ export enum VehicleSourceType {
 }
 
 // Free-text details a buyer can type in when there's no reg / no listing URL.
+// Expanded so the AI pipeline can ingest the same level of detail we'd typically
+// pull from a listing scrape (body, transmission, colour, history, faults…).
 export const manualDetailsSchema = z.object({
   make: z.string().optional(),
   model: z.string().optional(),
   year: z.number().int().optional(),
   mileage: z.number().int().nonnegative().optional(),
   fuelType: z.string().optional(),
+  transmission: z.string().optional(),
+  bodyType: z.string().optional(),
+  // British spelling to match the rest of the schema (vehicleIdentitySchema.colour).
+  colour: z.string().optional(),
+  // Number of previous owners. Must be ≥1; leave undefined for "unknown / not stated".
+  previousOwners: z.number().int().positive().optional(),
+  serviceHistory: z.string().optional(),
+  knownFaults: z.string().optional(),
   notes: z.string().optional(),
   images: z.array(extractedImageSchema).optional(),
 });

@@ -1,26 +1,17 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
-import { ArrowRight, ChevronRight, Image as ImageIcon, MapPinned, Sparkles, Wrench, X } from "lucide-react";
+import { ReactNode } from "react";
+import { Image as ImageIcon, MapPinned, Wrench } from "lucide-react";
 import type { VehicleVerdictReport } from "@ralph/shared";
 import { FindingTone } from "@ralph/shared";
-
-type DrawerId = "summary" | "reasons" | "noticed" | "repairs" | "budget" | "verify" | "expert";
+import { ListingGallery, type GalleryImageData } from "../../components/listing-gallery";
 
 type SectionProps = {
   id: string;
   title: string;
   subtitle: string;
-  actionLabel?: string;
-  onAction?: () => void;
   children: ReactNode;
   className?: string;
-};
-
-type AccordionProps = {
-  title: string;
-  children: ReactNode;
-  defaultOpen?: boolean;
 };
 
 
@@ -30,7 +21,7 @@ function money(value: unknown): string {
   return Number.isFinite(n) ? `£${n.toLocaleString("en-GB")}` : "—";
 }
 
-function SectionPanel({ id, title, subtitle, actionLabel = "See how Ralph got this", onAction, className, children }: SectionProps) {
+function SectionPanel({ id, title, subtitle, className, children }: SectionProps) {
   return (
     <section className={`report-panel ${className ?? ""}`} id={id}>
       <div className="report-panel-head">
@@ -38,247 +29,21 @@ function SectionPanel({ id, title, subtitle, actionLabel = "See how Ralph got th
           <h4>{title}</h4>
           <p>{subtitle}</p>
         </div>
-        {onAction ? (
-          <button className="report-drill-link" type="button" onClick={onAction} aria-label={`${actionLabel} for ${title}`}>
-            <span>{actionLabel}</span>
-            <ChevronRight size={16} aria-hidden="true" />
-          </button>
-        ) : null}
       </div>
       {children}
     </section>
   );
 }
 
-function DrawerAccordion({ title, defaultOpen, children }: AccordionProps) {
-  return (
-    <details className="report-accordion" open={defaultOpen}>
-      <summary>{title}</summary>
-      <div className="report-accordion-body">{children}</div>
-    </details>
-  );
-}
-
-function DrawerContent({ drawer, report, onJump }: { drawer: DrawerId; report: VehicleVerdictReport; onJump: (next: DrawerId) => void }) {
-  const { result } = report;
-  const drawerToc = [
-    { id: "reasons", label: "Reasons" },
-    { id: "repairs", label: "Repairs" },
-    { id: "budget", label: "Budget" },
-    { id: "verify", label: "Missing info" },
-  ] as const;
-
-  switch (drawer) {
-    case "summary":
-      return (
-        <div className="report-drawer-stack">
-          <div className="report-drawer-summary">
-            {result.summary}
-          </div>
-
-          <div className="report-drawer-toc">
-            {drawerToc.map((item) => (
-              <button key={item.id} type="button" onClick={() => onJump(item.id as any)} className="report-toc-chip">
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          <DrawerAccordion title="Why Ralph says this" defaultOpen>
-            <ul className="report-bullet-list">
-              {result.findings.map((reason, idx) => (
-                <li key={idx}>
-                  <strong>{reason.tone === FindingTone.Good ? "Helpful" : "Watch"}</strong>
-                  <span>{reason.title}</span>
-                </li>
-              ))}
-            </ul>
-          </DrawerAccordion>
-
-          <DrawerAccordion title="Repair allowance">
-            <p className="report-drawer-copy">
-              {result.runningCost.note}
-            </p>
-          </DrawerAccordion>
-
-          <DrawerAccordion title="Budget fit">
-            <p className="report-drawer-copy">
-              {result.budgetFit.note}
-            </p>
-          </DrawerAccordion>
-        </div>
-      );
-    case "reasons":
-      return (
-        <div className="report-drawer-stack">
-          <div className="report-drawer-summary">
-            Ralph's reason is a mix of vehicle uncertainty and money pressure. The report is not saying the car is broken; it is saying the visible clues do not justify loose bidding.
-          </div>
-          <div className="report-drawer-toc">
-            {drawerToc.map((item) => (
-              <button key={item.id} type="button" onClick={() => onJump(item.id as any)} className="report-toc-chip">
-                {item.label}
-              </button>
-            ))}
-          </div>
-          <div className="report-reason-list">
-            {result.findings.map((reason, idx) => (
-              <article key={idx} className="report-reason">
-                <span className={`report-severity ${reason.tone === FindingTone.Good ? 'helpful' : 'watch'}`}>
-                  {reason.tone === FindingTone.Good ? "Helpful" : "Watch"}
-                </span>
-                <strong>{reason.title}</strong>
-                <p>{reason.evidence}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      );
-    case "repairs":
-      return (
-        <div className="report-drawer-stack">
-          <div className="report-drawer-summary">
-            Ralph allowed a repair range rather than a quote because the photos can hint at work, but they cannot verify the full cost.
-          </div>
-          <DrawerAccordion title="What the allowance means" defaultOpen>
-            <p className="report-drawer-copy">
-              {result.runningCost.note}
-            </p>
-          </DrawerAccordion>
-        </div>
-      );
-    case "budget":
-      return (
-        <div className="report-drawer-stack">
-          <div className="report-drawer-summary">
-            Budget fit is only useful when it is tied back to the vehicle. Ralph keeps the surface simple and hides the arithmetic unless the user wants the rabbit hole.
-          </div>
-          <DrawerAccordion title="How Ralph interprets the budget" defaultOpen>
-            <p className="report-drawer-copy">
-              {result.budgetFit.note}
-            </p>
-          </DrawerAccordion>
-        </div>
-      );
-    case "verify":
-      return (
-        <div className="report-drawer-stack">
-          <div className="report-drawer-summary">
-            Ralph tells you what could not be verified because the missing information affects certainty, not because the report wants to sound cautious.
-          </div>
-          <DrawerAccordion title="What Ralph could not verify" defaultOpen>
-            <ul className="report-bullet-list">
-              {result.couldNotVerify.map((item, idx) => (
-                <li key={idx}>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </DrawerAccordion>
-        </div>
-      );
-    case "expert":
-      return (
-        <div className="report-drawer-stack">
-          <div className="report-drawer-summary">
-            Expert review is not the main verdict. It is the extra confidence layer when the photos leave a real judgement gap.
-          </div>
-          <DrawerAccordion title="Expert options" defaultOpen>
-            <div className="report-expert-options">
-              <button type="button" className="report-expert-btn">
-                Standard review <span>within 24h</span>
-              </button>
-              <button type="button" className="report-expert-btn primary">
-                Priority review <span>within 4h</span>
-              </button>
-            </div>
-          </DrawerAccordion>
-        </div>
-      );
-    default:
-      return null;
-  }
-}
-
-function Drawer({ drawer, report, onClose, onJump }: { drawer: DrawerId; report: VehicleVerdictReport; onClose: () => void; onJump: (next: DrawerId) => void }) {
-  return (
-    <div className="report-drawer-overlay" role="presentation" onClick={onClose}>
-      <aside
-        className="report-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Ralph report reasoning"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="report-drawer-grip" />
-        <header className="report-drawer-header">
-          <div>
-            <div className="report-drawer-kicker">See how Ralph got this</div>
-            <h3>
-              {drawer === "summary"
-                ? "Start here"
-                : drawer === "reasons"
-                  ? "Why Ralph says this"
-                  : drawer === "repairs"
-                    ? "Repair allowance Ralph used"
-                    : drawer === "budget"
-                      ? "Budget fit"
-                      : drawer === "verify"
-                        ? "What Ralph could not verify"
-                        : "Expert review"}
-            </h3>
-          </div>
-          <button type="button" className="report-drawer-close" onClick={onClose}>
-            <X size={16} aria-hidden="true" />
-            <span>Close</span>
-          </button>
-        </header>
-
-        <DrawerContent drawer={drawer} report={report} onJump={onJump} />
-      </aside>
-    </div>
-  );
-}
-
-function ReportPhotoFrame() {
-  return (
-    <figure className="report-photo-tile report-photo-tile-hero">
-      <div className="report-photo-tile-art">
-        <div className="report-photo-body" />
-        <div className="report-photo-wheels">
-          <span />
-          <span />
-        </div>
-        <div className="report-photo-window" />
-        <div className="report-photo-glow" />
-      </div>
-    </figure>
-  );
-}
-
-export function VerdictReport({ report, onReset }: { report: VehicleVerdictReport; onReset: () => void }) {
-  const [activeDrawer, setActiveDrawer] = useState<DrawerId | null>(null);
-
-  useEffect(() => {
-    if (!activeDrawer) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setActiveDrawer(null);
-      }
-    };
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [activeDrawer]);
-
+export function VerdictReport({ report }: { report: VehicleVerdictReport; onReset?: () => void }) {
   const { result, profile, request } = report;
+
+  // Real vehicle photos: prefer the scraped listing, fall back to the buyer's
+  // manually uploaded shots.
+  const galleryImages: GalleryImageData[] =
+    ((report.listing?.images as GalleryImageData[] | undefined)?.length
+      ? (report.listing!.images as GalleryImageData[])
+      : (request.manual?.images as GalleryImageData[] | undefined)) ?? [];
 
   const title =
     [profile?.identity.yearOfManufacture, profile?.identity.make, profile?.identity.model].filter(Boolean).join(" ") ||
@@ -304,11 +69,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
 
   return (
     <div className="flex flex-col gap-5 pb-12">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-foreground">Your MOT Check</h1>
-        <button onClick={onReset} className="text-sm font-bold text-[var(--blue)] hover:underline">Check another</button>
-      </div>
-
       <article className="report-artifact" aria-label="Ralph report">
         <div className="report-shell">
           <div className="report-main">
@@ -321,7 +81,7 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
                     <span>Listing photo used</span>
                   </div>
                 )}
-                <ReportPhotoFrame />
+                <ListingGallery images={galleryImages} alt={title} />
               </div>
 
               <div className="report-hero-copy">
@@ -357,12 +117,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
                     </div>
                   ))}
                 </div>
-
-                <button type="button" className="report-hero-drill" onClick={() => setActiveDrawer("summary")}>
-                  <Sparkles size={16} aria-hidden="true" />
-                  <span>See how Ralph got this</span>
-                  <ArrowRight size={16} aria-hidden="true" />
-                </button>
               </div>
             </section>
 
@@ -425,7 +179,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
                   id="report-reasons"
                   title="Why Ralph says this"
                   subtitle="The reasons behind the verdict"
-                  onAction={() => setActiveDrawer("reasons")}
                 >
                   <div className="report-reason-list">
                     {result.findings.map((reason, idx) => (
@@ -445,7 +198,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
                 id="report-repairs"
                 title="Repair allowance Ralph used"
                 subtitle="What Ralph allowed for, not a quote"
-                onAction={() => setActiveDrawer("repairs")}
               >
                 <div className="report-repair-panel">
                   <div className="report-repair-range">
@@ -462,7 +214,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
                   id="report-verify"
                   title="What Ralph could not verify"
                   subtitle="The missing bits that affect certainty"
-                  onAction={() => setActiveDrawer("verify")}
                 >
                   <ul className="report-check-list">
                     {result.couldNotVerify.map((item, idx) => (
@@ -491,7 +242,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
                 id="report-expert"
                 title="Expert review"
                 subtitle="Only where the uncertainty really matters"
-                onAction={() => setActiveDrawer("expert")}
                 className="span-2"
               >
                 <div className="report-expert-surface">
@@ -525,15 +275,6 @@ export function VerdictReport({ report, onReset }: { report: VehicleVerdictRepor
           </div>
         </div>
       </article>
-
-      {activeDrawer ? (
-        <Drawer
-          drawer={activeDrawer}
-          report={report}
-          onClose={() => setActiveDrawer(null)}
-          onJump={(next) => setActiveDrawer(next)}
-        />
-      ) : null}
     </div>
   );
 }

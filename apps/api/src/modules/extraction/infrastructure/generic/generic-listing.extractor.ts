@@ -13,6 +13,7 @@ import { buildGenericListingSnapshot } from "./generic-snapshot.mapper";
 import { reduceListingPage } from "./html-reducer";
 
 const EXTRACTION_MODEL_FALLBACK = "gpt-4.1-mini";
+const EXTRACTION_OLLAMA_MODEL_FALLBACK = "llama3.2";
 const EXTRACTION_MAX_OUTPUT_TOKENS = 1200;
 const EXTRACTION_RESPONSE_NAME = "listing_extraction";
 
@@ -64,6 +65,70 @@ export class GenericListingExtractor implements PlatformListingExtractor {
     }
 
     private async runExtraction(listingUrl: string, pageText: string, imageCandidates: string[]) {
+        const hasOllama = Boolean(this.config.get<string>("OLLAMA_URL"));
+        
+        if (hasOllama) {
+            try {
+                return await this.runOllamaExtraction(listingUrl, pageText, imageCandidates);
+            } catch (err) {
+                this.logger.warn(`Ollama generic extraction failed, falling back to OpenAI: ${err}`);
+            }
+        }
+
+        return await this.runOpenAiExtraction(listingUrl, pageText, imageCandidates);
+    }
+
+    private async runOllamaExtraction(listingUrl: string, pageText: string, imageCandidates: string[]) {
+        const ollamaUrl = this.config.getOrThrow<string>("OLLAMA_URL").replace(/\/$/, "");
+        const apiKey = this.config.get<string>("OLLAMA_API_KEY");
+        const model = this.config.get<string>("OLLAMA_MODEL") ?? EXTRACTION_OLLAMA_MODEL_FALLBACK;
+        const jsonSchema = z.toJSONSchema(genericExtractionSchema) as Record<string, unknown>;
+        const userPayload = JSON.stringify({ listingUrl, pageText, imageCandidates }, null, 2);
+
+        const response = await fetch(`${ollamaUrl}/api/chat`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+            },
+            body: JSON.stringify({
+                model,
+                stream: false,
+                format: jsonSchema,
+                messages: [
+                    { role: "system", content: EXTRACTION_INSTRUCTIONS },
+                    { role: "user", content: userPayload },
+                ],
+                options: {
+                    num_predict: EXTRACTION_MAX_OUTPUT_TOKENS,
+                    temperature: 0.1,
+                },
+            }),
+        });
+
+        if (!response.ok) {
+            const bodyText = await response.text().catch(() => "");
+            throw new AppError(`Ollama returned ${response.status} for extraction.`, 502, "OLLAMA_EXTRACTION_FAILED", bodyText.slice(0, 500));
+        }
+
+        const payload = (await response.json()) as any;
+        const text = payload.message?.content;
+        
+        if (!text) {
+            throw new AppError("Ollama returned an empty extraction response.", 502, "OLLAMA_EMPTY_RESPONSE");
+        }
+
+        try {
+            return genericExtractionSchema.parse(JSON.parse(text));
+        } catch (error) {
+            if (error instanceof SyntaxError) {
+                throw new AppError("Ollama returned malformed JSON for listing extraction.", 502, "OLLAMA_INVALID_JSON", error.message);
+            }
+            throw new AppError("Ollama returned a payload that did not match the extraction schema.", 502, "OLLAMA_INVALID_SCHEMA", error instanceof Error ? error.message : String(error));
+        }
+    }
+
+    private async runOpenAiExtraction(listingUrl: string, pageText: string, imageCandidates: string[]) {
         if (!this.openai) {
             throw new AppError("OpenAI listing extraction is not configured. Set OPENAI_API_KEY in apps/api/.env.", 500, "OPENAI_NOT_CONFIGURED");
         }
@@ -101,6 +166,7 @@ export class GenericListingExtractor implements PlatformListingExtractor {
                 throw error;
             }
             const message = error instanceof Error ? error.message : "Unknown extraction error.";
+            console.error("OpenAI Extraction Error:", error);
             throw new AppError("Unable to extract the listing.", 502, "EXTRACTION_FAILED", message);
         }
     }

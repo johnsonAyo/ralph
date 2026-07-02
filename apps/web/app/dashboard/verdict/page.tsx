@@ -24,19 +24,17 @@ import { type ManualDraft } from "./verdict-manual-form";
 import { ManualConfirm } from "./verdict-manual-confirm";
 import { type LinkSubmitData } from "./verdict-link-form";
 import { VerdictReport } from "./verdict-report";
-import { VerdictReportOld } from "./verdict-report-old";
 import ConfirmListing from "../../components/check-form/confirm-listing";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import { useReport } from "../../lib/use-report";
 import { API_BASE_URL } from "../../constants";
 
-type Step = "source" | "reg" | "details" | "confirm-listing" | "confirm-manual";
+type Step = "basics" | "details" | "confirm-listing" | "confirm-manual";
 
-const STEP_LABELS = ["Source", "Registration", "Details"] as const;
+const STEP_LABELS = ["Vehicle Basics", "Details"] as const;
 function stepIndex(step: Step): number {
-  if (step === "source") return 0;
-  if (step === "reg") return 1;
-  return 2; // details + both confirm stages
+  if (step === "basics") return 0;
+  return 1; // details + both confirm stages
 }
 
 function parseSource(value: string | null): VehicleSourceType | undefined {
@@ -54,8 +52,8 @@ function VerdictPageInner() {
   const prefillUrl = searchParams.get("url") ?? undefined;
   const prefillSource = parseSource(searchParams.get("source"));
 
-  // If a source is deep-linked we skip straight to the reg question.
-  const [step, setStep] = useState<Step>(prefillSource ? "reg" : "source");
+  // If a source is deep-linked we skip straight to the reg question by just having it prefilled.
+  const [step, setStep] = useState<Step>("basics");
   const [sourceType, setSourceType] = useState<VehicleSourceType | null>(prefillSource ?? null);
   const [registration, setRegistration] = useState<string | undefined>(prefillReg);
 
@@ -111,7 +109,18 @@ function VerdictPageInner() {
       const mockReport: VehicleVerdictReport = {
         id: "mock-123",
         sources: [AnalysisSource.Manual],
-        request,
+        // TEMP: sample photos so the report carousel is visible during styling.
+        request: {
+          ...request,
+          manual: {
+            ...(request.manual ?? {}),
+            images: [
+              { fullUrl: "https://picsum.photos/seed/ralphcar1/1200/900" },
+              { fullUrl: "https://picsum.photos/seed/ralphcar2/1200/900" },
+              { fullUrl: "https://picsum.photos/seed/ralphcar3/1200/900" },
+            ],
+          },
+        },
         result: {
           verdict: VehicleVerdictCode.ConsiderWithCaution,
           confidence: "medium" as any,
@@ -137,9 +146,6 @@ function VerdictPageInner() {
       };
       
       setReport(mockReport);
-      if (mockReport.id) {
-        window.history.replaceState(null, "", `/dashboard/verdict?id=${mockReport.id}`);
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
@@ -151,7 +157,6 @@ function VerdictPageInner() {
   const handleSelectSource = (source: VehicleSourceType) => {
     setSourceType(source);
     setError("");
-    setStep("reg");
   };
 
   // --- Step 2: registration ---
@@ -170,7 +175,7 @@ function VerdictPageInner() {
       try {
         const listing = await authedPost<ListingSnapshot>("/vehicle/preview-listing", { listingUrl: data.listingUrl });
         setFetchedListing(listing);
-        setPending({ totalBudget: data.totalBudget, askingPrice: data.askingPrice });
+        setPending({ totalBudget: data.totalBudget, askingPrice: undefined });
         setStep("confirm-listing");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Couldn't fetch that listing. Check the link or enter details manually.");
@@ -183,7 +188,7 @@ function VerdictPageInner() {
         sourceType,
         registration,
         totalBudget: data.totalBudget,
-        askingPrice: data.askingPrice,
+        askingPrice: undefined,
       });
     }
   };
@@ -219,7 +224,7 @@ function VerdictPageInner() {
   const handleReset = () => {
     setReport(null);
     setError("");
-    setStep(prefillSource ? "reg" : "source");
+    setStep("basics");
     setSourceType(prefillSource ?? null);
     setRegistration(prefillReg);
     setFetchedListing(null);
@@ -256,17 +261,8 @@ function VerdictPageInner() {
     }
     return (
       <div className="dashboard-page">
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="flex flex-col gap-12 xl:flex-row xl:gap-8">
-            <div className="flex-1 min-w-0">
-              <h2 className="mb-4 text-xl font-bold border-b pb-2">Old Design</h2>
-              <VerdictReportOld report={savedReport} onReset={handleReset} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="mb-4 text-xl font-bold border-b pb-2">New Design</h2>
-              <VerdictReport report={savedReport} onReset={handleReset} />
-            </div>
-          </div>
+        <div className="mx-auto w-full max-w-5xl">
+          <VerdictReport report={savedReport} onReset={handleReset} />
         </div>
       </div>
     );
@@ -276,17 +272,8 @@ function VerdictPageInner() {
   if (report) {
     return (
       <div className="dashboard-page">
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="flex flex-col gap-12 xl:flex-row xl:gap-8">
-            <div className="flex-1 min-w-0">
-              <h2 className="mb-4 text-xl font-bold border-b pb-2">Old Design</h2>
-              <VerdictReportOld report={report} onReset={handleReset} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="mb-4 text-xl font-bold border-b pb-2">New Design</h2>
-              <VerdictReport report={report} onReset={handleReset} />
-            </div>
-          </div>
+        <div className="mx-auto w-full max-w-5xl">
+          <VerdictReport report={report} onReset={handleReset} />
         </div>
       </div>
     );
@@ -296,16 +283,16 @@ function VerdictPageInner() {
 
   return (
     <div className="dashboard-page">
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto w-full max-w-5xl">
         {/* Progress stepper */}
-        <ol className="mb-6 flex items-center gap-2">
+        <ol className="mb-12 flex items-center justify-center gap-4 max-w-4xl mx-auto w-full">
           {STEP_LABELS.map((label, i) => {
             const done = i < current;
             const active = i === current;
             return (
               <li key={label} className="flex flex-1 items-center gap-2 last:flex-none">
                 <span
-                  className={`grid size-6 shrink-0 place-items-center rounded-full text-[0.72rem] font-[900] transition ${
+                  className={`grid size-8 shrink-0 place-items-center rounded-full text-[var(--font-label)] font-[900] transition ${
                     done
                       ? "bg-[var(--blue)] text-white"
                       : active
@@ -313,10 +300,10 @@ function VerdictPageInner() {
                         : "border border-[var(--line)] text-[var(--muted)]"
                   }`}
                 >
-                  {done ? <Check className="size-3.5" aria-hidden /> : i + 1}
+                  {done ? <Check className="size-4" aria-hidden /> : i + 1}
                 </span>
                 <span
-                  className={`text-[0.8rem] font-[800] ${
+                  className={`text-[var(--font-body)] font-[800] ${
                     active ? "text-foreground" : "text-[var(--muted)]"
                   }`}
                 >
@@ -330,17 +317,22 @@ function VerdictPageInner() {
           })}
         </ol>
 
-        {step === "source" && (
-          <SourceStep selected={sourceType ?? undefined} onSelect={handleSelectSource} />
-        )}
-
-        {step === "reg" && sourceType && (
-          <RegStep
-            sourceType={sourceType}
-            initialReg={registration}
-            onBack={() => setStep("source")}
-            onContinue={handleRegContinue}
-          />
+        {step === "basics" && (
+          <div className="flex flex-col gap-12">
+            <SourceStep
+              selected={sourceType ?? undefined}
+              onSelect={handleSelectSource}
+            />
+            {sourceType && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <RegStep
+                  sourceType={sourceType}
+                  initialReg={registration}
+                  onContinue={handleRegContinue}
+                />
+              </div>
+            )}
+          </div>
         )}
 
         {step === "details" && sourceType && (
@@ -353,7 +345,7 @@ function VerdictPageInner() {
             error={error}
             onSubmitLink={handleSubmitLink}
             onReviewManual={handleReviewManual}
-            onBack={() => setStep("reg")}
+            onBack={() => setStep("basics")}
           />
         )}
 
